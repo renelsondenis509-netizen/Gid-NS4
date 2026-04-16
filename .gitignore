@@ -1,1 +1,10 @@
 node_modules/
+# Fichiers secrets (IMPORTANT !)
+   .env
+   .env.local
+   
+   # Fichiers de build et cache
+   dist/
+   .vite/
+
+
