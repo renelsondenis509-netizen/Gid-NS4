@@ -1,6 +1,6 @@
 import { BottomNav } from "../components/UI";
 
-function PartnerScreen({ onBack, onNavigate }) {
+export function PartnerScreen({ onBack, onNavigate }) {
   // ─── SVG ICONS (Components) ──────────────────────────────────────────────
   const SchoolIcon = () => (
     <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#fbbf24" }}>

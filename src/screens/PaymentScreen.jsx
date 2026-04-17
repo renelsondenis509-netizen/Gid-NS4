@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { callEdge } from "../api";
 
-function PaymentScreen({ onBack }) {
+export function PaymentScreen({ onBack }) {
   const [payments, setPayments] = useState([]);
   const [copied, setCopied] = useState(null);
   const [loading, setLoading] = useState(true);
