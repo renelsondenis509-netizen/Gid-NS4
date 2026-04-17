@@ -54,7 +54,7 @@ ${Object.entries(stats.subjectBreakdown || {})
   }
 };
 
-function DashboardScreen({ onBack, userCode }) {
+export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
   const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState("");
