@@ -4,7 +4,7 @@ import { idbGetScans, idbDeleteScan } from "../utils/idb";
 import { LatexText } from "../components/LatexText";
 import { BottomNav } from "../components/UI";
 
-function HistoryScreen({ user, onNavigate }) {
+export function HistoryScreen({ user, onNavigate }) {
   const [history, setHistory] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);

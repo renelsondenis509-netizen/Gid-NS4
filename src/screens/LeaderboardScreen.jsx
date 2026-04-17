@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { callEdge, parseApiError } from "../api";
 import { BottomNav } from "../components/UI";
 
-function LeaderboardScreen({ user, onNavigate }) {
+export function LeaderboardScreen({ user, onNavigate }) {
   const [tab, setTab] = useState("bestNote");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

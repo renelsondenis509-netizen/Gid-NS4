@@ -1,7 +1,7 @@
 import { APP_LOGO } from "../config";
 import { BottomNav } from "../components/UI";
 
-function MenuScreen({ user, onNavigate, onLogout }) {
+export function MenuScreen({ user, onNavigate, onLogout }) {
   // ─── SVG ICONS ───────────────────────────────────────────────────────────
   const KeyIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#6B8ADB" }}>
