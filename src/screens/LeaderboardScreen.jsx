@@ -108,7 +108,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
               <div className="flex items-end justify-center gap-3 py-4" style={{ animation:"fadeIn .5s ease both" }}>
                 {[1,0,2].map(rank => {
                   const entry = board[rank];
-                  const heights = [80,100,65];
+                  const heights = [100,80,65];
                   return (
                     <div key={rank} style={{ display:"flex", flexDirection:"column", alignItems:"center", flex:1 }}>
                       <div style={{ marginBottom:6 }}><Medal rank={rank}/></div>
