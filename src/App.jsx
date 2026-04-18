@@ -21,10 +21,10 @@ export default function App() {
     if (saved?.phone && saved?.code) setUser(saved);
   }, []);
 
-  const handleLogin = (u) => { sessionSave(u); setUser(u); setScreen("chat"); };
-  const handleLogout = () => { sessionClear(); setUser(null); setScreen("login"); };
+  const handleLogin  = (u) => { sessionSave(u); setUser(u); setScreen("chat"); };
+  const handleLogout = ()  => { sessionClear(); setUser(null); setScreen("login"); };
 
-  if (screen === "splash")      return <SplashScreen onDone={() => { const s=sessionLoad(); setScreen(s?.phone&&s?.code?"chat":"login"); }} />;
+  if (screen === "splash")      return <SplashScreen onDone={() => { const s=sessionLoad(); if(s?.phone&&s?.code){setUser(s);setScreen("chat");}else{setScreen("login");} }} />;
   if (screen === "login")       return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
   if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} />;
   if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
@@ -34,12 +34,5 @@ export default function App() {
   if (screen === "payment")     return <PaymentScreen onBack={() => nav(user?"menu":"login")} />;
   if (screen === "dashboard")   return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} />;
   if (screen === "partner")     return <PartnerScreen onBack={() => nav(user?"menu":"login")} />;
+  return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
 }
-
-// Exports nommés pour les tests
-export { parseApiError } from "./api";
-export { scoreToNote20, getMention, getQuizGrades, saveQuizGrade } from "./utils/quiz";
-export { idbSaveScan, idbGetScans, idbDeleteScan } from "./utils/idb";
-export { LoginScreen }   from "./screens/LoginScreen";
-export { ChatScreen }    from "./screens/ChatScreen";
-export { QuizScreen }    from "./screens/QuizScreen";

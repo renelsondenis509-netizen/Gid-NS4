@@ -1,4 +1,3 @@
-src/screens/ChatScreen.jsx
 import { useState, useRef, useEffect } from "react";
 import { APP_LOGO, PROF_LAKAY_PHOTO } from "../config";
 import { callEdge, parseApiError } from "../api";
