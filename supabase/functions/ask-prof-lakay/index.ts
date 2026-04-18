@@ -351,6 +351,25 @@ async function validateCode(
 }
 
 // ─── ACTION : ask ─────────────────────────────────────────────────────────────
+async function hashMessage(msg: string): Promise<string> {
+  const normalized = msg.toLowerCase().trim().replace(/\s+/g, " ");
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("").slice(0,16);
+}
+
+async function getCached(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string|null> {
+  const { data } = await db.from("question_cache").select("id, answer, hit_count").eq("subject", subject).eq("question_hash", hash).maybeSingle();
+  if (!data) return null;
+  await db.from("question_cache").update({ hit_count: data.hit_count + 1 }).eq("id", data.id);
+  return data.answer;
+}
+
+async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string) {
+  await db.from("question_cache").upsert(
+    { subject, question_hash: hash, question, answer },
+    { onConflict: "subject,question_hash" }
+  );
+}
 async function processAsk(
   db: ReturnType<typeof createClient>,
   gemini: typeof callGemini,
@@ -411,7 +430,19 @@ Sois concis et va à l'essentiel — les élèves lisent sur téléphone.`;
 
   const fullPrompt = `${systemPrompt}\n\n${historyText ? `Contexte récent:\n${historyText}\n\n` : ""}Élève: ${message}`;
 
-  const reply = await gemini(fullPrompt, imageBase64);
+let reply: string;
+if (!imageBase64) {
+  const hash = await hashMessage(message);
+  const cached = await getCached(db, subject, hash);
+  if (cached) {
+    reply = cached;
+  } else {
+    reply = await gemini(fullPrompt, imageBase64);
+    await saveCache(db, subject, hash, message, reply);
+  }
+} else {
+  reply = await gemini(fullPrompt, imageBase64);
+}
 
   await db.from("scans").insert({
     phone,
