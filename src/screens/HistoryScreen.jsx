@@ -4,6 +4,16 @@ import { idbGetScans, idbDeleteScan } from "../utils/idb";
 import { LatexText } from "../components/LatexText";
 import { BottomNav } from "../components/UI";
 
+const IcoClipboard = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>;
+const IcoDatabase = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>;
+const IcoWarning = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+const IcoCamera = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>;
+const IcoChat = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
+const IcoChart = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
+const IcoInbox = () => <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>;
+const IcoTrash = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>;
+const IcoLoader = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{animation:"spin 1s linear infinite"}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
+
 export function HistoryScreen({ user, onNavigate }) {
   const [history, setHistory] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -40,28 +50,31 @@ export function HistoryScreen({ user, onNavigate }) {
         <button onClick={() => handleDelete(selected)} disabled={deleting === selected.id}
           className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
           style={{ background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
-          {deleting === selected.id ? "⏳" : "🗑️"} Efase
+          {deleting === selected.id ? <IcoLoader /> : <IcoTrash />} Efase
         </button>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {!selected._fallback ? (
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#14532d22", border: "1px solid #22c55e22" }}>
-            <span>🗄️</span>
-            <span className="text-green-300 text-xs">Stocké dans IndexedDB • Image disponible hors-ligne</span>          </div>
+            <span style={{ color:"#86efac" }}><IcoDatabase /></span>
+            <span className="text-green-300 text-xs">Stocké dans IndexedDB • Image disponible hors-ligne</span>
+          </div>
         ) : (
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#78350f22", border: "1px solid #f59e0b22" }}>
-            <span>⚠️</span>
+            <span style={{ color:"#fcd34d" }}><IcoWarning /></span>
             <span className="text-yellow-300 text-xs">Mode fallback — image non disponible hors-ligne</span>
           </div>
         )}
         {selected.image ? (
           <div>
-            <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2">📷 Imaj ki analize</p>
+            <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">
+              <IcoCamera /> Imaj ki analize
+            </p>
             <img src={selected.image} alt="scan" className="w-full rounded-2xl object-contain max-h-56" style={{ border: "1px solid #1e3a8a44" }} />
           </div>
         ) : (
           <div className="rounded-2xl px-4 py-3 flex items-center gap-3" style={{ background: "#1e3a8a11", border: "1px solid #1e3a8a22" }}>
-            <span>💬</span>
+            <IcoChat />
             <span className="text-blue-600 text-xs">Kesyon tèks — pa gen imaj</span>
           </div>
         )}
@@ -88,15 +101,16 @@ export function HistoryScreen({ user, onNavigate }) {
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
       <div className="px-4 py-4 border-b" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
-        <h2 className="text-white font-bold">📋 Istwa Scan Ou</h2>
+        <h2 className="text-white font-bold flex items-center gap-2"><IcoClipboard /> Istwa Scan Ou</h2>
         <div className="flex items-center gap-3 mt-0.5">
           <p className="text-blue-400 text-xs">{history.length} scan{history.length !== 1 ? "s" : ""} total</p>
-          <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "#14532d22", color: "#86efac", border: "1px solid #22c55e22" }}>
-            🗄️ IndexedDB • hors-ligne
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1" style={{ background: "#14532d22", color: "#86efac", border: "1px solid #22c55e22" }}>
+            <IcoDatabase /> IndexedDB • hors-ligne
           </span>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">        {loading && (
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {loading && (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="flex gap-2">
               {[0,1,2].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-blue-400" style={{ animation: `bounce 1s ${i*0.2}s infinite` }} />)}
@@ -106,7 +120,7 @@ export function HistoryScreen({ user, onNavigate }) {
         )}
         {!loading && Object.keys(dailyMap).length > 0 && (
           <div className="rounded-2xl p-4" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
-            <h3 className="text-white font-bold text-sm mb-3">📊 Scan pa Jou</h3>
+            <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2"><IcoChart /> Scan pa Jou</h3>
             <div className="space-y-2">
               {Object.entries(dailyMap).slice(0, 7).map(([day, count]) => (
                 <div key={day} className="flex items-center gap-3">
@@ -122,7 +136,7 @@ export function HistoryScreen({ user, onNavigate }) {
         )}
         {!loading && history.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
-            <span style={{ fontSize: 56 }}>📭</span>
+            <IcoInbox />
             <p className="text-blue-400 text-center text-sm">Pa gen istwa encore.<br />Fè premye scan ou nan Chat !</p>
             <button onClick={() => onNavigate("chat")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
               style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>→ Ale nan Chat</button>
@@ -139,13 +153,14 @@ export function HistoryScreen({ user, onNavigate }) {
                       <img src={h.image} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" style={{ border: "1px solid #1e3a8a44" }} />
                     ) : (
                       <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#1e3a8a33" }}>
-                        <span style={{ fontSize: 24 }}>💬</span>
+                        <IcoChat />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#d4002a22", color: "#ff8080" }}>{h.subject}</span>
-                        {h.image && <span className="text-green-700 text-xs">🗄️</span>}                      </div>
+                        {h.image && <span style={{ color:"#86efac" }}><IcoDatabase /></span>}
+                      </div>
                       <p className="text-xs leading-relaxed" style={{ color: "#93c5fd", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                         {h.response?.slice(0, 100)}...
                       </p>
@@ -156,9 +171,9 @@ export function HistoryScreen({ user, onNavigate }) {
                 </button>
                 <div className="px-4 pb-3 flex justify-end">
                   <button onClick={() => handleDelete(h)} disabled={deleting === h.id}
-                    className="px-3 py-1 rounded-lg text-xs font-semibold"
+                    className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
                     style={{ background: "#d4002a15", color: "#ff8080", border: "1px solid #d4002a22" }}>
-                    {deleting === h.id ? "⏳" : "🗑️ Efase"}
+                    {deleting === h.id ? <IcoLoader /> : <IcoTrash />} Efase
                   </button>
                 </div>
               </div>
