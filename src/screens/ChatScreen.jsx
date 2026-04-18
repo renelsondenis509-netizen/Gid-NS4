@@ -124,27 +124,32 @@ export function ChatScreen({ user, onNavigate }) {
             <span style={{ color:"#22C55E", fontSize:11, fontWeight:500 }}>En ligne</span>
           </div>
         </div>
-        <div style={{ display:"flex", gap:6 }}>
-          {/* Card image */}
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:imgDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${imgDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:48 }}>
-            <div style={{ display:"flex", gap:2 }}>
-              {Array.from({ length:IMG_MAX }).map((_,i) => (
-                <span key={i} style={{ fontSize:15, opacity:i<imgUsed?0.2:1, filter:i<imgUsed?"grayscale(1)":"none" }}>📷</span>
-              ))}
-            </div>
-            <span style={{ fontSize:8, fontWeight:700, marginTop:2, color:imgDone?"#3B4A6B":"#60A5FA" }}>{imgDone?"✓ Itilize":`${IMG_MAX-imgUsed} scan`}</span>
-          </div>
-          {/* Card texte */}
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:textDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${textDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:60 }}>
-            <div style={{ display:"flex", gap:2 }}>
-              {Array.from({ length:TEXT_MAX }).map((_,i) => (
-                <span key={i} style={{ fontSize:12, opacity:i<textUsed?0.2:1, filter:i<textUsed?"grayscale(1)":"none" }}>🖋️</span>
-              ))}
-            </div>
-            <span style={{ fontSize:8, fontWeight:700, marginTop:2, color:textDone?"#3B4A6B":"#60A5FA" }}>{textDone?"✓ Fini":`${TEXT_MAX-textUsed} kesyon`}</span>
-          </div>
-        </div>
-      </div>
+       <div style={{ display:"flex", gap:6 }}>
+  {/* Tokens image */}
+  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:imgDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${imgDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
+    <div style={{ display:"flex", gap:3, marginBottom:3 }}>
+      {Array.from({ length:5 }).map((_,i) => {
+        const filled = i < Math.round((imgUsed/IMG_MAX)*5);
+        return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#E8002A":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #E8002A88":"none", transition:"all .3s" }} />;
+      })}
+    </div>
+    <span style={{ fontSize:9, fontWeight:700, color:imgDone?"#3B4A6B":"#60A5FA" }}>
+      {imgDone?"✓ Fini":`${IMG_MAX-imgUsed}/${IMG_MAX} 📷`}
+    </span>
+  </div>
+  {/* Tokens texte */}
+  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:textDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${textDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
+    <div style={{ display:"flex", gap:3, marginBottom:3 }}>
+      {Array.from({ length:5 }).map((_,i) => {
+        const filled = i < Math.round((textUsed/TEXT_MAX)*5);
+        return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#2563EB":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #2563EB88":"none", transition:"all .3s" }} />;
+      })}
+    </div>
+    <span style={{ fontSize:9, fontWeight:700, color:textDone?"#3B4A6B":"#60A5FA" }}>
+      {textDone?"✓ Fini":`${TEXT_MAX-textUsed}/${TEXT_MAX} 🖋️`}
+    </span>
+  </div>
+</div>
       {/* TABS */}
       <div style={{ padding:"8px 14px", display:"flex", gap:8, overflowX:"auto", background:"rgba(10,15,46,0.92)", borderBottom:"1px solid rgba(255,255,255,0.05)", scrollbarWidth:"none" }}>
         {user.subjects.map((s,i) => (
