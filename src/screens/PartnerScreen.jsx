@@ -73,10 +73,10 @@ export function PartnerScreen({ onBack, onNavigate }) {
 
   // ─── AVANTAGES PARTENARIAT ───────────────────────────────────────────────
   const benefits = [
-    { icon: <KeyIcon />, title: "Kòd lekòl pèsonalize", desc: "Chak elèv resevwa yon kòd inik pou aksede" },
-    { icon: <SlidersIcon />, title: "Kontwòl total", desc: "Chwazi matyè, limit scan, ak dire abònman" },
+    { icon: <KeyIcon />, title: "Kòd lekòl pèsonalize", desc: "Chak elèv resevwa yon kòd inik pou gen aksè" },
+    { icon: <SlidersIcon />, title: "Kontwòl total", desc: "Tout matyè yo disponib ak dire abònman" },
     { icon: <UsersIcon />, title: "Jiska 500 elèv", desc: "Jere tout klas nan yon sèl tablodbò" },
-    { icon: <BookOpenIcon />, title: "14 matyè NS4", desc: "Sipò konplè pou program Ministè a" },
+    { icon: <BookOpenIcon />, title: "Tout matyè NS4 yo", desc: "Sipò konplè pou program Ministè a" },
     { icon: <TrophyIcon />, title: "Rapò detaye", desc: "Swiv pwogrè elèv yo an tan reyèl" },
     { icon: <ShieldLockIcon />, title: "Done pwoteje", desc: "Chifreman ak konfòmite done elèv yo" },
   ];
@@ -93,7 +93,7 @@ export function PartnerScreen({ onBack, onNavigate }) {
         <div className="text-center py-4">
           <SchoolIcon />
           <h3 className="text-white font-bold text-xl mt-4">Rejwenn Gid-NS4</h3>
-          <p className="text-blue-400 text-sm mt-2">Ofri yon asistan IA pwofesyonèl a tout elèv ou yo</p>
+          <p className="text-blue-400 text-sm mt-2">Ofri yon asistan IA pwofesyonèl a tout elèv ou yo 24/24, 7/7</p>
         </div>
 
         {/* Avantages */}        <div className="space-y-3">
@@ -117,7 +117,7 @@ export function PartnerScreen({ onBack, onNavigate }) {
 
         {/* Note légale */}
         <p className="text-blue-800 text-xs text-center px-4">
-          * Abònman lekòl kòmanse a 50 elèv. Kontak dirèk pou tarif espesyal.
+          * Kontakte dirèkteman responsab yo pou jwenn yon abònman.
         </p>
       </div>
       <BottomNav active="menu" onNavigate={onNavigate} />
