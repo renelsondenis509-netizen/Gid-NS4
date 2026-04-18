@@ -150,6 +150,7 @@ export function ChatScreen({ user, onNavigate }) {
     </span>
   </div>
 </div>
+      </div>
       {/* TABS */}
       <div style={{ padding:"8px 14px", display:"flex", gap:8, overflowX:"auto", background:"rgba(10,15,46,0.92)", borderBottom:"1px solid rgba(255,255,255,0.05)", scrollbarWidth:"none" }}>
         {user.subjects.map((s,i) => (
