@@ -42,7 +42,7 @@ async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Pro
       "Authorization": `Bearer ${OPENROUTER_KEY}`,
     },
     body: JSON.stringify({
-      model: "openrouter/free",
+      model: "google/gemini-2.0-flash-lite-001",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent },
