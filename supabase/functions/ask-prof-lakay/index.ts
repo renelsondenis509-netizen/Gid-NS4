@@ -309,6 +309,8 @@ const { data: isTeacher } = await db
   .eq("phone", phone)
   .maybeSingle();
 
+console.log("🔍 isTeacher:", isTeacher, "phone:", phone, "schoolCode:", schoolCode);
+
 if (!isTeacher) {
   const { data: existingOtherSchool } = await db
     .from("profiles")
@@ -321,6 +323,9 @@ if (!isTeacher) {
     return { valid: false, reason: "Nimewo sa a deja anrejistre ak yon lòt kòd. Kontakte direksyon lekòl ou." };
   }
 }
+
+console.log("🔍 existingOtherSchool:", existingOtherSchool);
+
   const { count: studentCount } = await db
     .from("profiles")
     .select("*", { count: "exact", head: true })
