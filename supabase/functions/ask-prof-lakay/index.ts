@@ -365,11 +365,14 @@ async function getCached(db: ReturnType<typeof createClient>, subject: string, h
 }
 
 async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string) {
-  await db.from("question_cache").upsert(
+  const { error } = await db.from("question_cache").upsert(
     { subject, question_hash: hash, question, answer },
     { onConflict: "subject,question_hash" }
   );
+  if (error) console.error("❌ saveCache error:", JSON.stringify(error));
+  else console.log("✅ Cache saved:", subject, hash);
 }
+
 async function processAsk(
   db: ReturnType<typeof createClient>,
   gemini: typeof callGemini,
