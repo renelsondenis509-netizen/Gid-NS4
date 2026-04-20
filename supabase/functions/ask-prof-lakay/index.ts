@@ -303,6 +303,24 @@ async function validateCode(
   const starts = new Date(school.starts_at);
   if (now < starts) return { valid: false, reason: "Kòd sa a poko aktif. Kontakte lekòl ou." };
 
+const { data: isTeacher } = await db
+  .from("teachers")
+  .select("phone")
+  .eq("phone", phone)
+  .maybeSingle();
+
+if (!isTeacher) {
+  const { data: existingOtherSchool } = await db
+    .from("profiles")
+    .select("school_code")
+    .eq("phone", phone)
+    .neq("school_code", schoolCode)
+    .maybeSingle();
+
+  if (existingOtherSchool) {
+    return { valid: false, reason: "Nimewo sa a deja anrejistre ak yon lòt kòd. Kontakte direksyon lekòl ou." };
+  }
+}
   const { count: studentCount } = await db
     .from("profiles")
     .select("*", { count: "exact", head: true })
