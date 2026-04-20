@@ -239,8 +239,8 @@ export function QuizScreen({ user, onNavigate }) {
           </div>
           {!hasMore && usedQKeys.size >= allCount && (
             <p className="text-yellow-400 text-xs text-center">🏆 Ou fini tout {allCount} kesyon yo ! Bravo !</p>
-          )}
-        </div>
+          ))}
+          </div>
       </div>
     );  }
 
