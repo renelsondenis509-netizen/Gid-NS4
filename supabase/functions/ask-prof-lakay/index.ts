@@ -358,9 +358,8 @@ async function hashMessage(msg: string): Promise<string> {
 }
 
 async function getCached(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string|null> {
-  console.log("🔍 getCached lookup:", subject, hash);
   const { data, error } = await db.from("question_cache").select("id, answer, hit_count").eq("subject", subject).eq("question_hash", hash).maybeSingle();
-  console.log("🔍 getCached result:", data ? "HIT" : "MISS", error ? JSON.stringify(error) : "");
+   
   if (!data) return null;
   await db.from("question_cache").update({ hit_count: data.hit_count + 1 }).eq("id", data.id);
   return data.answer;
