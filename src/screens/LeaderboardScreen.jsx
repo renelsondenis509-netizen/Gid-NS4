@@ -141,7 +141,10 @@ export function LeaderboardScreen({ user, onNavigate }) {
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                      <span style={{ color:"#E8EEFF", fontWeight:700, fontSize:13, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{entry.name||entry.phone}</span>
+                      <div style={{ minWidth:0 }}>
+  <span style={{ color:"#E8EEFF", fontWeight:700, fontSize:13, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", display:"block" }}>{entry.name||entry.phone}</span>
+  {entry.school && <span style={{ color:"#4B6ABA", fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", display:"block" }}>{entry.school}</span>}
+</div>
                       {entry.isMe && <span style={{ padding:"2px 7px", borderRadius:20, fontSize:10, fontWeight:700, background:"#2563EB", color:"white", flexShrink:0 }}>Ou</span>}
                     </div>
                   </div>
