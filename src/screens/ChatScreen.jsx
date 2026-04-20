@@ -10,7 +10,7 @@ import { BottomNav } from "../components/UI";
 export function ChatScreen({ user, onNavigate }) {
   const [messages, setMessages] = useState([{
     role:"assistant",
-    content:`Bonjou **${user.name||""}** ! Mwen se **Prof Lakay** \n\nJe suis ton assistant IA pour le **Bac NS4**.\n\n📚 Matières disponibles pour toi :\n${user.subjects.map(s=>`• ${s}`).join("\n")}\n\n**Ann al travay !**`
+    content:`Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**. Voici tes matières : ${user.subjects.join(" • ")}\n\n**Ann al travay !**`
   }]);
   const [input, setInput]           = useState("");
   const [image, setImage]           = useState(null);
