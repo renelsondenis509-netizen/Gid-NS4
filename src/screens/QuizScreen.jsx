@@ -211,19 +211,31 @@ export function QuizScreen({ user, onNavigate }) {
         <div className="w-full max-w-sm space-y-5" style={{ animation:"popIn .5s cubic-bezier(.34,1.56,.64,1) both" }}>
           <div className="text-center">
             <div style={{ fontSize:64 }}>🎊</div>
-Non — restons sur SVG. Trouve et remplace ces 4 sections :
-1. <div style={{ fontSize:64 }}>🎉</div> →
-<div style={{ display:"flex", justifyContent:"center" }}><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/></svg></div>
-2. {[{icon:"✅",val:score,label:"Total kòrèk"},{icon:"🔥",val:maxStreak,label:"Max streak"},{icon:"📚",val:{usedQKeys.size}/{allCount},label:"Kesyon wè"}] →
-{[
-  {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>, val:score, label:"Total kòrèk"},
-  {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>, val:maxStreak, label:"Max streak"},
-  {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>, val:`${usedQKeys.size}/${allCount}`, label:"Kesyon wè"},
-]}
-3. style={{ background:"linear-gradient(135deg,#22c55e,#16a34a)" }}>✅ Wi</button> →
-style={{ background:"linear-gradient(135deg,#22c55e,#16a34a)" }} className="flex-1 py-4 rounded-2xl font-black text-white text-lg flex items-center justify-center gap-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Wi</button>
-4. style={{ background:"#0f1e4a", color:"#93c5fd", border:"1px solid #1e3a8a33" }}>❌ Non</button> →
-style={{ background:"#0f1e4a", color:"#93c5fd", border:"1px solid #1e3a8a33" }} className="flex-1 py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Non</button>
+            <h2 className="text-white font-black text-3xl mt-2">Bravo !</h2>
+            <p className="text-blue-300 text-sm mt-1">{subject} • Wònn {round}</p>
+          </div>
+          <div className="rounded-3xl px-5 py-5 text-center" style={{ background:mention.bg, border:`2px solid ${mention.border}` }}>
+            <div style={{ fontSize:40 }}>{mention.emoji}</div>
+            <div className="font-black mt-1" style={{ fontSize:48, color:mention.color, lineHeight:1 }}>{note20}<span className="text-xl" style={{ color:mention.color+"99" }}>/20</span></div>
+            <div className="text-white font-bold text-lg mt-1">{mention.label}</div>
+            <div className="text-blue-300 text-sm mt-1">{roundScore}/10 kòrèk {streak>0?`• 🔥 Streak ${streak}`:""}</div>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[{icon:"✔",color:"#22c55e",val:score,label:"Total kòrèk"},{icon:"♦",color:"#f97316",val:maxStreak,label:"Max streak"},{icon:"▣",color:"#3b82f6",val:`${usedQKeys.size}/${allCount}`,label:"Kesyon wè"}].map((s,i)=>(
+              <div key={i} className="rounded-2xl p-3 text-center" style={{ background:"#0f1e4a", border:"1px solid #1e3a8a33" }}>
+                <div style={{ fontSize:18, color:s.color, fontWeight:900 }}>{s.icon}</div>
+                <div className="text-white font-black text-base">{s.val}</div>
+                <div className="text-blue-500 text-xs">{s.label}</div>
+              </div>
+            ))}
+          <p className="text-white font-bold text-center text-lg">Ou vle kontinye ?</p>
+          <div className="flex gap-3">
+            <button onClick={continueQuiz} disabled={!hasMore && usedQKeys.size >= allCount}
+              className="flex-1 py-4 rounded-2xl font-black text-white text-lg"
+              style={{ background:"linear-gradient(135deg,#22c55e,#16a34a)" }}>✔ Wi<
+            <button onClick={() => setPhase("select")}
+              className="flex-1 py-4 rounded-2xl font-black text-lg"
+              style={{ background:"#0f1e4a", color:"#93c5fd", border:"1px solid #1e3a8a33" }}>✕ Non<
           </div>
           {!hasMore && usedQKeys.size >= allCount && (
             <p className="text-yellow-400 text-xs text-center">🏆 Ou fini tout {allCount} kesyon yo ! Bravo !</p>
