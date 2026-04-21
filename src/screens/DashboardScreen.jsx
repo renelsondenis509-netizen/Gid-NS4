@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { callEdge, parseApiError } from "../api";
-
+import { useState, useEffect } from "react";
 // ─── FONCTION DE PARTAGE PDF / RAPPORT ─────────────────────────────────────
 const generateAndSharePDF = async (school, stats) => {
   try {
@@ -53,19 +53,33 @@ ${Object.entries(stats.subjectBreakdown || {})
     window.open(`https://wa.me/?text=${text}`, "_blank");
   }
 };
+<button onClick={() => { localStorage.removeItem(_dirKey); setAuthorized(false); setStats(null); }}
+  className="px-3 py-2 rounded-xl text-xs font-bold"
+  style={{ background:"#ffffff10", color:"#94a3b8" }}>
+  ⏻
+</button>
 
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
   const [authorized, setAuthorized] = useState(false);
+  const _dirKey = `gid_dir_${userCode}`;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
 
+  useEffect(() => {
+    const saved = localStorage.getItem(_dirKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setStats(parsed); setAuthorized(true);
+    }
+  }, []);
   const handleAuth = async () => {
     setLoading(true); setError("");
     try {
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim() });
       setStats(result); setAuthorized(true);
+      localStorage.setItem(_dirKey, JSON.stringify(result));
     } catch (e) { setError(parseApiError(e).message); }
     setLoading(false);
   };
