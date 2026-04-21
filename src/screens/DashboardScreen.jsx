@@ -230,6 +230,11 @@ export function DashboardScreen({ onBack, userCode }) {
         <button onClick={() => generateAndSharePDF(school, s)} className="px-3 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-2 active:scale-95 transition-transform" style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>
           <FileIcon /> PDF
         </button>
+       <button onClick={() => { localStorage.removeItem(_dirKey); setAuthorized(false); setStats(null); }}
+  className="px-3 py-2 rounded-xl text-xs font-bold"
+  style={{ background:"#ffffff10", color:"#94a3b8", border:"1px solid #ffffff15" }}>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+</button> 
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         <div className="rounded-2xl px-4 py-3 flex justify-between items-center"
