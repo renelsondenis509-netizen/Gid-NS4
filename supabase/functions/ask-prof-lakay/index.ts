@@ -576,23 +576,72 @@ async function processDashboard(
   if (!school || school.director_code !== directorCode) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
 
   const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+  const currentWeek = getWeekKey();
 
   const [
     { count: totalStudents },
     { count: totalScans },
     { count: scansToday },
+    { count: imageScans },
+    { count: textScans },
     { data: subjectData },
+    { data: dailyData },
+    { data: weeklyData },
+    { data: recentScans },
+    { data: quizData },
   ] = await Promise.all([
     db.from("profiles").select("*", { count: "exact", head: true }).eq("school_code", schoolCode),
     db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode),
     db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).gte("created_at", `${today}T05:00:00Z`),
+    db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).eq("has_image", true),
+    db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).eq("has_image", false),
     db.from("scans").select("subject").eq("school_code", schoolCode),
+    db.from("scans").select("created_at").eq("school_code", schoolCode).gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString()),
+    db.from("scans").select("created_at").eq("school_code", schoolCode).gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()),
+    db.from("scans").select("created_at, subject, has_image").eq("school_code", schoolCode).order("created_at", { ascending: false }).limit(10),
+    db.from("quiz_scores").select("phone, name, note20, score, total, subject, created_at").eq("school_code", schoolCode).order("created_at", { ascending: false }).limit(20),
   ]);
 
   const subjectBreakdown: Record<string, number> = {};
   (subjectData ?? []).forEach((s: { subject: string }) => {
     subjectBreakdown[s.subject] = (subjectBreakdown[s.subject] ?? 0) + 1;
   });
+
+  // Activité par jour (7 derniers jours)
+  const dailyActivity: Record<string, number> = {};
+  (dailyData ?? []).forEach((s: { created_at: string }) => {
+    const day = new Date(s.created_at).toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+    dailyActivity[day] = (dailyActivity[day] ?? 0) + 1;
+  });
+
+  // Activité par semaine (30 derniers jours)
+  const weeklyActivity: Record<string, number> = {};
+  (weeklyData ?? []).forEach((s: { created_at: string }) => {
+    const d = new Date(s.created_at);
+    const year = d.getFullYear();
+    const start = new Date(year, 0, 1);
+    const week = Math.ceil(((d.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7);
+    const key = `${year}-W${String(week).padStart(2, "0")}`;
+    weeklyActivity[key] = (weeklyActivity[key] ?? 0) + 1;
+  });
+
+  // Stats quiz
+  const quizStats = {
+    totalQuizzes: (quizData ?? []).length,
+    avgNote: (quizData ?? []).length > 0
+      ? Math.round((quizData ?? []).reduce((a: number, q: any) => a + q.note20, 0) / (quizData ?? []).length * 10) / 10
+      : 0,
+    topStudents: Object.values(
+      (quizData ?? []).reduce((acc: Record<string, any>, q: any) => {
+        if (!acc[q.phone]) acc[q.phone] = { name: q.name || q.phone, totalScore: 0, count: 0 };
+        acc[q.phone].totalScore += q.note20;
+        acc[q.phone].count += 1;
+        return acc;
+      }, {})
+    ).map((s: any) => ({ ...s, avg: Math.round(s.totalScore / s.count * 10) / 10 }))
+     .sort((a: any, b: any) => b.avg - a.avg)
+     .slice(0, 5),
+  };
 
   const expires  = new Date(school.expires_at);
   const daysLeft = Math.ceil((expires.getTime() - Date.now()) / 86400000);
@@ -602,27 +651,20 @@ async function processDashboard(
       name: school.school_name, subjects: school.subjects ?? [],
       dailyScans: school.daily_scans, daysRemaining: daysLeft,
       maxStudents: school.max_students, expiresAt: school.expires_at,
+      code: schoolCode,
     },
     stats: {
-      totalStudents: totalStudents ?? 0, totalScans: totalScans ?? 0,
-      scansToday: scansToday ?? 0, subjectBreakdown,
+      totalStudents: totalStudents ?? 0,
+      totalScans: totalScans ?? 0,
+      scansToday: scansToday ?? 0,
+      imageScans: imageScans ?? 0,
+      textScans: textScans ?? 0,
+      subjectBreakdown,
+      dailyActivity,
+      weeklyActivity,
+      recentScans: recentScans ?? [],
+      quizStats,
     },
-  };
-}
-
-// ─── ACTION : get_payment_numbers ─────────────────────────────────────────────
-async function getPaymentNumbers(db: ReturnType<typeof createClient>) {
-  const { data } = await db
-    .from("payment_config")
-    .select("method, number")
-    .eq("active", true)
-    .order("display_order");
-
-  return {
-    payments: data ?? [
-      { method: "MonCash", number: "50948695079" },
-      { method: "NatCash", number: "50940669105" },
-    ],
   };
 }
 
