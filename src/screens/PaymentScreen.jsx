@@ -50,8 +50,8 @@ export function PaymentScreen({ onBack }) {
       <line x1="2" y1="10" x2="22" y2="10" />    </svg>
   );
   const cardStyle = {
-    MonCash: { grad: "linear-gradient(135deg,#c0392b,#e74c3c)", icon: "/file_0000000025ec71fda3e5c1372f7bef4d.png", sub: "Digicel Haiti" },
-    NatCash: { grad: "linear-gradient(135deg,#e67e22,#f39c12)", icon: "/file_00000000ae3c71f788921fb0d044db44.png", sub: "Natcom Haiti" },
+    MonCash: { grad: "linear-gradient(135deg,#c0392b,#e74c3c)", icon: "/moncash.png", sub: "Digicel Haiti" },
+    NatCash: { grad: "linear-gradient(135deg,#e67e22,#f39c12)", icon: "/natcash.png", sub: "Natcom Haiti" },
   };
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
