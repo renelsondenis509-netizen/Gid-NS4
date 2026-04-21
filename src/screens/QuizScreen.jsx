@@ -373,77 +373,133 @@ export function QuizScreen({ user, onNavigate }) {
   );
   
   // ── BRAVO ──
-  if (phase === "bravo") {
-    const note20 = scoreToNote20(roundScore, 10);
-    const mention = getMention(note20);
-    const allCount = (QUIZ_DATA[subject] || []).length;
-    const seenCount = usedQKeys.size;
-    const hasMore = (allCount - seenCount) >= 5;
-    
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center px-6" style={{ background: "linear-gradient(160deg,#0a0f2e,#0d1b4b,#1a0505)" }}>
-        <div className="w-full max-w-sm space-y-5" style={{ animation: "popIn .5s cubic-bezier(.34,1.56,.64,1) both" }}>
-          <div className="text-center">
-            <div style={{ fontSize: 64 }}>🎉</div>
-            <h2 className="text-white font-black text-3xl mt-2">Bravo !</h2>
-            <p className="text-blue-300 text-sm mt-1">{subject} • Wònn {round}</p>
-          </div>
-          
-          <div className="rounded-3xl px-5 py-5 text-center" style={{ background: mention.bg, border: `2px solid ${mention.border}` }}>
-            <div style={{ fontSize: 40 }}>{mention.emoji}</div>            <div className="font-black mt-1" style={{ fontSize: 48, color: mention.color, lineHeight: 1 }}>
-              {note20}<span className="text-xl" style={{ color: mention.color + "99" }}>/20</span>
-            </div>
-            <div className="text-white font-bold text-lg mt-1">{mention.label}</div>
-            <div className="text-blue-300 text-sm mt-1">{roundScore}/10 kòrèk • {streak > 0 ? `🔥 Streak ${streak}` : ""}</div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { icon: <CheckCircleIcon size={24} color="#22c55e" />, val: score, label: "Total kòrèk" },
-              { icon: <FireIcon size={24} color="#f97316" />, val: maxStreak, label: "Max streak" },
-              { icon: <BookOpenIcon size={24} color="#3b82f6" />, val: `${seenCount}/${allCount}`, label: "Kesyon wè" },
-            ].map((s, i) => (
-              <div key={i} className="rounded-2xl p-3 text-center" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 4 }}>{s.icon}</div>
-                <div className="text-white font-black text-base">{s.val}</div>
-                <div className="text-blue-500 text-xs">{s.label}</div>
-              </div>
-            ))}
-          </div>
-          
-          <p className="text-white font-bold text-center text-lg">Ou vle kontinye ?</p>
-          
-          <div className="flex gap-3">
-            <button onClick={continueQuiz} disabled={!hasMore && seenCount >= allCount}
-              className="flex-1 py-4 rounded-2xl font-black text-white text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-              style={{ 
-                background: "linear-gradient(135deg,#22c55e,#16a34a)", 
-                boxShadow: "0 4px 20px #22c55e44",
-                opacity: (!hasMore && seenCount >= allCount) ? 0.5 : 1,
-                cursor: (!hasMore && seenCount >= allCount) ? "not-allowed" : "pointer"
-              }}>
-              <CheckCircleIcon size={22} color="white" /> Wi
-            </button>
-            <button onClick={() => setPhase("select")}
-              className="flex-1 py-4 rounded-2xl font-black text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-              style={{ 
-                background: "#0f1e4a", 
-                color: "#93c5fd", 
-                border: "1px solid #1e3a8a33" 
-              }}>
-              <XCircleIcon size={22} color="#93c5fd" /> Non
-            </button>
-          </div>
-          
-          {!hasMore && seenCount >= allCount && (
-            <p className="text-yellow-400 text-xs text-center flex items-center justify-center gap-1">
-              <TrophyIcon size={14} color="#fbbf24" /> Ou fini tout {allCount} kesyon yo ! Bravo !
-            </p>
-          )}        </div>
-      </div>
-    );
-  }
+if (phase === "bravo") {
+  const note20 = scoreToNote20(roundScore, 10);
+  const mention = getMention(note20);
+  const allCount = (QUIZ_DATA[subject] || []).length;
+  const seenCount = usedQKeys.size;
+  const hasMore = (allCount - seenCount) >= 5;
   
+  return (
+    <div className="fixed inset-0 flex flex-col items-center justify-center px-6" style={{ background: "linear-gradient(160deg,#0a0f2e,#0d1b4b,#1a0505)" }}>
+      <div className="w-full max-w-sm space-y-5" style={{ animation: "popIn .5s cubic-bezier(.34,1.56,.64,1) both" }}>
+        <div className="text-center">
+          <div style={{ fontSize: 64 }}>🎉</div>
+          <h2 className="text-white font-black text-3xl mt-2">Bravo !</h2>
+          <p className="text-blue-300 text-sm mt-1">{subject} • Wònn {round}</p>
+        </div>
+        
+        <div className="rounded-3xl px-5 py-5 text-center" style={{ background: mention.bg, border: `2px solid ${mention.border}` }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>
+            {mention.emoji === "🏆" ? (
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={mention.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+              </svg>
+            ) : mention.emoji}
+          </div>
+          <div className="font-black mt-1" style={{ fontSize: 48, color: mention.color, lineHeight: 1 }}>
+            {note20}<span className="text-xl" style={{ color: mention.color + "99" }}>/20</span>
+          </div>
+          <div className="text-white font-bold text-lg mt-1">{mention.label}</div>
+          <div className="text-blue-300 text-sm mt-1 flex items-center justify-center gap-1">
+            {roundScore}/10 kòrèk • {streak > 0 ? (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                </svg>
+                Streak {streak}
+              </>
+            ) : ""}
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-3 gap-2">
+          <div className="rounded-2xl p-3 text-center" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 4 }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <div className="text-white font-black text-base">{score}</div>
+            <div className="text-blue-500 text-xs">Total kòrèk</div>
+          </div>
+          
+          <div className="rounded-2xl p-3 text-center" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 4 }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+              </svg>
+            </div>
+            <div className="text-white font-black text-base">{maxStreak}</div>
+            <div className="text-blue-500 text-xs">Max streak</div>
+          </div>
+          
+          <div className="rounded-2xl p-3 text-center" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 4 }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <div className="text-white font-black text-base">{seenCount}/{allCount}</div>
+            <div className="text-blue-500 text-xs">Kesyon wè</div>
+          </div>
+        </div>
+        
+        <p className="text-white font-bold text-center text-lg">Ou vle kontinye ?</p>
+        
+        <div className="flex gap-3">
+          <button onClick={continueQuiz} disabled={!hasMore && seenCount >= allCount}
+            className="flex-1 py-4 rounded-2xl font-black text-white text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+            style={{ 
+              background: "linear-gradient(135deg,#22c55e,#16a34a)", 
+              boxShadow: "0 4px 20px #22c55e44",
+              opacity: (!hasMore && seenCount >= allCount) ? 0.5 : 1,
+              cursor: (!hasMore && seenCount >= allCount) ? "not-allowed" : "pointer"
+            }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            Wi
+          </button>
+          <button onClick={() => setPhase("select")}
+            className="flex-1 py-4 rounded-2xl font-black text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+            style={{               background: "#0f1e4a", 
+              color: "#93c5fd", 
+              border: "1px solid #1e3a8a33" 
+            }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="m15 9-6 6" />
+              <path d="m9 9 6 6" />
+            </svg>
+            Non
+          </button>
+        </div>
+        
+        {!hasMore && seenCount >= allCount && (
+          <p className="text-yellow-400 text-xs text-center flex items-center justify-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+              <path d="M4 22h16" />
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+              <path d="M14 14.66V17c0 .55-.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+            </svg>
+            Ou fini tout {allCount} kesyon yo ! Bravo !
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
   // ── GAME OVER ──
   if (phase === "gameover") {
     const note20 = scoreToNote20(score, totalAnswered);
