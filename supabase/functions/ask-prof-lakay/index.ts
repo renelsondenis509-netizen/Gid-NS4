@@ -641,8 +641,29 @@ async function processDashboard(
     ).map((s: any) => ({ ...s, avg: Math.round(s.totalScore / s.count * 10) / 10 }))
      .sort((a: any, b: any) => b.avg - a.avg)
      .slice(0, 5),
+    weakSubject: (() => {
+      const subjectAvg: Record<string, { total: number; count: number }> = {};
+      (quizData ?? []).forEach((q: any) => {
+        if (!subjectAvg[q.subject]) subjectAvg[q.subject] = { total: 0, count: 0 };
+        subjectAvg[q.subject].total += q.note20;
+        subjectAvg[q.subject].count += 1;
+      });
+      const weak = Object.entries(subjectAvg)
+        .map(([sub, d]) => ({ sub, avg: Math.round(d.total / d.count * 10) / 10 }))
+        .sort((a, b) => a.avg - b.avg)[0] ?? null;
+      return weak ? { subject: weak.sub, avg: weak.avg } : null;
+    })(),
   };
-
+// Matière la plus faible (moy. note la plus basse)
+const subjectAvg: Record<string, { total: number; count: number }> = {};
+(quizData ?? []).forEach((q: any) => {
+  if (!subjectAvg[q.subject]) subjectAvg[q.subject] = { total: 0, count: 0 };
+  subjectAvg[q.subject].total += q.note20;
+  subjectAvg[q.subject].count += 1;
+});
+const weakSubject = Object.entries(subjectAvg)
+  .map(([sub, d]) => ({ sub, avg: Math.round(d.total / d.count * 10) / 10 }))
+  .sort((a, b) => a.avg - b.avg)[0] ?? null;
   const expires  = new Date(school.expires_at);
   const daysLeft = Math.ceil((expires.getTime() - Date.now()) / 86400000);
 
