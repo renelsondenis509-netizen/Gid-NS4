@@ -3,61 +3,82 @@ import { useState, useEffect } from "react";
 // ─── FONCTION DE PARTAGE PDF / RAPPORT ─────────────────────────────────────
 const generateAndSharePDF = async (school, stats) => {
   try {
-    // Générer le contenu du rapport
+    const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
+    const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
+
+    const topSubjects = Object.entries(stats.subjectBreakdown || {})
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([sub, count], i) => `  ${i+1}. ${sub}: ${count} scan${count > 1 ? "s" : ""}`)
+      .join("\n") || "  • Pa gen done ankò";
+
+    const dailyActivity = Object.entries(stats.dailyActivity || {})
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-7)
+      .map(([day, count]) => `  ${day}: ${count} scan${count > 1 ? "s" : ""}`)
+      .join("\n") || "  • Pa gen done ankò";
+
+    const topStudents = (stats.quizStats?.topStudents || [])
+      .map((s, i) => `  ${i+1}. ${s.name} — moy. ${s.avg}/20 (${s.count} quiz)`)
+      .join("\n") || "  • Pa gen done ankò";
+
+    const imagePercent = stats.totalScans > 0
+      ? Math.round((stats.imageScans / stats.totalScans) * 100)
+      : 0;
+
     const report = `
-📊 RAPÒ GID-NS4 — ${school.name}
-🗓️ Dat: ${new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" })}
+╔══════════════════════════════════════╗
+     📊 RAPÒ OFISYÈL GID NS4
+     ${school.name}
+╚══════════════════════════════════════╝
 
-📈 REZIME:
-• Total Scan: ${stats.totalScans}
-• Elèv Aktif: ${stats.totalStudents}
-• Scan Jodi a: ${stats.scansToday}
-• Jou Rete: ${school.daysRemaining}
-• Limit Scan/Jou: ${school.dailyScans}
-• Max Elèv: ${school.maxStudents}
+📅 Dat: ${date} • ${time}
+🔐 Kòd: ${school.code?.slice(0, 4)}****
 
-📚 MATYÈ POPILÈ:
-${Object.entries(stats.subjectBreakdown || {})
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 5)
-  .map(([sub, count]) => `• ${sub}: ${count} scan`)
-  .join("\n") || "• Pa gen done ankò"}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 REZIME JENERAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👥 Elèv Aktif      : ${stats.totalStudents} / ${school.maxStudents}
+📊 Total Scan      : ${stats.totalScans}
+📅 Scan Jodi a     : ${stats.scansToday} / ${school.dailyScans * stats.totalStudents}
+📷 Scan Imaj       : ${stats.imageScans} (${imagePercent}%)
+✏️  Scan Tèks      : ${stats.textScans} (${100 - imagePercent}%)
+⏳ Jou Rete        : ${school.daysRemaining}
+📚 Matyè Disponib  : ${school.subjects.length}
 
-🔐 Kòd lekòl: ${school.code?.slice(0, 4)}****
-✨ Pwodwi ak Gid-NS4 • Prof Lakay
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏆 TOP 5 MATYÈ PI POPLÈ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${topSubjects}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📆 AKTIVITE 7 DÈNYE JOU
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${dailyActivity}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TOP 5 ELÈV QUIZ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${topStudents}
+Moy. jeneral quiz : ${stats.quizStats?.avgNote ?? 0}/20
+Total quiz fèt    : ${stats.quizStats?.totalQuizzes ?? 0}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ Pwodwi ak Gid NS4 • Prof Lakay
     `.trim();
 
-    // Essayer l'API de partage native (mobile)
     if (navigator.share) {
-      await navigator.share({
-        title: `Rapò GID-NS4 — ${school.name}`,
-        text: report,
-      });
+      await navigator.share({ title: `Rapò GID-NS4 — ${school.name}`, text: report });
       return;
     }
-
-    // Fallback : copier dans le presse-papiers
     await navigator.clipboard.writeText(report);
     alert("📋 Rapò a kopye! Kole l nan WhatsApp oubyen yon lòt app.");
-
   } catch (err) {
     console.warn("Partage échoué", err);
-    // Dernier fallback : ouvrir WhatsApp avec le texte pré-rempli
-    const text = encodeURIComponent(
-      `Rapò GID-NS4 — ${school.name}\n\n` +
-      `Total Scan: ${stats.totalScans}\n` +
-      `Elèv Aktif: ${stats.totalStudents}\n` +      `Scan Jodi a: ${stats.scansToday}\n` +
-      `Jou Rete: ${school.daysRemaining}`
-    );
+    const text = encodeURIComponent(`Rapò GID-NS4 — ${school.name}\n\nTotal Scan: ${stats.totalScans}\nElèv Aktif: ${stats.totalStudents}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   }
 };
-<button onClick={() => { localStorage.removeItem(_dirKey); setAuthorized(false); setStats(null); }}
-  className="px-3 py-2 rounded-xl text-xs font-bold"
-  style={{ background:"#ffffff10", color:"#94a3b8" }}>
-  ⏻
-</button>
-
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
   const [authorized, setAuthorized] = useState(false);
