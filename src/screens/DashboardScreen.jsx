@@ -105,7 +105,7 @@ const generateAndSharePDF = async (school, stats) => {
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
   const [authorized, setAuthorized] = useState(false);
-  const _dirKey = `gid_dir_${userCode}`;
+  const _dirKey = `gid_dir_v2_${userCode}`;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
