@@ -2,82 +2,94 @@ import { callEdge, parseApiError } from "../api";
 import { useState, useEffect } from "react";
 // ─── FONCTION DE PARTAGE PDF / RAPPORT ─────────────────────────────────────
 const generateAndSharePDF = async (school, stats) => {
-  try {
-    const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
-    const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
+  const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
+  const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
 
-    const topSubjects = Object.entries(stats.subjectBreakdown || {})
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([sub, count], i) => `  ${i+1}. ${sub}: ${count} scan${count > 1 ? "s" : ""}`)
-      .join("\n") || "  • Pa gen done ankò";
+  // Charger jsPDF dynamiquement
+  const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-    const dailyActivity = Object.entries(stats.dailyActivity || {})
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-7)
-      .map(([day, count]) => `  ${day}: ${count} scan${count > 1 ? "s" : ""}`)
-      .join("\n") || "  • Pa gen done ankò";
+  const W = 210, margin = 15;
+  let y = 20;
 
-    const topStudents = (stats.quizStats?.topStudents || [])
-      .map((s, i) => `  ${i+1}. ${s.name} — moy. ${s.avg}/20 (${s.count} quiz)`)
-      .join("\n") || "  • Pa gen done ankò";
+  const addLine = (text, fontSize = 10, bold = false, color = [30, 30, 60]) => {
+    doc.setFontSize(fontSize);
+    doc.setFont("helvetica", bold ? "bold" : "normal");
+    doc.setTextColor(...color);
+    const lines = doc.splitTextToSize(text, W - margin * 2);
+    lines.forEach(line => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(line, margin, y);
+      y += fontSize * 0.45;
+    });
+    y += 2;
+  };
 
-    const imagePercent = stats.totalScans > 0
-      ? Math.round((stats.imageScans / stats.totalScans) * 100)
-      : 0;
+  const addSeparator = () => {
+    doc.setDrawColor(37, 99, 235);
+    doc.line(margin, y, W - margin, y);
+    y += 5;
+  };
 
-    const report = `
-╔══════════════════════════════════════╗
-     📊 RAPÒ OFISYÈL GID NS4
-     ${school.name}
-╚══════════════════════════════════════╝
+  // Header
+  doc.setFillColor(10, 15, 46);
+  doc.rect(0, 0, W, 35, "F");
+  doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
+  doc.text("RAPÒ OFISYÈL GID NS4", W / 2, 15, { align: "center" });
+  doc.setFontSize(11); doc.setFont("helvetica", "normal");
+  doc.text(school.name, W / 2, 23, { align: "center" });
+  doc.setFontSize(9); doc.setTextColor(147, 197, 253);
+  doc.text(`${date} • ${time}`, W / 2, 30, { align: "center" });
+  y = 45;
 
-📅 Dat: ${date} • ${time}
-🔐 Kòd: ${school.code?.slice(0, 4)}****
+  // Résumé général
+  addLine("REZIME JENERAL", 13, true, [37, 99, 235]);
+  addSeparator();
+  addLine(`Elèv Aktif: ${stats.totalStudents} / ${school.maxStudents}`);
+  addLine(`Total Scan: ${stats.totalScans}`);
+  addLine(`Scan Jodi a: ${stats.scansToday}`);
+  addLine(`Scan Imaj: ${stats.imageScans ?? 0}`);
+  addLine(`Scan Tèks: ${stats.textScans ?? 0}`);
+  addLine(`Jou Rete: ${school.daysRemaining}`);
+  addLine(`Matyè Disponib: ${school.subjects.length}`);
+  y += 5;
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📈 REZIME JENERAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👥 Elèv Aktif      : ${stats.totalStudents} / ${school.maxStudents}
-📊 Total Scan      : ${stats.totalScans}
-📅 Scan Jodi a     : ${stats.scansToday} / ${school.dailyScans * stats.totalStudents}
-📷 Scan Imaj       : ${stats.imageScans} (${imagePercent}%)
-✏️  Scan Tèks      : ${stats.textScans} (${100 - imagePercent}%)
-⏳ Jou Rete        : ${school.daysRemaining}
-📚 Matyè Disponib  : ${school.subjects.length}
+  // Top matières
+  addLine("TOP MATYÈ PI POPILÈ", 13, true, [37, 99, 235]);
+  addSeparator();
+  Object.entries(stats.subjectBreakdown || {})
+    .sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .forEach(([sub, count], i) => addLine(`${i + 1}. ${sub}: ${count} scan${count > 1 ? "s" : ""}`));
+  y += 5;
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏆 TOP 5 MATYÈ PI POPLÈ
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${topSubjects}
+  // Activité 7 jours
+  addLine("AKTIVITE 7 DÈNYE JOU", 13, true, [37, 99, 235]);
+  addSeparator();
+  Object.entries(stats.dailyActivity || {})
+    .sort((a, b) => a[0].localeCompare(b[0])).slice(-7)
+    .forEach(([day, count]) => addLine(`${day}: ${count} scan${count > 1 ? "s" : ""}`));
+  y += 5;
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📆 AKTIVITE 7 DÈNYE JOU
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${dailyActivity}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 TOP 5 ELÈV QUIZ
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${topStudents}
-Moy. jeneral quiz : ${stats.quizStats?.avgNote ?? 0}/20
-Total quiz fèt    : ${stats.quizStats?.totalQuizzes ?? 0}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✨ Pwodwi ak Gid NS4 • Prof Lakay
-    `.trim();
-
-    if (navigator.share) {
-      await navigator.share({ title: `Rapò GID-NS4 — ${school.name}`, text: report });
-      return;
-    }
-    await navigator.clipboard.writeText(report);
-    alert("📋 Rapò a kopye! Kole l nan WhatsApp oubyen yon lòt app.");
-  } catch (err) {
-    console.warn("Partage échoué", err);
-    const text = encodeURIComponent(`Rapò GID-NS4 — ${school.name}\n\nTotal Scan: ${stats.totalScans}\nElèv Aktif: ${stats.totalStudents}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank");
+  // Top élèves quiz
+  addLine("TOP ELÈV QUIZ", 13, true, [37, 99, 235]);
+  addSeparator();
+  if ((stats.quizStats?.topStudents || []).length > 0) {
+    (stats.quizStats.topStudents).forEach((s, i) =>
+      addLine(`${i + 1}. ${s.name} — moy. ${s.avg}/20 (${s.count} quiz)`));
+  } else {
+    addLine("Pa gen done quiz ankò.");
   }
+  addLine(`Moy. jeneral: ${stats.quizStats?.avgNote ?? 0}/20`);
+  addLine(`Total quiz: ${stats.quizStats?.totalQuizzes ?? 0}`);
+  y += 5;
+
+  // Footer
+  doc.setFillColor(10, 15, 46);
+  doc.rect(0, 285, W, 12, "F");
+  doc.setFontSize(8); doc.setTextColor(147, 197, 253);
+  doc.text("Pwodwi ak Gid NS4 • Prof Lakay", W / 2, 292, { align: "center" });
+
+  doc.save(`rapport-${school.name}-${date}.pdf`);
 };
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
