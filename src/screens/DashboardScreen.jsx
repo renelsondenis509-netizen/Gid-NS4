@@ -88,7 +88,18 @@ const generateAndSharePDF = async (school, stats) => {
   doc.rect(0, 285, W, 12, "F");
   doc.setFontSize(8); doc.setTextColor(147, 197, 253);
   doc.text("Pwodwi ak Gid NS4 • Prof Lakay", W / 2, 292, { align: "center" });
-
+// Recommandation
+  y += 3;
+  addLine("REKÒMANDASYON", 13, true, [220, 0, 42]);
+  addSeparator();
+  if (stats.quizStats?.weakSubject) {
+    addLine(`Matyè ki bezwen plis atansyon:`);
+    addLine(`${stats.quizStats.weakSubject.subject} — moy. ${stats.quizStats.weakSubject.avg}/20`, 11, true, [220, 0, 42]);
+    addLine("Elèv yo dwe travay plis sou matyè sa a pou amelyore rezilta yo.");
+  } else {
+    addLine("Pa gen done suffizan pou yon rekòmandasyon.");
+  }
+  y += 5;
   doc.save(`rapport-${school.name}-${date}.pdf`);
 };
 export function DashboardScreen({ onBack, userCode }) {
