@@ -215,7 +215,7 @@ export function QuizScreen({ user, onNavigate }) {
             {[0,1,2].map(i => <HeartIcon key={i} filled={true} size={22} />)}
           </div>
           <div>
-            <div style={{ color:"#E8EEFF", fontWeight:700, fontSize:12 }}>Mode Duolingo — 3 kè</div>
+            <div style={{ color:"#E8EEFF", fontWeight:700, fontSize:12 }}>3 kè</div>
             <div style={{ color:"#5B7ADB", fontSize:11, marginTop:2 }}>Kesyon enfini • Jwe jouk ou pèdi 3 kè</div>
           </div>
         </div>
