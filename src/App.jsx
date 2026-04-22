@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
+import { requestNotificationPermission, scheduleDailyReminder, scheduleExpiryReminder } from "./utils/notifications";
 import { SplashScreen }      from "./screens/SplashScreen";
 import { LoginScreen }       from "./screens/LoginScreen";
 import { ChatScreen }        from "./screens/ChatScreen";
@@ -22,6 +23,12 @@ export default function App() {
   }, []);
 
   const handleLogin  = (u) => { sessionSave(u); setUser(u); setScreen("chat"); };
+  requestNotificationPermission().then(granted => {
+  if (granted) {
+    scheduleDailyReminder();
+    if (u.daysRemaining <= 7) scheduleExpiryReminder(u.daysRemaining);
+  }
+});
   const handleLogout = ()  => { sessionClear(); setUser(null); setScreen("login"); };
 
   if (screen === "splash")      return <SplashScreen onDone={() => { const s=sessionLoad(); if(s?.phone&&s?.code){setUser(s);setScreen("chat");}else{setScreen("login");} }} />;
