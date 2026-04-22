@@ -85,7 +85,7 @@ export function PartnerScreen({ onBack, onNavigate }) {
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
       <div className="flex items-center gap-3 px-4 py-4 border-b" style={{ borderColor: "#ffffff10" }}>
         <button onClick={onBack} className="text-blue-400 text-xl">←</button>
-        <h2 className="text-white font-bold text-lg">Vin Patnè</h2>
+        <h2 className="text-white font-bold text-lg">Patenarya</h2>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
         
