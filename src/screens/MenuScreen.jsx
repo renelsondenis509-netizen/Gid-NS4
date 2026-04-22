@@ -57,9 +57,9 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
 
   // ─── MENU ITEMS DATA ─────────────────────────────────────────────────────
   const menuItems = [
-    { icon: <ChartBarIcon />, label: "Dashboard Direksyon", screen: "dashboard" },
+    { icon: <ChartBarIcon />, label: "Aksè Direksyon", screen: "dashboard" },
     { icon: <CreditCardIcon />, label: "Pèman", screen: "payment" },
-    { icon: <HandshakeIcon />, label: "Vin Patnè", screen: "partner" },
+    { icon: <HandshakeIcon />, label: "Patenarya", screen: "partner" },
   ];
 
   return (
