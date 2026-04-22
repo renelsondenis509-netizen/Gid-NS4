@@ -11,7 +11,7 @@ export async function scheduleDailyReminder() {
       {
         id: 1,
         title: "📚 Gid NS4 — Prof Lakay",
-        body: "Ou pa etidye jodi a encore ! Ouvri app la epi poze yon kesyon.",
+        body: "Ou pa etidye jodi a ankò ! Ouvri app la epi poze yon kesyon.",
         schedule: {
           on: { hour: 18, minute: 0 },
           repeats: true,
