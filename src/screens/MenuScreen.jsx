@@ -61,7 +61,48 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
     { icon: <CreditCardIcon />, label: "Pèman", screen: "payment" },
     { icon: <HandshakeIcon />, label: "Patenarya", screen: "partner" },
   ];
+// ─── BADGES ──────────────────────────────────────────────────────────────
+const computeBadges = () => {
+  const badges = [];
+  try {
+    const grades = JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}");
+    const allGrades = Object.values(grades);
+    const totalQuizzes = allGrades.length;
+    const perfect = allGrades.filter(g => g.note20 >= 20).length;
+    const subjects20 = new Set(Object.keys(grades).filter(k => grades[k]?.note20 >= 20));
 
+    const imgKey  = `gid_img_${user.phone}`;
+    const txtKey  = `gid_txt_${user.phone}`;
+    const imgTotal = Object.keys(localStorage).filter(k => k.startsWith(imgKey)).reduce((a, k) => a + parseInt(localStorage.getItem(k) || "0"), 0);
+    const txtTotal = Object.keys(localStorage).filter(k => k.startsWith(txtKey)).reduce((a, k) => a + parseInt(localStorage.getItem(k) || "0"), 0);
+    const totalScans = imgTotal + txtTotal;
+
+    if (totalScans >= 1)   badges.push({ icon:"🎯", label:"Premye Kesyon", color:"#fbbf24" });
+    if (totalScans >= 50)  badges.push({ icon:"📚", label:"Elèv Asidu",    color:"#3b82f6" });
+    if (totalQuizzes >= 1) badges.push({ icon:"⭐", label:"Premye Quiz",   color:"#f59e0b" });
+    if (perfect >= 1)      badges.push({ icon:"🏆", label:"Pafè 20/20",    color:"#fbbf24" });
+    if (subjects20.size >= 3) badges.push({ icon:"💎", label:"Maèt",       color:"#a855f7" });
+    if (totalScans >= 100) badges.push({ icon:"🔥", label:"Eksplozif",     color:"#ef4444" });
+  } catch {}
+  return badges;
+};
+
+const badges = computeBadges();
+Puis dans la Profile Card, juste après le bloc <div style={{ color:"#3B5BA8"...}}>{user.school}</div>, ajoute :
+{badges.length > 0 && (
+  <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:10 }}>
+    {badges.map((b, i) => (
+      <div key={i} style={{
+        display:"flex", alignItems:"center", gap:4,
+        padding:"3px 8px", borderRadius:20,
+        background:`${b.color}18`, border:`1px solid ${b.color}44`,
+        fontSize:10, fontWeight:700, color:b.color
+      }}>
+        <span style={{ fontSize:12 }}>{b.icon}</span> {b.label}
+      </div>
+    ))}
+  </div>
+)}
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
       <div style={{ padding:"32px 20px 20px", borderBottom:"1px solid rgba(255,255,255,0.10)" }}>
