@@ -5,6 +5,7 @@ import { SplashScreen }      from "./screens/SplashScreen";
 import { LoginScreen }       from "./screens/LoginScreen";
 import { ChatScreen }        from "./screens/ChatScreen";
 import { QuizScreen }        from "./screens/QuizScreen";
+import { ExerciceScreen } from "./screens/ExerciceScreen";
 import { LeaderboardScreen } from "./screens/LeaderboardScreen";
 import { HistoryScreen }     from "./screens/HistoryScreen";
 import { MenuScreen }        from "./screens/MenuScreen";
@@ -15,6 +16,7 @@ import { PartnerScreen }     from "./screens/PartnerScreen";
 export default function App() {
   const [screen, setScreen] = useState("splash");
   const [user, setUser]     = useState(null);
+  const [activeScan, setActiveScan] = useState(null);
   const nav = (s) => setScreen(s);
 
   useEffect(() => {
@@ -36,10 +38,11 @@ export default function App() {
   if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} />;
   if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
   if (screen === "leaderboard") return <LeaderboardScreen user={user} onNavigate={nav} />;
-  if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} />;
+  if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan(scan); setScreen("exercice"); }} />;
   if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
   if (screen === "payment")     return <PaymentScreen onBack={() => nav(user?"menu":"login")} />;
   if (screen === "dashboard")   return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} />;
   if (screen === "partner")     return <PartnerScreen onBack={() => nav(user?"menu":"login")} />;
+  if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />;
   return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
 }
