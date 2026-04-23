@@ -14,7 +14,7 @@ const IcoInbox = () => <svg width="48" height="48" viewBox="0 0 24 24" fill="non
 const IcoTrash = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>;
 const IcoLoader = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{animation:"spin 1s linear infinite"}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
 
-export function HistoryScreen({ user, onNavigate }) {
+export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   const [history, setHistory] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,6 +52,12 @@ export function HistoryScreen({ user, onNavigate }) {
           style={{ background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
           {deleting === selected.id ? <IcoLoader /> : <IcoTrash />} Efase
         </button>
+     <button onClick={() => onStartExercice(selected)}
+  className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
+  style={{ background:"#1e3a8a22", color:"#60a5fa", border:"1px solid #3b82f633" }}>
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  Fè Egzèsis
+</button>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {!selected._fallback ? (
