@@ -19,7 +19,9 @@ export function ChatScreen({ user, onNavigate }) {
   const [lastPayload, setLastPayload] = useState(null);
   const [activeSubject, setActiveSubject] = useState(user.subjects[0] || null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
-
+  const [favorites, setFavorites] = useState(() => {
+  try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; }
+});
   const bottomRef       = useRef(null);
   const fileRef         = useRef(null);
   const chatRef         = useRef(null);
@@ -108,7 +110,19 @@ export function ChatScreen({ user, onNavigate }) {
   const imgDone  = imgUsed  >= IMG_MAX;
   const textDone = textUsed >= TEXT_MAX;
   const allDone  = imgDone && textDone;
-
+  const toggleFav = (msg, i) => {
+  setFavorites(prev => {
+    const exists = prev.findIndex(f => f.id === i);
+    let next;
+    if (exists >= 0) {
+      next = prev.filter(f => f.id !== i);
+    } else {
+      next = [...prev, { id:i, content:msg.content, subject:activeSubject, date:new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" }) }];
+    }
+    try { localStorage.setItem(`fav_${user.phone}`, JSON.stringify(next)); } catch {}
+    return next;
+  });
+};
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"#0a0f2e" }}>
       <ExpiryBanner daysRemaining={user.daysRemaining} />
@@ -170,11 +184,16 @@ export function ChatScreen({ user, onNavigate }) {
               </div>
             )}
             <div style={{ maxWidth:"82%" }}>
-              {msg.image && <img src={msg.image} alt="scan" style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.1)" }} />}
-              <div style={{ padding:"11px 15px", fontSize:14, lineHeight:1.65, background:msg.role==="user"?"linear-gradient(135deg,#2563EB,#1D4ED8)":"rgba(15,28,60,0.95)", border:msg.role==="assistant"?"1px solid rgba(37,99,235,0.15)":"none", color:"#E8EEFF", borderRadius:msg.role==="user"?"18px 18px 5px 18px":"5px 18px 18px 18px" }}>
-                <LatexText content={msg.content} />
-              </div>
-            </div>
+  {msg.image && <img src={msg.image} alt="scan" style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.1)" }} />}
+  <div style={{ padding:"11px 15px", fontSize:14, lineHeight:1.65, background:msg.role==="user"?"linear-gradient(135deg,#2563EB,#1D4ED8)":"rgba(15,28,60,0.95)", border:msg.role==="assistant"?"1px solid rgba(37,99,235,0.15)":"none", color:"#E8EEFF", borderRadius:msg.role==="user"?"18px 18px 5px 18px":"5px 18px 18px 18px" }}>
+    <LatexText content={msg.content} />
+  </div>
+  {msg.role==="assistant" && (
+    <button onClick={() => toggleFav(msg, i)} style={{ marginTop:4, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:0.7 }}>
+      {favorites.findIndex(f => f.id === i) >= 0 ? "⭐" : "☆"}
+    </button>
+  )}
+</div>
           </div>
         ))}
         {loading && (
