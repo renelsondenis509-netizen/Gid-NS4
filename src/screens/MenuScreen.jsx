@@ -122,7 +122,7 @@ const badges = computeBadges();
               {user.daysRemaining <= 7 ? <><AlertIcon /> Ekspire byento</> : <><CheckIcon /> Kòd Aktif</>}
             </div>
             <div className="text-xs mt-0.5" style={{ color: user.daysRemaining <= 7 ? "#ff6060" : "#6ee7b7" }}>
-              {user.daysRemaining} jou rete • {user.dailyScans} scan/jou
+              {user.daysRemaining} jou ki rete • {user.dailyScans} rekèt/jou
             </div>
           </div>
           <div className="text-right">
