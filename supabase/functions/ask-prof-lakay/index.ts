@@ -724,12 +724,13 @@ async function getAnnouncements(
   body: { schoolCode: string }
 ) {
   const { schoolCode } = body;
-  const { data } = await db
+  const { data, error } = await db
     .from("Announcements")
     .select("id, title, message, created_at, expires_at")
     .eq("school_code", schoolCode)
     .order("created_at", { ascending: false })
     .limit(5);
+  console.log("📢 getAnnouncements:", schoolCode, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
   return { announcements: data ?? [] };
 }
 
