@@ -207,7 +207,7 @@ const speak = (text) => {
 </div>
      {msg.role==="assistant" && (
   <button onClick={() => speak(msg.content)} style={{ marginTop:2, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:0.8, color:"#60a5fa" }}>
-    🔊
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
   </button>
 )}  
      </div>
