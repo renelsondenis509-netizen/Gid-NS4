@@ -728,7 +728,6 @@ async function getAnnouncements(
     .from("Announcements")
     .select("id, title, message, created_at, expires_at")
     .eq("school_code", schoolCode)
-    .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
     .order("created_at", { ascending: false })
     .limit(5);
   return { announcements: data ?? [] };
