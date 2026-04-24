@@ -260,7 +260,7 @@ export function DashboardScreen({ onBack, userCode }) {
               )}
             </div>
             <div className="text-xs mt-0.5" style={{ color: "#93c5fd" }}>
-              {school.daysRemaining} jou rete • {school.dailyScans} rekèt/jou • max {school.maxStudents} elèv
+              {school.daysRemaining} jou ki rete • {school.dailyScans} rekèt/jou • max {school.maxStudents} elèv
             </div>
           </div>
         </div>
