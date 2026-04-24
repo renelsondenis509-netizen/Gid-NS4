@@ -40,7 +40,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
       <div className="flex gap-2 mb-4">
         {[0,1,2].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-blue-400" style={{ animation:`bounce 1s ${i*0.2}s infinite` }} />)}
       </div>
-      <p className="text-blue-400 text-sm">Prof Lakay ap kreye egzèsis ou...</p>
+      <p className="text-blue-400 text-sm">Prof Lakay ap prepare egzèsis ou a...</p>
     </div>
   );
 
@@ -48,7 +48,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     <div className="fixed inset-0 flex flex-col items-center justify-center px-6" style={{ background:"#0a0f2e" }}>
       <p className="text-red-400 text-center mb-4">{error}</p>
       <button onClick={onBack} className="px-6 py-3 rounded-xl font-bold text-white"
-        style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>← Retounen</button>
+        style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Retounen</button>
     </div>
   );
 
@@ -57,7 +57,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
       <div className="w-full max-w-sm space-y-4" style={{ animation:"popIn .5s cubic-bezier(.34,1.56,.64,1) both" }}>
         <div className="text-center">
           <div style={{ fontSize:56, textAlign:"center" }}>🎊</div>
-          <h2 className="text-white font-black text-2xl mt-2">Egzèsis Fini !</h2>
+          <h2 className="text-white font-black text-2xl mt-2">Egzèsis la fini !</h2>
           <p className="text-blue-300 text-sm mt-1">{scan.subject}</p>
         </div>
         <div className="rounded-3xl px-5 py-5 text-center" style={{ background:"rgba(37,99,235,0.15)", border:"2px solid rgba(37,99,235,0.35)" }}>
@@ -65,7 +65,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
             {score}<span className="text-xl" style={{ color:"#60a5fa99" }}>/{questions.length}</span>
           </div>
           <div className="text-white font-bold text-lg mt-1">
-            {score === questions.length ? "Pafè !" : score >= questions.length/2 ? "Bien !" : "Kontinye travay !"}
+            {score === questions.length ? "Pafè !" : score >= questions.length/2 ? "Byen !" : "Kontinye travay !"}
           </div>
         </div>
         <div className="space-y-3">
@@ -81,7 +81,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
           ))}
         </div>
         <button onClick={onBack} className="w-full py-4 rounded-2xl font-bold text-white"
-          style={{ background:"linear-gradient(135deg,#2563eb,#3b82f6)" }}>← Retounen nan Istwa</button>
+          style={{ background:"linear-gradient(135deg,#2563eb,#3b82f6)" }}>Retounen nan istorik</button>
       </div>
     </div>
   );
@@ -132,7 +132,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
             )}
             <button onClick={next} className="w-full py-4 rounded-2xl font-bold text-white"
               style={{ background:"linear-gradient(135deg,#2563eb,#3b82f6)" }}>
-              {current + 1 >= questions.length ? "Wè Rezilta" : "Kesyon Swivan →"}
+              {current + 1 >= questions.length ? "Wè Rezilta" : "Kesyon Swivan"}
             </button>
           </div>
         )}
