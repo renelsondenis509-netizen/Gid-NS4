@@ -12,6 +12,7 @@ import { MenuScreen }        from "./screens/MenuScreen";
 import { PaymentScreen }     from "./screens/PaymentScreen";
 import { DashboardScreen }   from "./screens/DashboardScreen";
 import { PartnerScreen }     from "./screens/PartnerScreen";
+import { FavoritesScreen }   from "./screens/FavoritesScreen";
 
 export default function App() {
   const [screen, setScreen] = useState("splash");
@@ -44,5 +45,6 @@ export default function App() {
   if (screen === "dashboard")   return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} />;
   if (screen === "partner")     return <PartnerScreen onBack={() => nav(user?"menu":"login")} />;
   if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />;
-  return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
+ if (screen === "favorites") return <FavoritesScreen user={user} onNavigate={nav} />;
+ return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
 }
