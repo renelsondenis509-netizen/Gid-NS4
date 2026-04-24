@@ -718,6 +718,37 @@ Format exact :
   return parsed;
 }
 
+// ─── ACTION : get_announcements ───────────────────────────────────────────────
+async function getAnnouncements(
+  db: ReturnType<typeof createClient>,
+  body: { schoolCode: string }
+) {
+  const { schoolCode } = body;
+  const { data } = await db
+    .from("Announcements")
+    .select("id, title, message, created_at, expires_at")
+    .eq("school_code", schoolCode)
+    .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+    .order("created_at", { ascending: false })
+    .limit(5);
+  return { announcements: data ?? [] };
+}
+
+// ─── ACTION : create_announcement ────────────────────────────────────────────
+async function createAnnouncement(
+  db: ReturnType<typeof createClient>,
+  body: { schoolCode: string; directorCode: string; title: string; message: string; expiresAt?: string }
+) {
+  const { schoolCode, directorCode, title, message, expiresAt } = body;
+  const { data: school } = await db.from("schools").select("director_code").eq("code", schoolCode).single();
+  if (!school || school.director_code !== directorCode) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
+  await db.from("Announcements").insert({
+    school_code: schoolCode, title, message,
+    expires_at: expiresAt || null,
+  });
+  return { created: true };
+}
+
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
@@ -734,7 +765,9 @@ Deno.serve(async (req) => {
       case "get_leaderboard":     result = await getLeaderboard(supabase, body); break;
       case "dashboard":           result = await processDashboard(supabase, body); break;
       case "get_payment_numbers": result = await getPaymentNumbers(supabase); break;
-      default:
+      case "get_announcements":   result = await getAnnouncements(supabase, body); break;
+      case "create_announcement": result = await createAnnouncement(supabase, body); break;
+ default:
         return new Response(JSON.stringify({ error: "Action inconnue" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
