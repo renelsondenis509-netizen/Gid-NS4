@@ -719,30 +719,30 @@ Format exact :
 }
 
 // ─── ACTION : get_announcements ───────────────────────────────────────────────
-async function getAnnouncements(
+async function getannouncements(
   db: ReturnType<typeof createClient>,
   body: { schoolCode: string }
 ) {
   const { schoolCode } = body;
   const { data, error } = await db
-    .from("Announcements")
+    .from("announcements")
     .select("id, title, message, created_at, expires_at")
     .eq("school_code", schoolCode)
     .order("created_at", { ascending: false })
     .limit(5);
-  console.log("📢 getAnnouncements:", schoolCode, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
+  console.log("📢 getannouncements:", schoolCode, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
   return { announcements: data ?? [] };
 }
 
 // ─── ACTION : create_announcement ────────────────────────────────────────────
-async function createAnnouncement(
+async function createannouncement(
   db: ReturnType<typeof createClient>,
   body: { schoolCode: string; directorCode: string; title: string; message: string; expiresAt?: string }
 ) {
   const { schoolCode, directorCode, title, message, expiresAt } = body;
   const { data: school } = await db.from("schools").select("director_code").eq("code", schoolCode).single();
   if (!school || school.director_code !== directorCode) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
-  await db.from("Announcements").insert({
+  await db.from("announcements").insert({
     school_code: schoolCode, title, message,
     expires_at: expiresAt || null,
   });
