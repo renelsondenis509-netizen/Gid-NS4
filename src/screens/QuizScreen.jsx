@@ -205,7 +205,7 @@ export function QuizScreen({ user, onNavigate }) {
         </div>
         <div>
           <h2 style={{ color:"#E8EEFF", fontWeight:800, fontSize:15, margin:0 }}>Quiz NS4</h2>
-          <p style={{ color:"#4B6ABA", fontSize:11, margin:0, marginTop:1 }}>{availableSubjects.length} matière{availableSubjects.length > 1 ? "s" : ""} disponib</p>
+          <p style={{ color:"#4B6ABA", fontSize:11, margin:0, marginTop:1 }}>{availableSubjects.length} matyè{availableSubjects.length > 1 ? "s" : ""} disponib</p>
         </div>
       </div>
       
@@ -220,7 +220,7 @@ export function QuizScreen({ user, onNavigate }) {
           </div>
         </div>
         
-        <p style={{ color:"#4B5EA8", fontSize:11, textAlign:"center", padding:"4px 0", letterSpacing:"0.08em", textTransform:"uppercase" }}>— Chwazi yon matière —</p>
+        <p style={{ color:"#4B5EA8", fontSize:11, textAlign:"center", padding:"4px 0", letterSpacing:"0.08em", textTransform:"uppercase" }}>Chwazi yon matyè</p>
         
         {availableSubjects.map(sub => (
           <button key={sub} onClick={() => startQCM(sub)}
@@ -363,7 +363,7 @@ export function QuizScreen({ user, onNavigate }) {
                 boxShadow: hearts <= 0 ? "0 4px 20px rgba(232,0,42,0.3)" : "0 4px 20px rgba(37,99,235,0.3)",
                 borderRadius:14, border:"none"
               }}>
-              {hearts <= 0 ? "💔 Gade Rezilta" : "Kesyon ki vini apre →"}
+              {hearts <= 0 ? "💔 Gade Rezilta" : "Kesyon ki vini apre"}
             </button>
           </div>
         )}
