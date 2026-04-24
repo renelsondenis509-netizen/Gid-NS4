@@ -189,7 +189,7 @@ export function ChatScreen({ user, onNavigate }) {
     <LatexText content={msg.content} />
   </div>
   {msg.role==="assistant" && (
-    <button onClick={() => toggleFav(msg, i)} style={{ marginTop:4, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:1 et color:"#fbbf24"}}>
+    <button onClick={() => toggleFav(msg, i)} style={{ marginTop:4, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:1,color:"#fbbf24"}}>
       {favorites.findIndex(f => f.id === i) >= 0 ? "⭐" : "☆"}
     </button>
   )}
