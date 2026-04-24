@@ -134,6 +134,16 @@ useEffect(() => {
     return next;
   });
 };
+const speak = (text) => {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const clean = text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/[#*_~`]/g, "").replace(/\$[^$]*\$/g, "formule").trim();
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = "fr-FR";
+  utt.rate = 0.9;
+  utt.pitch = 1;
+  window.speechSynthesis.speak(utt);
+};
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"#0a0f2e" }}>
       <ExpiryBanner daysRemaining={user.daysRemaining} />
@@ -216,7 +226,12 @@ useEffect(() => {
     </button>
   )}
 </div>
-          </div>
+     {msg.role==="assistant" && (
+  <button onClick={() => speak(msg.content)} style={{ marginTop:2, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:0.8, color:"#60a5fa" }}>
+    🔊
+  </button>
+)}  
+     </div>
         ))}
         {loading && (
           <div className="flex gap-2 items-start">
