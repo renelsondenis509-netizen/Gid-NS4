@@ -22,6 +22,8 @@ export function ChatScreen({ user, onNavigate }) {
   const [favorites, setFavorites] = useState(() => {
   try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; }
 });
+  const [announcement, setAnnouncement] = useState(null);
+
   const bottomRef       = useRef(null);
   const fileRef         = useRef(null);
   const chatRef         = useRef(null);
@@ -45,6 +47,14 @@ export function ChatScreen({ user, onNavigate }) {
     el?.addEventListener('scroll', onScroll);
     return () => el?.removeEventListener('scroll', onScroll);
   }, []);
+useEffect(() => {
+  const lastSeen = localStorage.getItem(`ann_seen_${user.phone}`);
+  callEdge({ action:"get_announcements", schoolCode:user.code })
+    .then(data => {
+      const ann = data.announcements?.[0];
+      if (ann && ann.id !== parseInt(lastSeen)) setAnnouncement(ann);
+    }).catch(() => {});
+}, []);
 
   const detectSubject = (text) => {
     const t = text.toLowerCase();
