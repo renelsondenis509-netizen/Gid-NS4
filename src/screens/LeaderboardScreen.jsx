@@ -79,7 +79,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
             <div className="flex gap-2">
               {[0,1,2].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-blue-400" style={{ animation:`bounce 1s ${i*0.2}s infinite` }} />)}
             </div>
-            <p className="text-blue-500 text-sm">Chajman Klasman an...</p>
+            <p className="text-blue-500 text-sm">Chajman klasman an...</p>
           </div>
         )}
 
