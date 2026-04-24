@@ -153,8 +153,8 @@ const speak = (text) => {
   {/* Tokens image */}
   <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:imgDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${imgDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
     <div style={{ display:"flex", gap:3, marginBottom:3 }}>
-      {Array.from({ length:5 }).map((_,i) => {
-        const filled = i < Math.round((imgUsed/IMG_MAX)*5);
+      {Array.from({ length:IMG_MAX }).map((_,i) => {
+  const filled = i < imgUsed;
         return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#E8002A":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #E8002A88":"none", transition:"all .3s" }} />;
       })}
     </div>
