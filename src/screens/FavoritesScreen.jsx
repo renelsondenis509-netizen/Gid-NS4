@@ -44,7 +44,7 @@ export function FavoritesScreen({ user, onNavigate }) {
       <div className="px-4 py-4 border-b" style={{ background:"rgba(10,15,46,0.98)", borderColor:"#ffffff10" }}>
         <h2 className="text-white font-bold flex items-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Repons Favoris
+          Repons Favori
         </h2>
         <p className="text-blue-400 text-xs mt-0.5">{favorites.length} favori{favorites.length !== 1 ? "s" : ""}</p>
       </div>
