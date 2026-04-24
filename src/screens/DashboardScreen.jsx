@@ -260,15 +260,15 @@ export function DashboardScreen({ onBack, userCode }) {
               )}
             </div>
             <div className="text-xs mt-0.5" style={{ color: "#93c5fd" }}>
-              {school.daysRemaining} jou rete • {school.dailyScans} scan/jou • max {school.maxStudents} elèv
+              {school.daysRemaining} jou rete • {school.dailyScans} rekèt/jou • max {school.maxStudents} elèv
             </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: "Scan Total", val: s.totalScans, Icon: SearchIcon, color: "#3b82f6" },
+            { label: "Requêtes Totales", val: s.totalScans, Icon: SearchIcon, color: "#3b82f6" },
             { label: "Élèves Actifs", val: s.totalStudents, Icon: UsersIcon, color: "#22c55e" },
-            { label: "Scan d'aujourd'hui", val: s.scansToday, Icon: CalendarIcon, color: "#f59e0b" },
+            { label: "Requêtes d'aujourd'hui", val: s.scansToday, Icon: CalendarIcon, color: "#f59e0b" },
             { label: "Matières", val: school.subjects.length, Icon: BookIcon, color: "#a855f7" },
           ].map((item, i) => (
             <div key={i} className="rounded-2xl p-4" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
@@ -280,7 +280,7 @@ export function DashboardScreen({ onBack, userCode }) {
         </div>
         <div className="rounded-2xl p-4" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
           <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
-            <BookIcon color="#a855f7" /> Matières Autorisées
+            <BookIcon color="#a855f7" /> Matières autorisées
           </h3>
           <div className="flex flex-wrap gap-2">
             {school.subjects.map((s, i) => (
@@ -294,7 +294,7 @@ export function DashboardScreen({ onBack, userCode }) {
         {subjectEntries.length > 0 && (
           <div className="rounded-2xl p-5" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
             <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-              <ChartIcon /> Matières les Plus Scannées
+              <ChartIcon /> Matières les plus visitées
             </h3>
             <div className="space-y-3">
               {subjectEntries.map(([sub, count], i) => (
@@ -312,7 +312,7 @@ export function DashboardScreen({ onBack, userCode }) {
         )}
         <button onClick={() => generateAndSharePDF(school, s)} className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg,#25d366,#128c7e)", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}>
-          <WhatsAppIcon /> Pataje Rapò PDF sou WhatsApp
+          <WhatsAppIcon /> Pataje rapò PDF sou WhatsApp
         </button>
       </div>
     </div>
