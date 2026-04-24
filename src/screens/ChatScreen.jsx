@@ -22,8 +22,7 @@ export function ChatScreen({ user, onNavigate }) {
   const [favorites, setFavorites] = useState(() => {
   try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; }
 });
-  const [announcement, setAnnouncement] = useState(null);
-
+  
   const bottomRef       = useRef(null);
   const fileRef         = useRef(null);
   const chatRef         = useRef(null);
@@ -47,15 +46,6 @@ export function ChatScreen({ user, onNavigate }) {
     el?.addEventListener('scroll', onScroll);
     return () => el?.removeEventListener('scroll', onScroll);
   }, []);
-useEffect(() => {
-  const lastSeen = localStorage.getItem(`ann_seen_${user.phone}`);
-  callEdge({ action:"get_announcements", schoolCode:user.code })
-    .then(data => {
-      console.log("ANNONCES:", JSON.stringify(data));
-      const ann = data.announcements?.[0];
-      if (ann && ann.id !== parseInt(lastSeen)) setAnnouncement(ann);
-    }).catch(e => console.log("ERREUR annonces:", e));
-}, []);
 
   const detectSubject = (text) => {
     const t = text.toLowerCase();
@@ -147,17 +137,6 @@ const speak = (text) => {
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"#0a0f2e" }}>
       <ExpiryBanner daysRemaining={user.daysRemaining} />
-     {announcement && (
-  <div style={{ background:"linear-gradient(135deg,#1e3a8a,#2563eb)", padding:"10px 16px", display:"flex", gap:10, alignItems:"flex-start" }}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, marginTop:2 }}><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
-    <div style={{ flex:1 }}>
-      <div style={{ color:"white", fontWeight:700, fontSize:12 }}>{announcement.title}</div>
-      <div style={{ color:"#bfdbfe", fontSize:11, marginTop:2 }}>{announcement.message}</div>
-    </div>
-    <button onClick={() => { localStorage.setItem(`ann_seen_${user.phone}`, String(announcement.id)); setAnnouncement(null); }}
-      style={{ color:"white", background:"none", border:"none", fontSize:16, cursor:"pointer", flexShrink:0 }}>✕</button>
-  </div>
-)}
       {/* HEADER */}
       <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", background:"rgba(10,15,46,0.98)", backdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.10)" }}>
         <div style={{ width:40, height:40, borderRadius:10, overflow:"hidden", flexShrink:0, background:"#fff" }}>
