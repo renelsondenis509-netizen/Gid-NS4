@@ -44,7 +44,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
       <div className="px-4 py-4 border-b flex items-center gap-3" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
         <button onClick={() => setSelected(null)} className="text-blue-400 text-xl">←</button>
         <div className="flex-1">
-          <h2 className="text-white font-bold">Detay Scan</h2>
+          <h2 className="text-white font-bold">Detay rekèt yo</h2>
           <p className="text-blue-400 text-xs">{selected.subject} • {selected.date}</p>
         </div>
         <button onClick={() => handleDelete(selected)} disabled={deleting === selected.id}
@@ -56,7 +56,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
   style={{ background:"#1e3a8a22", color:"#60a5fa", border:"1px solid #3b82f633" }}>
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-  Fè Egzèsis
+  Fè yon egzèsis
 </button>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
@@ -81,7 +81,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         ) : (
           <div className="rounded-2xl px-4 py-3 flex items-center gap-3" style={{ background: "#1e3a8a11", border: "1px solid #1e3a8a22" }}>
             <IcoChat />
-            <span className="text-blue-600 text-xs">Kesyon tèks. Pa gen imaj</span>
+            <span className="text-blue-600 text-xs">Kesyon tèks sèlman. Pa gen imaj.</span>
           </div>
         )}
         <div className="rounded-2xl p-4" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
@@ -96,7 +96,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
           </div>
         </div>
         <div className="rounded-2xl px-4 py-3 flex justify-between" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a22" }}>
-          <span className="text-blue-400 text-xs">Scan itilize jou sa</span>
+          <span className="text-blue-400 text-xs">Rekèt itilize jou sa</span>
           <span className="text-orange-300 font-bold text-xs">{selected.scansUsed}/{selected.dailyLimit || user.dailyScans}</span>
         </div>
       </div>
@@ -107,7 +107,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
       <div className="px-4 py-4 border-b" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
-        <h2 className="text-white font-bold flex items-center gap-2"><IcoClipboard /> Istwa Scan, Kesyon/Repons Ou Yo</h2>
+        <h2 className="text-white font-bold flex items-center gap-2"><IcoClipboard /> Istorik Rekèt Yo, Kesyon/Repons Ou Yo</h2>
         <div className="flex items-center gap-3 mt-0.5">
           <p className="text-blue-400 text-xs">{history.length} scan{history.length !== 1 ? "s" : ""} total</p>
           <span className="text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1" style={{ background: "#14532d22", color: "#86efac", border: "1px solid #22c55e22" }}>
@@ -121,12 +121,12 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             <div className="flex gap-2">
               {[0,1,2].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-blue-400" style={{ animation: `bounce 1s ${i*0.2}s infinite` }} />)}
             </div>
-            <p className="text-blue-500 text-sm">Chajman istwa ou a...</p>
+            <p className="text-blue-500 text-sm">Chajman istorik ou a...</p>
           </div>
         )}
         {!loading && Object.keys(dailyMap).length > 0 && (
           <div className="rounded-2xl p-4" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
-            <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2"><IcoChart /> Scan pa Jou</h3>
+            <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2"><IcoChart /> Rekèt pa jou</h3>
             <div className="space-y-2">
               {Object.entries(dailyMap).slice(0, 7).map(([day, count]) => (
                 <div key={day} className="flex items-center gap-3">
@@ -143,14 +143,14 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         {!loading && history.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <IcoInbox />
-            <p className="text-blue-400 text-center text-sm">Poko gen istwa.<br />Fè premye scan, kesyon ou nan Chat la!</p>
+            <p className="text-blue-400 text-center text-sm">Poko gen istwa.<br />Fè yon premye rekèt nan chat la!</p>
             <button onClick={() => onNavigate("chat")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan Chat</button>
+              style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan chat la</button>
           </div>
         )}
         {!loading && history.length > 0 && (
           <>
-            <h3 className="text-blue-400 text-xs font-semibold uppercase tracking-wider">Tout Scan, Kesyon/Repons Ou Yo</h3>
+            <h3 className="text-blue-400 text-xs font-semibold uppercase tracking-wider">Tout rekèt, kesyon/repons ou yo</h3>
             {history.map(h => (
               <div key={h.id} className="rounded-2xl overflow-hidden" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
                 <button onClick={() => setSelected(h)} className="w-full text-left active:scale-95 transition-transform">
