@@ -51,9 +51,10 @@ useEffect(() => {
   const lastSeen = localStorage.getItem(`ann_seen_${user.phone}`);
   callEdge({ action:"get_announcements", schoolCode:user.code })
     .then(data => {
+      console.log("ANNONCES:", JSON.stringify(data));
       const ann = data.announcements?.[0];
       if (ann && ann.id !== parseInt(lastSeen)) setAnnouncement(ann);
-    }).catch(() => {});
+    }).catch(e => console.log("ERREUR annonces:", e));
 }, []);
 
   const detectSubject = (text) => {
