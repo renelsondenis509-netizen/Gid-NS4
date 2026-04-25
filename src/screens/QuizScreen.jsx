@@ -6,6 +6,29 @@ import { shuffleArray, shuffleChoices } from "../utils/helpers";
 import { scoreToNote20, getMention, saveQuizGrade } from "../utils/quiz";
 import { BottomNav } from "../components/UI";
 
+const FILIERES = {
+  "SVT": {
+    label: "SVT — Sciences de la Vie et de la Terre",
+    color: "#22c55e",
+    subjects: ["Biologie", "Géologie", "Chimie"]
+  },
+  "SES": {
+    label: "SES — Sciences Économiques et Sociales",
+    color: "#f59e0b",
+    subjects: ["Histoire", "Géographie", "Économie", "Philosophie"]
+  },
+  "SMP": {
+    label: "SMP — Sciences Mathématiques et Physiques",
+    color: "#3b82f6",
+    subjects: ["Analyse", "Algèbre", "Suite", "Complexe", "Probabilité", "Géométrie", "Physique"]
+  },
+  "LLA": {
+    label: "LLA — Lettres, Langues et Arts",
+    color: "#a855f7",
+    subjects: ["Créole", "Français", "Anglais", "Espagnol", "Dissertation", "Littérature Haïtienne", "Littérature Française", "Éducation Esthétique et Artistique", "Éducation Physique et Sportive", "Éducation à la Citoyenneté", "Numérique et Informatique"]
+  },
+};
+
 // ─── QUIZ SCREEN ─────────────────────────────────────────────────────────────
 export function QuizScreen({ user, onNavigate }) {
   const [phase, setPhase] = useState("select");
