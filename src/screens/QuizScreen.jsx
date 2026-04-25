@@ -97,22 +97,29 @@ export function QuizScreen({ user, onNavigate }) {
       <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
     </svg>
   );
-  const allIcons = {
-    "SVT (Sciences de la Vie et de la Terre)": "🧬",
-    "Physique": "⚡",
-    "Chimie": "⚗️",
-    "Philosophie & Dissertation": "🧠",
-    "Sciences Sociales & Citoyenneté": "🌍",
-    "Littérature Haïtienne": "🇭🇹",
-    "Littérature Française": "🗼",
-    "Mathématiques": "📐",
-    "Kreyòl Ayisyen": "🗣️",
-    "Art & Mizik Ayisyen": "🎵",
-    "Anglais": "🇬",
-    "Espagnol": "🇪🇸",
-    "Entrepreneuriat Scolaire": "💼",
-    "Informatique, Technologie & Arts": "💻",
-  };
+
+  const FILIERES = {
+  "SVT": {
+  label: "SVT — Sciences de la Vie et de la Terre",
+  color: "#22c55e",
+  subjects: ["Biologie", "Géologie", "Chimie"]
+},
+  "SES": {
+    label: "SES — Sciences Économiques et Sociales",
+    color: "#f59e0b",
+    subjects: ["Histoire", "Géographie", "Économie", "Philosophie"]
+  },
+  "SMP": {
+    label: "SMP — Sciences Mathématiques et Physiques",
+    color: "#3b82f6",
+    subjects: ["Analyse", "Algèbre", "Suite", "Complexe", "Probabilité", "Géométrie", "Physique"]
+  },
+  "LLA": {
+    label: "LLA — Lettres, Langues et Arts",
+    color: "#a855f7",
+    subjects: ["Créole", "Français", "Anglais", "Espagnol", "Dissertation", "Éducation Esthétique et Artistique", "Éducation Physique et Sportive", "Éducation à la Citoyenneté", "Numérique et Informatique"]
+  },
+};
   
   const startQCM = (sub) => {
     const all = shuffleArray(QUIZ_DATA[sub]);
