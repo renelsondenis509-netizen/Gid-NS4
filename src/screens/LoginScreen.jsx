@@ -49,7 +49,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
         <div style={{ width:80, height:80, borderRadius:20, background:"#fff", overflow:"hidden", boxShadow:"0 0 0 1px #2563EB22, 0 12px 40px #00000055", marginBottom:14 }}>
           <img src={APP_LOGO} alt="Gid NS4" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
         </div>
-        <p style={{ color:"#4B6ABA", fontSize:11, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:24 }}>Asistan IA pou elèv NS4</p>
+        <p style={{ color:"#4B6ABA", fontSize:11, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:24 }}>Asistan Entèlijans Atifisyèl pou elèv NS4</p>
         <div className="w-full" style={{ maxWidth:380, background:"rgba(15,28,60,0.80)", backdropFilter:"blur(20px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:24, padding:"28px 24px", boxShadow:"0 24px 60px rgba(0,0,0,0.5)" }}>
           {inputs.map(({ label, type, val, fn, ph, extra }, i) => (
             <div key={i} style={{ marginBottom:16 }}>
@@ -67,10 +67,10 @@ export function LoginScreen({ onLogin, onNavigate }) {
           )}
           <button onClick={handleLogin} disabled={loading}
             style={{ width:"100%", padding:"15px", borderRadius:14, background:loading?"#2E4080":"linear-gradient(135deg,#E8002A,#FF5C35)", color:"white", fontWeight:800, fontSize:15, border:"none", boxShadow:loading?"none":"0 6px 24px #E8002A33", cursor:loading?"not-allowed":"pointer" }}>
-            {loading ? "⏳ Ap verifye..." : "Rantre"}
+            {loading ? "Verifikasyon..." : "Rantre"}
           </button>
           <div style={{ textAlign:"center", marginTop:16 }}>
-            <span style={{ color:"#4b5ea8", fontSize:12 }}>Pa gen kòd ? </span>
+            <span style={{ color:"#4b5ea8", fontSize:12 }}>Ou poko gen kòd paw la? </span>
             <span style={{ color:"#4B6ABA", fontSize:12 }}>Pale ak direksyon lekòl ou a.</span>
           </div>
         </div>
