@@ -46,11 +46,11 @@ const generateAndSharePDF = async (school, stats) => {
   addLine("REZIME JENERAL", 13, true, [37, 99, 235]);
   addSeparator();
   addLine(`Elèv Aktif: ${stats.totalStudents} / ${school.maxStudents}`);
-  addLine(`Total Scan: ${stats.totalScans}`);
+  addLine(`Total Rekèt: ${stats.totalScans}`);
   addLine(`Scan Jodi a: ${stats.scansToday}`);
   addLine(`Scan Imaj: ${stats.imageScans ?? 0}`);
   addLine(`Scan Tèks: ${stats.textScans ?? 0}`);
-  addLine(`Jou Rete: ${school.daysRemaining}`);
+  addLine(`Jou ki Rete: ${school.daysRemaining}`);
   addLine(`Matyè Disponib: ${school.subjects.length}`);
   y += 5;
 
@@ -79,7 +79,7 @@ const generateAndSharePDF = async (school, stats) => {
   } else {
     addLine("Pa gen done quiz ankò.");
   }
-  addLine(`Moy. jeneral: ${stats.quizStats?.avgNote ?? 0}/20`);
+  addLine(`Mwayèn jeneral: ${stats.quizStats?.avgNote ?? 0}/20`);
   addLine(`Total quiz: ${stats.quizStats?.totalQuizzes ?? 0}`);
   y += 5;
 
@@ -97,7 +97,7 @@ const generateAndSharePDF = async (school, stats) => {
     addLine(`${stats.quizStats.weakSubject.subject} — moy. ${stats.quizStats.weakSubject.avg}/20`, 11, true, [220, 0, 42]);
     addLine("Elèv yo dwe travay plis sou matyè sa a pou amelyore rezilta yo.");
   } else {
-    addLine("Pa gen done suffizan pou yon rekòmandasyon.");
+    addLine("Pa gen done sifizan pou yon rekòmandasyon.");
   }
   y += 5;
   doc.save(`rapport-${school.name}-${date}.pdf`);
@@ -301,7 +301,7 @@ export function DashboardScreen({ onBack, userCode }) {
                 <div key={sub}>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-blue-200">{sub}</span>
-                    <span className="text-blue-400 font-bold">{count} scan{count > 1 ? "s" : ""}</span>
+                    <span className="text-blue-400 font-bold">{count} requêtes{count > 1 ? "s" : ""}</span>
                   </div>
                   <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "#ffffff10" }}>
                     <div className="h-full rounded-full transition-all" style={{ width: `${(count/maxScans)*100}%`, background: colors[i % colors.length] }} />
