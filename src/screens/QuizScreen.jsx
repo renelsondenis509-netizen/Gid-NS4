@@ -7,22 +7,22 @@ import { scoreToNote20, getMention, saveQuizGrade } from "../utils/quiz";
 import { BottomNav } from "../components/UI";
 
 const FILIERES = {
-  "SVT": {
+  "SVT (Sciences de la Vie et de la Terre)": {
     label: "SVT — Sciences de la Vie et de la Terre",
     color: "#22c55e",
     subjects: ["Biologie", "Géologie", "Chimie"],
   },
-  "SES": {
+  "SES (Sciences Économiques et Sociales)": {
     label: "SES — Sciences Économiques et Sociales",
     color: "#f59e0b",
     subjects: ["Histoire", "Géographie", "Économie", "Philosophie"],
   },
-  "SMP": {
+  "SMP (Sciences Mathématiques et Physiques)": {
     label: "SMP — Sciences Mathématiques et Physiques",
     color: "#3b82f6",
     subjects: ["Analyse", "Algèbre", "Suite", "Complexe", "Probabilité", "Géométrie", "Physique"],
   },
-  "LLA": {
+  "LLA (Lettres,Langues et Arts)": {
     label: "LLA — Lettres, Langues et Arts",
     color: "#a855f7",
     subjects: [
