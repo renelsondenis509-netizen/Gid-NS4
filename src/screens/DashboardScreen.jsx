@@ -301,7 +301,7 @@ export function DashboardScreen({ onBack, userCode }) {
                 <div key={sub}>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-blue-200">{sub}</span>
-                    <span className="text-blue-400 font-bold">{count} requêtes{count > 1 ? "s" : ""}</span>
+                    <span className="text-blue-400 font-bold">{count} requête{count > 1 ? "s" : ""}</span>
                   </div>
                   <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "#ffffff10" }}>
                     <div className="h-full rounded-full transition-all" style={{ width: `${(count/maxScans)*100}%`, background: colors[i % colors.length] }} />
