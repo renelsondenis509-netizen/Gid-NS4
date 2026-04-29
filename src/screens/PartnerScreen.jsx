@@ -93,7 +93,7 @@ export function PartnerScreen({ onBack, onNavigate }) {
         <div className="text-center py-4">
           <SchoolIcon />
           <h3 className="text-white font-bold text-xl mt-4">Rejwenn Gid-NS4</h3>
-          <p className="text-blue-400 text-sm mt-2">Ofri yon asistan IA pwofesyonèl a tout elèv ou yo 24/24, 7/7</p>
+          <p className="text-blue-400 text-sm mt-2">Ofri yon asistan Entèlijans Atifisyèl pwofesyonèl a tout elèv ou yo 24/24 e 7/7</p>
         </div>
 
         {/* Avantages */}        <div className="space-y-3">
