@@ -546,7 +546,7 @@ export function QuizScreen({ user, onNavigate }) {
 
                           {/* Icône SVG */}
                           <div style={{ width: 36, height: 36, borderRadius: 10, background: `${filiere.color}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            {SubjectIcon && SubjectIcon({ size: 20, color: filiere.color })}
+                            {SubjectIcon && <SubjectIcon size={20} color={filiere.color} />}
                           </div>
 
                           {/* Nom + nombre de questions */}
@@ -572,7 +572,7 @@ export function QuizScreen({ user, onNavigate }) {
                         >
                           <div style={{ width: 3, height: 36, borderRadius: 3, background: "#4B5EA8", flexShrink: 0 }} />
                           <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(75,94,168,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            {SubjectIcon && SubjectIcon({ size: 20, color: "#4B5EA8" })}
+                            {SubjectIcon && <SubjectIcon size={20} color="#4B5EA8" />}
                           </div>
                           <div style={{ flex: 1, textAlign: "left" }}>
                             <div style={{ color: "#E8EEFF", fontWeight: 600, fontSize: 13 }}>{sub}</div>
