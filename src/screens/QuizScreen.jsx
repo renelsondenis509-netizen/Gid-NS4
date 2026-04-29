@@ -95,245 +95,252 @@ const ChevronIcon = ({ open, color = "#fff" }) => (
   </svg>
 );
 
-// ─── ICÔNES SVG PAR MATIÈRE (SVT) ──────────────────────────────────────────
-const IconBiologie = ({ size = 20, color = "#22c55e" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"/>
-    <path d="M12 3v18"/>
-    <path d="M8 8l8 8"/>
-    <path d="M16 8l-8 8"/>
-  </svg>
-);
+// ─── FONCTION D'ICÔNE PAR MATIÈRE ──────────────────────────────────────────
+const getSubjectIcon = (subject, size = 22, color = "#fff") => {
+  const svgProps = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: color,
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  };
 
-const IconGeologie = ({ size = 20, color = "#22c55e" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 20h18L12 4 3 20z"/>
-    <path d="M8 14l4-6 4 6"/>
-    <path d="M10 18h4"/>
-  </svg>
-);
-
-const IconChimie = ({ size = 20, color = "#22c55e" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 3h6v8l-3 9-3-9V3z"/>
-    <circle cx="12" cy="12" r="2"/>
-    <path d="M6 16l2-2"/>
-    <path d="M18 16l-2-2"/>
-  </svg>
-);
-
-// ─── ICÔNES SVG PAR MATIÈRE (SES) ──────────────────────────────────────────
-const IconHistoire = ({ size = 20, color = "#f59e0b" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 8v4l3 3"/>
-    <circle cx="12" cy="12" r="9"/>
-    <path d="M12 2v2"/>
-    <path d="M12 20v2"/>
-    <path d="M2 12h2"/>
-    <path d="M20 12h2"/>
-  </svg>
-);
-
-const IconGeographie = ({ size = 20, color = "#f59e0b" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M2 12h20"/>
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-  </svg>
-);
-
-const IconEconomie = ({ size = 20, color = "#f59e0b" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"/>
-    <path d="M12 6v12"/>
-    <path d="M9 9h6"/>
-    <path d="M9 15h6"/>
-    <path d="M10 12h4"/>
-  </svg>
-);
-
-const IconPhilosophie = ({ size = 20, color = "#f59e0b" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"/>
-    <path d="M12 8v8"/>
-    <path d="M8 12h8"/>
-    <circle cx="12" cy="12" r="2" fill={color}/>
-  </svg>
-);
-
-// ─── ICÔNES SVG PAR MATIÈRE (SMP) ──────────────────────────────────────────
-const IconAnalyse = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 3v18h18"/>
-    <path d="M7 16l4-8 4 4 5-10"/>
-  </svg>
-);
-
-const IconAlgebre = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 4h16v16H4z"/>
-    <path d="M8 8l8 8"/>
-    <path d="M16 8l-8 8"/>
-    <circle cx="12" cy="12" r="1" fill={color}/>
-  </svg>
-);
-
-const IconSuite = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 12h4l3-9 4 18 3-9h4"/>
-  </svg>
-);
-
-const IconComplexe = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"/>
-    <path d="M12 3v18"/>
-    <path d="M3 12h18"/>
-    <circle cx="12" cy="12" r="2" fill={color}/>
-  </svg>
-);
-
-const IconProbabilite = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <circle cx="8" cy="8" r="1.5" fill={color}/>
-    <circle cx="16" cy="8" r="1.5" fill={color}/>
-    <circle cx="8" cy="16" r="1.5" fill={color}/>
-    <circle cx="16" cy="16" r="1.5" fill={color}/>
-    <circle cx="12" cy="12" r="1.5" fill={color}/>
-  </svg>
-);
-
-const IconGeometrie = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 3l7 19 7-19 7 19H3z"/>
-    <path d="M12 3v19"/>
-  </svg>
-);
-
-const IconPhysique = ({ size = 20, color = "#3b82f6" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-  </svg>
-);
-
-// ─── ICÔNES SVG PAR MATIÈRE (LLA) ──────────────────────────────────────────
-const IconCreole = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    <path d="M8 10h8"/>
-    <path d="M8 14h5"/>
-  </svg>
-);
-
-const IconFrancais = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-    <path d="M8 7h8"/>
-    <path d="M8 11h6"/>
-    <path d="M8 15h8"/>
-  </svg>
-);
-
-const IconLangue = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M2 12h20"/>
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-  </svg>
-);
-
-const IconDissertation = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-    <polyline points="10 9 9 9 8 9"/>
-  </svg>
-);
-
-const IconLitterature = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-    <path d="M12 6v12"/>
-    <path d="M8 10h8"/>
-  </svg>
-);
-
-const IconArt = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="13.5" cy="6.5" r="2.5"/>
-    <path d="M17 17a5 5 0 0 1-7 0c-1.5-1.5-2-4-1-6 .5-1 1-2 2-2 2 0 3 2 4 3"/>
-    <circle cx="8.5" cy="14.5" r="1.5" fill={color}/>
-    <circle cx="12" cy="12" r="1" fill={color}/>
-    <circle cx="15.5" cy="13.5" r="1" fill={color}/>
-  </svg>
-);
-
-const IconSport = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M5.5 5.5L18.5 18.5"/>
-    <path d="M18.5 5.5L5.5 18.5"/>
-    <path d="M12 2v20"/>
-    <path d="M2 12h20"/>
-  </svg>
-);
-
-const IconCitoyennete = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 21h18"/>
-    <path d="M5 21V7l7-4 7 4v14"/>
-    <path d="M9 21v-6h6v6"/>
-    <path d="M9 9h.01"/>
-    <path d="M15 9h.01"/>
-  </svg>
-);
-
-const IconNumerique = ({ size = 20, color = "#a855f7" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="3" width="20" height="14" rx="2"/>
-    <path d="M8 21h8"/>
-    <path d="M12 17v4"/>
-    <path d="M6 7h4"/>
-    <path d="M6 11h2"/>
-  </svg>
-);
-
-// ─── MAPPING DES ICÔNES PAR MATIÈRE ────────────────────────────────────────
-const allIcons = {
-  // SVT
-  "Biologie": IconBiologie,
-  "Géologie": IconGeologie,
-  "Chimie": IconChimie,
-  // SES
-  "Histoire": IconHistoire,
-  "Géographie": IconGeographie,
-  "Économie": IconEconomie,
-  "Philosophie": IconPhilosophie,
-  // SMP
-  "Analyse": IconAnalyse,
-  "Algèbre": IconAlgebre,
-  "Suite": IconSuite,
-  "Complexe": IconComplexe,
-  "Probabilité": IconProbabilite,
-  "Géométrie": IconGeometrie,
-  "Physique": IconPhysique,
-  // LLA
-  "Créole": IconCreole,
-  "Français": IconFrancais,
-  "Anglais": IconLangue,
-  "Espagnol": IconLangue,
-  "Dissertation": IconDissertation,
-  "Littérature Haïtienne": IconLitterature,
-  "Littérature Française": IconLitterature,
-  "Éducation Esthétique et Artistique": IconArt,
-  "Éducation Physique et Sportive": IconSport,
-  "Éducation à la Citoyenneté": IconCitoyennete,
-  "Numérique et Informatique": IconNumerique,
+  switch(subject) {
+    // SVT
+    case "Biologie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 3v18"/>
+          <path d="M8 8l8 8"/>
+          <path d="M16 8l-8 8"/>
+        </svg>
+      );
+    case "Géologie":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 20h18L12 4 3 20z"/>
+          <path d="M8 14l4-6 4 6"/>
+          <path d="M10 18h4"/>
+        </svg>
+      );
+    case "Chimie":
+      return (
+        <svg {...svgProps}>
+          <path d="M9 3h6v8l-3 9-3-9V3z"/>
+          <circle cx="12" cy="12" r="2"/>
+          <path d="M6 16l2-2"/>
+          <path d="M18 16l-2-2"/>
+        </svg>
+      );
+    
+    // SES
+    case "Histoire":
+      return (
+        <svg {...svgProps}>
+          <path d="M12 8v4l3 3"/>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 2v2"/>
+          <path d="M12 20v2"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+        </svg>
+      );
+    case "Géographie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      );
+    case "Économie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 6v12"/>
+          <path d="M9 9h6"/>
+          <path d="M9 15h6"/>
+          <path d="M10 12h4"/>
+        </svg>
+      );
+    case "Philosophie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 8v8"/>
+          <path d="M8 12h8"/>
+          <circle cx="12" cy="12" r="2" fill={color}/>
+        </svg>
+      );
+    
+    // SMP
+    case "Analyse":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 3v18h18"/>
+          <path d="M7 16l4-8 4 4 5-10"/>
+        </svg>
+      );
+    case "Algèbre":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 4h16v16H4z"/>
+          <path d="M8 8l8 8"/>
+          <path d="M16 8l-8 8"/>
+          <circle cx="12" cy="12" r="1" fill={color}/>
+        </svg>
+      );
+    case "Suite":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 12h4l3-9 4 18 3-9h4"/>
+        </svg>
+      );
+    case "Complexe":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 3v18"/>
+          <path d="M3 12h18"/>
+          <circle cx="12" cy="12" r="2" fill={color}/>
+        </svg>
+      );
+    case "Probabilité":
+      return (
+        <svg {...svgProps}>
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8" cy="8" r="1.5" fill={color}/>
+          <circle cx="16" cy="8" r="1.5" fill={color}/>
+          <circle cx="8" cy="16" r="1.5" fill={color}/>
+          <circle cx="16" cy="16" r="1.5" fill={color}/>
+          <circle cx="12" cy="12" r="1.5" fill={color}/>
+        </svg>
+      );
+    case "Géométrie":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 3l7 19 7-19 7 19H3z"/>
+          <path d="M12 3v19"/>
+        </svg>
+      );
+    case "Physique":
+      return (
+        <svg {...svgProps}>
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      );
+    
+    // LLA
+    case "Créole":
+      return (
+        <svg {...svgProps}>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M8 10h8"/>
+          <path d="M8 14h5"/>
+        </svg>
+      );
+    case "Français":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M8 7h8"/>
+          <path d="M8 11h6"/>
+          <path d="M8 15h8"/>
+        </svg>
+      );
+    case "Anglais":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      );
+    case "Espagnol":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      );
+    case "Dissertation":
+      return (
+        <svg {...svgProps}>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+      );
+    case "Littérature Haïtienne":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M12 6v12"/>
+          <path d="M8 10h8"/>
+        </svg>
+      );
+    case "Littérature Française":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M12 6v12"/>
+          <path d="M8 10h8"/>
+        </svg>
+      );
+    case "Éducation Esthétique et Artistique":
+      return (
+        <svg {...svgProps}>
+          <circle cx="13.5" cy="6.5" r="2.5"/>
+          <path d="M17 17a5 5 0 0 1-7 0c-1.5-1.5-2-4-1-6 .5-1 1-2 2-2 2 0 3 2 4 3"/>
+          <circle cx="8.5" cy="14.5" r="1.5" fill={color}/>
+          <circle cx="12" cy="12" r="1" fill={color}/>
+          <circle cx="15.5" cy="13.5" r="1" fill={color}/>
+        </svg>
+      );
+    case "Éducation Physique et Sportive":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M5.5 5.5L18.5 18.5"/>
+          <path d="M18.5 5.5L5.5 18.5"/>
+          <path d="M12 2v20"/>
+          <path d="M2 12h20"/>
+        </svg>
+      );
+    case "Éducation à la Citoyenneté":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 21h18"/>
+          <path d="M5 21V7l7-4 7 4v14"/>
+          <path d="M9 21v-6h6v6"/>
+          <path d="M9 9h.01"/>
+          <path d="M15 9h.01"/>
+        </svg>
+      );
+    case "Numérique et Informatique":
+      return (
+        <svg {...svgProps}>
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8"/>
+          <path d="M12 17v4"/>
+          <path d="M6 7h4"/>
+          <path d="M6 11h2"/>
+        </svg>
+      );
+    
+    default:
+      return <span style={{ fontSize: 20 }}>📚</span>;
+  }
 };
 
 // ─── QUIZ SCREEN ─────────────────────────────────────────────────────────────
@@ -535,7 +542,6 @@ export function QuizScreen({ user, onNavigate }) {
                     {filiere.subjects.map((sub, idx) => {
                       const available = user.subjects.includes(sub) && QUIZ_DATA[sub];
                       const qCount = QUIZ_DATA[sub]?.length || 0;
-                      const SubjectIcon = allIcons[sub];
 
                       return available ? (
                         <button
@@ -555,7 +561,7 @@ export function QuizScreen({ user, onNavigate }) {
                           {/* Ligne verticale de couleur */}
                           <div style={{ width: 3, height: 36, borderRadius: 3, background: filiere.color, flexShrink: 0, opacity: 0.7 }} />
 
-                          {/* Icône SVG - CORRIGÉ */}
+                          {/* Icône SVG */}
                           <div style={{ 
                             width: 40, 
                             height: 40, 
@@ -567,11 +573,7 @@ export function QuizScreen({ user, onNavigate }) {
                             justifyContent: "center", 
                             flexShrink: 0 
                           }}>
-                            {SubjectIcon ? (
-                              <SubjectIcon size={22} color={filiere.color} />
-                            ) : (
-                              <span style={{ fontSize: 20 }}>📚</span>
-                            )}
+                            {getSubjectIcon(sub, 22, filiere.color)}
                           </div>
 
                           {/* Nom + nombre de questions */}
@@ -607,11 +609,7 @@ export function QuizScreen({ user, onNavigate }) {
                             justifyContent: "center", 
                             flexShrink: 0 
                           }}>
-                            {SubjectIcon ? (
-                              <SubjectIcon size={22} color="#4B5EA8" />
-                            ) : (
-                              <span style={{ fontSize: 20, opacity: 0.5 }}>📚</span>
-                            )}
+                            {getSubjectIcon(sub, 22, "#4B5EA8")}
                           </div>
                           <div style={{ flex: 1, textAlign: "left" }}>
                             <div style={{ color: "#E8EEFF", fontWeight: 600, fontSize: 13 }}>{sub}</div>
