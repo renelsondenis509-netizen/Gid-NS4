@@ -9,23 +9,23 @@ import { BottomNav } from "../components/UI";
 
 export function ChatScreen({ user, onNavigate }) {
   const [messages, setMessages] = useState([{
-  role: "assistant",
-  content: `Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**.\n\n**Ann al travay !**`
-}]);
-  const [input, setInput]           = useState("");
-  const [image, setImage]           = useState(null);
-  const [loading, setLoading]       = useState(false);
-  const [apiError, setApiError]     = useState(null);
+    role: "assistant",
+    content: `Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**.\n\n**Ann al travay !**`
+  }]);
+  const [input, setInput] = useState("");
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
   const [lastPayload, setLastPayload] = useState(null);
   const [activeSubject, setActiveSubject] = useState(user.subjects[0] || null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites, setFavorites] = useState(() => {
-  try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; }
-});
-  
-  const bottomRef       = useRef(null);
-  const fileRef         = useRef(null);
-  const chatRef         = useRef(null);
+    try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; }
+  });
+
+  const bottomRef = useRef(null);
+  const fileRef = useRef(null);
+  const chatRef = useRef(null);
 
   const IMG_MAX  = user.dailyImageScans ?? 1;
   const TEXT_MAX = user.dailyTextScans  ?? 4;
@@ -111,32 +111,36 @@ export function ChatScreen({ user, onNavigate }) {
   const imgDone  = imgUsed  >= IMG_MAX;
   const textDone = textUsed >= TEXT_MAX;
   const allDone  = imgDone && textDone;
+
   const toggleFav = (msg, i) => {
-  setFavorites(prev => {
-    const exists = prev.findIndex(f => f.id === i);
-    let next;
-    if (exists >= 0) {
-      next = prev.filter(f => f.id !== i);
-    } else {
-      next = [...prev, { id:i, content:msg.content, subject:activeSubject, date:new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" }) }];
-    }
-    try { localStorage.setItem(`fav_${user.phone}`, JSON.stringify(next)); } catch {}
-    return next;
-  });
-};
-const speak = (text) => {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const clean = text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/[#*_~`]/g, "").replace(/\$[^$]*\$/g, "formule").trim();
-  const utt = new SpeechSynthesisUtterance(clean);
-  utt.lang = "fr-FR";
-  utt.rate = 0.9;
-  utt.pitch = 1;
-  window.speechSynthesis.speak(utt);
-};
+    setFavorites(prev => {
+      const exists = prev.findIndex(f => f.id === i);
+      let next;
+      if (exists >= 0) {
+        next = prev.filter(f => f.id !== i);
+      } else {
+        next = [...prev, { id:i, content:msg.content, subject:activeSubject, date:new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" }) }];
+      }
+      try { localStorage.setItem(`fav_${user.phone}`, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
+  const speak = (text) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/[#*_~`]/g, "").replace(/\$[^$]*\$/g, "formule").trim();
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = "fr-FR";
+    utt.rate = 0.9;
+    utt.pitch = 1;
+    window.speechSynthesis.speak(utt);
+  };
+
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"#0a0f2e" }}>
       <ExpiryBanner daysRemaining={user.daysRemaining} />
+      
       {/* HEADER */}
       <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", background:"rgba(10,15,46,0.98)", backdropFilter:"blur(20px)", borderBottom:"1px solid rgba(255,255,255,0.10)" }}>
         <div style={{ width:40, height:40, borderRadius:10, overflow:"hidden", flexShrink:0, background:"#fff" }}>
@@ -149,34 +153,36 @@ const speak = (text) => {
             <span style={{ color:"#22C55E", fontSize:11, fontWeight:500 }}>En ligne</span>
           </div>
         </div>
-       <div style={{ display:"flex", gap:6 }}>
-  {/* Tokens image */}
-  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:imgDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${imgDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
-    <div style={{ display:"flex", gap:3, marginBottom:3 }}>
-      {Array.from({ length:IMG_MAX }).map((_,i) => {
-  const filled = i < imgUsed;
-        return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#E8002A":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #E8002A88":"none", transition:"all .3s" }} />;
-      })}
-    </div>
-    <span style={{ fontSize:9, fontWeight:700, color:imgDone?"#3B4A6B":"#60A5FA" }}>
-      {imgDone?"✓ Fini":<span style={{display:"flex",alignItems:"center",gap:3}}>{IMG_MAX-imgUsed}/{IMG_MAX} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>}
-    </span>
-  </div>
-  {/* Tokens texte */}
-  <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:textDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${textDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
-    <div style={{ display:"flex", gap:3, marginBottom:3 }}>
-      {Array.from({ length:5 }).map((_,i) => {
-        const filled = i < Math.round((textUsed/TEXT_MAX)*5);
-        return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#2563EB":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #2563EB88":"none", transition:"all .3s" }} />;
-      })}
-    </div>
-    <span style={{ fontSize:9, fontWeight:700, color:textDone?"#3B4A6B":"#60A5FA" }}>
-      {textDone?"✓ Fini":<span style={{display:"flex",alignItems:"center",gap:3}}>{TEXT_MAX-textUsed}/{TEXT_MAX} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>}
-    </span>
-  </div>
-</div>
+        <div style={{ display:"flex", gap:6 }}>
+          {/* Tokens image */}
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:imgDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${imgDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
+            <div style={{ display:"flex", gap:3, marginBottom:3 }}>
+              {Array.from({ length:IMG_MAX }).map((_,i) => {
+                const filled = i < imgUsed;
+                return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#E8002A":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #E8002A88":"none", transition:"all .3s" }} />;
+              })}
+            </div>
+            <span style={{ fontSize:9, fontWeight:700, color:imgDone?"#3B4A6B":"#60A5FA" }}>
+              {imgDone?"✓ Fini":<span style={{display:"flex",alignItems:"center",gap:3}}>{IMG_MAX-imgUsed}/{IMG_MAX} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>}
+            </span>
+          </div>
+          {/* Tokens texte */}
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"5px 9px", borderRadius:12, background:textDone?"rgba(255,255,255,0.04)":"rgba(37,99,235,0.15)", border:`1px solid ${textDone?"rgba(255,255,255,0.08)":"rgba(37,99,235,0.35)"}`, minWidth:52 }}>
+            <div style={{ display:"flex", gap:3, marginBottom:3 }}>
+              {Array.from({ length:5 }).map((_,i) => {
+                const filled = i < Math.round((textUsed/TEXT_MAX)*5);
+                return <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:filled?"#2563EB":"rgba(255,255,255,0.12)", boxShadow:filled?"0 0 4px #2563EB88":"none", transition:"all .3s" }} />;
+              })}
+            </div>
+            <span style={{ fontSize:9, fontWeight:700, color:textDone?"#3B4A6B":"#60A5FA" }}>
+              {textDone?"✓ Fini":<span style={{display:"flex",alignItems:"center",gap:3}}>{TEXT_MAX-textUsed}/{TEXT_MAX} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>}
+            </span>
+          </div>
+        </div>
       </div>
-      </div>
+
+      {/* PLUS DE TABS – la liste des matières a été supprimée */}
+
       {/* MESSAGES */}
       <div ref={chatRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
         {messages.map((msg, i) => (
@@ -187,22 +193,22 @@ const speak = (text) => {
               </div>
             )}
             <div style={{ maxWidth:"82%" }}>
-  {msg.image && <img src={msg.image} alt="scan" style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.1)" }} />}
-  <div style={{ padding:"11px 15px", fontSize:14, lineHeight:1.65, background:msg.role==="user"?"linear-gradient(135deg,#2563EB,#1D4ED8)":"rgba(15,28,60,0.95)", border:msg.role==="assistant"?"1px solid rgba(37,99,235,0.15)":"none", color:"#E8EEFF", borderRadius:msg.role==="user"?"18px 18px 5px 18px":"5px 18px 18px 18px" }}>
-    <LatexText content={msg.content} />
-  </div>
-  {msg.role==="assistant" && (
-    <button onClick={() => toggleFav(msg, i)} style={{ marginTop:4, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:1,color:"#fbbf24"}}>
-      {favorites.findIndex(f => f.id === i) >= 0 ? "⭐" : "☆"}
-    </button>
-  )}
-</div>
-     {msg.role==="assistant" && (
-  <button onClick={() => speak(msg.content)} style={{ marginTop:2, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:0.8, color:"#60a5fa" }}>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-  </button>
-)}  
-     </div>
+              {msg.image && <img src={msg.image} alt="scan" style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.1)" }} />}
+              <div style={{ padding:"11px 15px", fontSize:14, lineHeight:1.65, background:msg.role==="user"?"linear-gradient(135deg,#2563EB,#1D4ED8)":"rgba(15,28,60,0.95)", border:msg.role==="assistant"?"1px solid rgba(37,99,235,0.15)":"none", color:"#E8EEFF", borderRadius:msg.role==="user"?"18px 18px 5px 18px":"5px 18px 18px 18px" }}>
+                <LatexText content={msg.content} />
+              </div>
+              {msg.role==="assistant" && (
+                <button onClick={() => toggleFav(msg, i)} style={{ marginTop:4, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:1, color:"#fbbf24"}}>
+                  {favorites.findIndex(f => f.id === i) >= 0 ? "⭐" : "☆"}
+                </button>
+              )}
+            </div>
+            {msg.role==="assistant" && (
+              <button onClick={() => speak(msg.content)} style={{ marginTop:2, padding:"2px 8px", borderRadius:10, background:"none", border:"none", cursor:"pointer", fontSize:14, opacity:0.8, color:"#60a5fa" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              </button>
+            )}
+          </div>
         ))}
         {loading && (
           <div className="flex gap-2 items-start">
@@ -224,6 +230,7 @@ const speak = (text) => {
         )}
         <div ref={bottomRef} />
       </div>
+
       {/* SCROLL BUTTON */}
       {showScrollBtn && (
         <button onClick={() => chatRef.current?.scrollTo({ top:chatRef.current.scrollHeight, behavior:'smooth' })}
@@ -233,7 +240,9 @@ const speak = (text) => {
           </svg>
         </button>
       )}
+
       <ErrorToast error={apiError} onRetry={lastPayload ? () => sendMessage(lastPayload) : null} onDismiss={() => { setApiError(null); setLastPayload(null); }} />
+
       {/* INPUT */}
       <div style={{ padding:"10px 12px", background:"rgba(10,15,46,0.98)", backdropFilter:"blur(20px)", borderTop:"1px solid rgba(255,255,255,0.10)" }}>
         {image && (
@@ -251,8 +260,7 @@ const speak = (text) => {
               <circle cx="12" cy="13" r="4"/>
             </svg>
           </button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleImage}
-            style={{ position:"absolute", width:0, height:0, opacity:0, pointerEvents:"none" }} />
+          <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} style={{ position:"absolute", width:0, height:0, opacity:0, pointerEvents:"none" }} />
           <textarea value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key==="Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); sendMessage(); } }}
             placeholder={allDone?"Limit ou a rive...":imgDone?"Poze yon kesyon tèks...":"Poze yon kesyon oswa analize yon egzèsis..."}
