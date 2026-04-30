@@ -275,14 +275,13 @@ function getWeekKey(): string {
   return `${year}-W${String(week).padStart(2, "0")}`;
 }
 
-// ─── CACHE : fonctions corrigées ──────────────────────────────────────────────
-/** Normalisation forte pour le cache */
+// ─── Normalisation et hash ─────────────────────────────────────────────────
 function normalizeMessage(msg: string): string {
   return msg
     .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // enlève accents
-    .replace(/[^\w\s]/g, "")                         // enlève ponctuation
-    .replace(/\s+/g, " ")                            // un seul espace
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -292,6 +291,31 @@ async function hashMessage(msg: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
 }
 
+// ─── Récupérer depuis le cache ─────────────────────────────────────────────
+async function getCachedAnswer(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string | null> {
+  const { data, error } = await db
+    .from("question_cache")
+    .select("id, answer, hit_count")
+    .eq("subject", subject)
+    .eq("question_hash", hash)
+    .maybeSingle();
+
+  if (error) {
+    console.error("❌ getCachedAnswer error:", error);
+    return null;
+  }
+  if (!data) return null;
+
+  // Mise à jour non bloquante du compteur
+  db.from("question_cache")
+    .update({ hit_count: (data.hit_count || 0) + 1 })
+    .eq("id", data.id)
+    .catch(e => console.warn("hit_count update failed", e));
+
+  return data.answer;
+}
+
+// ─── Sauvegarder dans le cache (avec gestion des conflits) ─────────────────
 async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string): Promise<boolean> {
   try {
     const { error } = await db
@@ -327,6 +351,7 @@ async function saveCache(db: ReturnType<typeof createClient>, subject: string, h
     return false;
   }
 }
+
 // ─── ACTION : validate_code ───────────────────────────────────────────────────
 async function validateCode(
   db: ReturnType<typeof createClient>,
