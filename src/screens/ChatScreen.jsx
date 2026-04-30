@@ -48,15 +48,51 @@ export function ChatScreen({ user, onNavigate }) {
   }, []);
 
   const detectSubject = (text) => {
-    const t = text.toLowerCase();
-    if (t.includes("bio") || t.includes("cellule") || t.includes("adn"))     return "Biologie";
-    if (t.includes("chim") || t.includes("molécule") || t.includes("acide")) return "Chimie";
-    if (t.includes("physi") || t.includes("vitesse") || t.includes("force")) return "Physique";
-    if (t.includes("philo") || t.includes("socrate"))                        return "Philosophie";
-    if (t.includes("social") || t.includes("haïti"))                         return "Sciences Sociales";
-    if (t.includes("littér") || t.includes("roman"))                         return "Littérature Haïtienne";
-    return user.subjects[0] || "Général";
-  };
+  const t = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Sciences naturelles
+  if (t.includes("bio") || t.includes("cellule") || t.includes("adn") || t.includes("génétique") || t.includes("évolution") || t.includes("végétal") || t.includes("animal")) return "Biologie";
+  if (t.includes("géol") || t.includes("roche") || t.includes("minéral") || t.includes("tectonique") || t.includes("fossile") || t.includes("volcan")) return "Géologie";
+  if (t.includes("physiol") || t.includes("organe") || t.includes("système") || t.includes("homéostasie") || t.includes("fonction")) return "Physiologie";
+  
+  // Chimie / Physique
+  if (t.includes("chim") || t.includes("molécule") || t.includes("acide") || t.includes("réaction") || t.includes("atome") || t.includes("tableau périodique")) return "Chimie";
+  if (t.includes("phys") || t.includes("vitesse") || t.includes("force") || t.includes("énergie") || t.includes("mouvement") || t.includes("électricité") || t.includes("onde")) return "Physiques";
+  
+  // Mathématiques
+  if (t.includes("analyse") || t.includes("limite") || t.includes("dérivée") || t.includes("intégrale") || t.includes("continuité")) return "Analyse";
+  if (t.includes("algèbre") || t.includes("équation") || t.includes("inéquation") || t.includes("fonction") || t.includes("polynôme")) return "Algèbre";
+  if (t.includes("suite") || t.includes("arithmétique") || t.includes("géométrique") || t.includes("récurrence") || t.includes("suite numérique")) return "Suite";
+  if (t.includes("complexe") || t.includes("imaginaire") || t.includes("argument") || t.includes("module") || t.includes("nombre complexe")) return "Complexe";
+  if (t.includes("probabilité") || t.includes("chance") || t.includes("dé") || t.includes("loi normale") || t.includes("prob")) return "Probabilité";
+  if (t.includes("géométrie") || t.includes("triangle") || t.includes("cercle") || t.includes("vecteur") || t.includes("angle") || t.includes("droite")) return "Géométrie";
+  
+  // Humanités / Sciences sociales
+  if (t.includes("philo") || t.includes("socrate") || t.includes("kant") || t.includes("conscience") || t.includes("liberté") || t.includes("justice")) return "Philosophie";
+  if (t.includes("histoire") || t.includes("révolution") || t.includes("guerre") || t.includes("colonie") || t.includes("indépendance")) return "Histoire";
+  if (t.includes("géo") || t.includes("carte") || t.includes("population") || t.includes("climat") || t.includes("relief")) return "Géographie";
+  if (t.includes("économie") || t.includes("marché") || t.includes("offre") || t.includes("demande") || t.includes("pib")) return "Économie";
+  
+  // Langues et lettres
+  if (t.includes("créole") || t.includes("grammaire créole")) return "Créole";
+  if (t.includes("français") || t.includes("grammaire fr") || t.includes("conjugaison") || t.includes("orthographe fr")) return "Français";
+  if (t.includes("anglais") || t.includes("english") || t.includes("vocabulaire anglais")) return "Anglais";
+  if (t.includes("espagnol") || t.includes("español") || t.includes("vocabulaire espagnol")) return "Espagnol";
+  if (t.includes("dissertation") || t.includes("rédaction") || t.includes("thèse") || t.includes("argumentation")) return "Dissertation";
+  
+  // Éducation, art, sport, citoyenneté, numérique
+  if (t.includes("esthétique") || t.includes("artistique") || t.includes("dessin") || t.includes("peinture") || t.includes("art")) return "Éducative Esthétique et Artistique";
+  if (t.includes("sport") || t.includes("éducation physique") || t.includes("ep") || t.includes("musculation") || t.includes("athlétisme")) return "Éducation Physique et Sportive";
+  if (t.includes("citoyenneté") || t.includes("civique") || t.includes("droit") || t.includes("devoir") || t.includes("constitution")) return "Éducation à la Citoyenneté";
+  if (t.includes("numérique") || t.includes("informatique") || t.includes("ordinateur") || t.includes("programmation") || t.includes("algorithme")) return "Numérique et Informatique";
+  
+  // Littérature (Haïtienne / Française) – on peut les distinguer
+  if (t.includes("littérature haïtienne") || t.includes("écrivain haïtien") || t.includes("price-mars") || t.includes("roumain") || t.includes("chauvet")) return "Littérature Haïtienne";
+  if (t.includes("littérature française") || t.includes("écrivain français") || t.includes("racine") || t.includes("molière") || t.includes("zola")) return "Littérature Française";
+
+  // En dernier recours, utiliser la première matière de l’utilisateur
+  return (user.subjects && user.subjects[0]) || "Général";
+};
 
   const sendMessage = async (retryPayload = null) => {
     await new Promise(r => setTimeout(r, 300));
