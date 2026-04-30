@@ -11,18 +11,12 @@ export function PaymentScreen({ onBack }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    callEdge({
-      action: "get_payment_numbers",
-      then: (d) => {
-        // ✅ Correction : la réponse contient "numbers" et non "payments"
-        if (d && d.numbers) {
-          setPayments(d.numbers);
-        } else {
-          // Fallback avec les vrais numéros formatés
-          setPayments([
-            { method: "Digicel", number: "+509 48 69 50 79" },
-            { method: "Natcom", number: "+509 40 66 91 05" }
-          ]);
+  setPayments([
+    { method: "Digicel", number: "+509 48 69 50 79" },
+    { method: "Natcom", number: "+509 40 66 91 05" }
+  ]);
+  setLoading(false);
+}, []);
         }
       }
     }).catch(() => {
