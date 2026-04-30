@@ -292,42 +292,37 @@ async function hashMessage(msg: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
 }
 
-async function getCachedAnswer(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string | null> {
-  const { data, error } = await db
-    .from("question_cache")
-    .select("id, answer, hit_count")
-    .eq("subject", subject)
-    .eq("question_hash", hash)
-    .maybeSingle();
-
-  if (error) {
-    console.error("❌ getCachedAnswer error:", error);
-    return null;
-  }
-  if (!data) return null;
-
-  // Incrémenter hit_count sans bloquer
-  db.from("question_cache")
-    .update({ hit_count: (data.hit_count || 0) + 1 })
-    .eq("id", data.id)
-    .catch(e => console.warn("hit_count update failed", e));
-
-  return data.answer;
-}
-
 async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string): Promise<boolean> {
   try {
+    // Tentative d'insertion
     const { error } = await db
       .from("question_cache")
-      .upsert(
-        { subject, question_hash: hash, question, answer, hit_count: 1 },
-        { onConflict: "subject,question_hash" }
-      );
+      .insert({
+        subject,
+        question_hash: hash,
+        question,
+        answer,
+        hit_count: 1,
+        created_at: new Date().toISOString()
+      });
+
     if (error) {
+      if (error.code === "23505") {
+        // Conflit : mettre à jour l'entrée existante
+        console.log("⚠️ Doublon détecté, mise à jour pour", subject, hash);
+        const { error: updateError } = await db
+          .from("question_cache")
+          .update({ answer, created_at: new Date().toISOString() })
+          .eq("subject", subject)
+          .eq("question_hash", hash);
+        if (updateError) throw updateError;
+        console.log("✅ Cache mis à jour (conflit résolu)");
+        return true;
+      }
       console.error("❌ saveCache error:", JSON.stringify(error));
       return false;
     }
-    console.log("✅ Cache saved:", subject, hash);
+    console.log("✅ Cache sauvegardé:", subject, hash);
     return true;
   } catch (err) {
     console.error("❌ saveCache exception:", err);
