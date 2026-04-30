@@ -59,6 +59,7 @@ export function ChatScreen({ user, onNavigate }) {
   };
 
   const sendMessage = async (retryPayload = null) => {
+    await new Promise(r => setTimeout(r, 300));
     const isImage = retryPayload ? !!retryPayload.isImage : !!image;
     const payload = retryPayload || {
       userMsg: { role:"user", content:input.trim() || "Analyse cet exercice.", image },
