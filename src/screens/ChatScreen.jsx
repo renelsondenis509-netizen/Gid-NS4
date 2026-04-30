@@ -9,9 +9,15 @@ import { BottomNav } from "../components/UI";
 
 export function ChatScreen({ user, onNavigate }) {
   const [messages, setMessages] = useState([{
+<<<<<<< HEAD
   role: "assistant",
   content: `Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**.\n\n**Ann al travay !**`
 }]);
+=======
+    role:"assistant",
+    content:`Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**\n\n**Ann al travay !**`
+  }]);
+>>>>>>> d421db6 (refactor: supprimer la liste des matières dans le message d'accueil)
   const [input, setInput]           = useState("");
   const [image, setImage]           = useState(null);
   const [loading, setLoading]       = useState(false);
