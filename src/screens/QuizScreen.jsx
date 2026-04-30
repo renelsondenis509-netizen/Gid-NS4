@@ -34,6 +34,315 @@ const FILIERES = {
   },
 };
 
+// ─── SVG ICONS UTILITAIRES ─────────────────────────────────────────────────
+const HeartIcon = ({ filled = true, size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? "#ef4444" : "none"} stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: filled ? "none" : "grayscale(1)", opacity: filled ? 1 : 0.15 }}>
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+  </svg>
+);
+
+const FireIcon = ({ size = 14, color = "#f97316" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+);
+
+const CheckCircleIcon = ({ size = 16, color = "#22c55e" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
+
+const XCircleIcon = ({ size = 16, color = "#ef4444" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="m15 9-6 6" />
+    <path d="m9 9 6 6" />
+  </svg>
+);
+
+const LightbulbIcon = ({ size = 14, color = "#fbbf24" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5a6 6 0 0 0-11 0c0 1.5.5 2.5 1.5 3.5.8.8 1.3 1.5 1.5 2.5" />
+    <path d="M9 18h6" />
+    <path d="M10 22h4" />
+  </svg>
+);
+
+const RefreshIcon = ({ size = 14, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+    <path d="M21 3v5h-5" />
+    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+    <path d="M8 16H3v5" />
+  </svg>
+);
+
+const FileTextIcon = ({ size = 24, color = "#3b82f6" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+  </svg>
+);
+
+const ChevronIcon = ({ open, color = "#fff" }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+    style={{ transition: "transform .25s", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+// ─── FONCTION D'ICÔNE PAR MATIÈRE ──────────────────────────────────────────
+const getSubjectIcon = (subject, size = 22, color = "#fff") => {
+  const svgProps = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: color,
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  };
+
+  switch(subject) {
+    // SVT
+    case "Biologie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 3v18"/>
+          <path d="M8 8l8 8"/>
+          <path d="M16 8l-8 8"/>
+        </svg>
+      );
+    case "Géologie":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 20h18L12 4 3 20z"/>
+          <path d="M8 14l4-6 4 6"/>
+          <path d="M10 18h4"/>
+        </svg>
+      );
+    case "Chimie":
+      return (
+        <svg {...svgProps}>
+          <path d="M9 3h6v8l-3 9-3-9V3z"/>
+          <circle cx="12" cy="12" r="2"/>
+          <path d="M6 16l2-2"/>
+          <path d="M18 16l-2-2"/>
+        </svg>
+      );
+    
+    // SES
+    case "Histoire":
+      return (
+        <svg {...svgProps}>
+          <path d="M12 8v4l3 3"/>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 2v2"/>
+          <path d="M12 20v2"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+        </svg>
+      );
+    case "Géographie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      );
+    case "Économie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 6v12"/>
+          <path d="M9 9h6"/>
+          <path d="M9 15h6"/>
+          <path d="M10 12h4"/>
+        </svg>
+      );
+    case "Philosophie":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 8v8"/>
+          <path d="M8 12h8"/>
+          <circle cx="12" cy="12" r="2" fill={color}/>
+        </svg>
+      );
+    
+    // SMP
+    case "Analyse":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 3v18h18"/>
+          <path d="M7 16l4-8 4 4 5-10"/>
+        </svg>
+      );
+    case "Algèbre":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 4h16v16H4z"/>
+          <path d="M8 8l8 8"/>
+          <path d="M16 8l-8 8"/>
+          <circle cx="12" cy="12" r="1" fill={color}/>
+        </svg>
+      );
+    case "Suite":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 12h4l3-9 4 18 3-9h4"/>
+        </svg>
+      );
+    case "Complexe":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 3v18"/>
+          <path d="M3 12h18"/>
+          <circle cx="12" cy="12" r="2" fill={color}/>
+        </svg>
+      );
+    case "Probabilité":
+      return (
+        <svg {...svgProps}>
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8" cy="8" r="1.5" fill={color}/>
+          <circle cx="16" cy="8" r="1.5" fill={color}/>
+          <circle cx="8" cy="16" r="1.5" fill={color}/>
+          <circle cx="16" cy="16" r="1.5" fill={color}/>
+          <circle cx="12" cy="12" r="1.5" fill={color}/>
+        </svg>
+      );
+    case "Géométrie":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 3l7 19 7-19 7 19H3z"/>
+          <path d="M12 3v19"/>
+        </svg>
+      );
+    case "Physique":
+      return (
+        <svg {...svgProps}>
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      );
+    
+    // LLA
+    case "Créole":
+      return (
+        <svg {...svgProps}>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M8 10h8"/>
+          <path d="M8 14h5"/>
+        </svg>
+      );
+    case "Français":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M8 7h8"/>
+          <path d="M8 11h6"/>
+          <path d="M8 15h8"/>
+        </svg>
+      );
+    case "Anglais":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      );
+    case "Espagnol":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      );
+    case "Dissertation":
+      return (
+        <svg {...svgProps}>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+      );
+    case "Littérature Haïtienne":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M12 6v12"/>
+          <path d="M8 10h8"/>
+        </svg>
+      );
+    case "Littérature Française":
+      return (
+        <svg {...svgProps}>
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M12 6v12"/>
+          <path d="M8 10h8"/>
+        </svg>
+      );
+    case "Éducation Esthétique et Artistique":
+      return (
+        <svg {...svgProps}>
+          <circle cx="13.5" cy="6.5" r="2.5"/>
+          <path d="M17 17a5 5 0 0 1-7 0c-1.5-1.5-2-4-1-6 .5-1 1-2 2-2 2 0 3 2 4 3"/>
+          <circle cx="8.5" cy="14.5" r="1.5" fill={color}/>
+          <circle cx="12" cy="12" r="1" fill={color}/>
+          <circle cx="15.5" cy="13.5" r="1" fill={color}/>
+        </svg>
+      );
+    case "Éducation Physique et Sportive":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M5.5 5.5L18.5 18.5"/>
+          <path d="M18.5 5.5L5.5 18.5"/>
+          <path d="M12 2v20"/>
+          <path d="M2 12h20"/>
+        </svg>
+      );
+    case "Éducation à la Citoyenneté":
+      return (
+        <svg {...svgProps}>
+          <path d="M3 21h18"/>
+          <path d="M5 21V7l7-4 7 4v14"/>
+          <path d="M9 21v-6h6v6"/>
+          <path d="M9 9h.01"/>
+          <path d="M15 9h.01"/>
+        </svg>
+      );
+    case "Numérique et Informatique":
+      return (
+        <svg {...svgProps}>
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8"/>
+          <path d="M12 17v4"/>
+          <path d="M6 7h4"/>
+          <path d="M6 11h2"/>
+        </svg>
+      );
+    
+    default:
+      return <span style={{ fontSize: 20 }}>📚</span>;
+  }
+};
+
 // ─── QUIZ SCREEN ─────────────────────────────────────────────────────────────
 export function QuizScreen({ user, onNavigate }) {
   const [phase, setPhase] = useState("select");
@@ -51,81 +360,9 @@ export function QuizScreen({ user, onNavigate }) {
   const [round, setRound] = useState(1);
   const [roundScore, setRoundScore] = useState(0);
   const [usedQKeys, setUsedQKeys] = useState(new Set());
-  const [openBranch, setOpenBranch] = useState(null); // accordion state
+  const [openBranch, setOpenBranch] = useState(null);
 
   const currentQ = shuffledQs[qIndex];
-
-  // ─── SVG ICONS ───────────────────────────────────────────────────────────────
-  const HeartIcon = ({ filled = true, size = 20 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? "#ef4444" : "none"} stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: filled ? "none" : "grayscale(1)", opacity: filled ? 1 : 0.15 }}>
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-    </svg>
-  );
-
-  const FireIcon = ({ size = 14, color = "#f97316" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-    </svg>
-  );
-
-  const CheckCircleIcon = ({ size = 16, color = "#22c55e" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  );
-
-  const XCircleIcon = ({ size = 16, color = "#ef4444" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="m15 9-6 6" />
-      <path d="m9 9 6 6" />
-    </svg>
-  );
-
-  const LightbulbIcon = ({ size = 14, color = "#fbbf24" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5a6 6 0 0 0-11 0c0 1.5.5 2.5 1.5 3.5.8.8 1.3 1.5 1.5 2.5" />
-      <path d="M9 18h6" />
-      <path d="M10 22h4" />
-    </svg>
-  );
-
-  const RefreshIcon = ({ size = 14, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-      <path d="M21 3v5h-5" />
-      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-      <path d="M8 16H3v5" />
-    </svg>
-  );
-
-  const FileTextIcon = ({ size = 24, color = "#3b82f6" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" y1="13" x2="8" y2="13" />
-      <line x1="16" y1="17" x2="8" y2="17" />
-    </svg>
-  );
-
-  const ChevronIcon = ({ open, color = "#fff" }) => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-      style={{ transition: "transform .25s", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-
-  const allIcons = {
-    "Biologie": "🧬", "Géologie": "🪨", "Chimie": "⚗️",
-    "Histoire": "📜", "Géographie": "🗺️", "Économie": "📊", "Philosophie": "🧠",
-    "Analyse": "📈", "Algèbre": "🔢", "Suite": "🔁", "Complexe": "🌀",
-    "Probabilité": "🎲", "Géométrie": "📐", "Physique": "⚡",
-    "Créole": "🗣️", "Français": "🗼", "Anglais": "🇬🇧", "Espagnol": "🇪🇸",
-    "Dissertation": "✍️", "Littérature Haïtienne": "🇭🇹", "Littérature Française": "📖",
-    "Éducation Esthétique et Artistique": "🎨", "Éducation Physique et Sportive": "🏃",
-    "Éducation à la Citoyenneté": "🏛️", "Numérique et Informatique": "💻",
-  };
 
   // ─── HANDLERS ────────────────────────────────────────────────────────────────
   const startQCM = (sub) => {
@@ -214,7 +451,6 @@ export function QuizScreen({ user, onNavigate }) {
 
   // ── SELECT (ACCORDION) ────────────────────────────────────────────────────────
   if (phase === "select") {
-    // Compte les matières disponibles pour l'utilisateur
     const totalAvailable = Object.values(FILIERES).flatMap(f => f.subjects)
       .filter(s => user.subjects.includes(s) && QUIZ_DATA[s]).length;
 
@@ -325,9 +561,19 @@ export function QuizScreen({ user, onNavigate }) {
                           {/* Ligne verticale de couleur */}
                           <div style={{ width: 3, height: 36, borderRadius: 3, background: filiere.color, flexShrink: 0, opacity: 0.7 }} />
 
-                          {/* Icône */}
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: `${filiere.color}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <span style={{ fontSize: 18 }}>{allIcons[sub]}</span>
+                          {/* Icône SVG */}
+                          <div style={{ 
+                            width: 40, 
+                            height: 40, 
+                            borderRadius: 10, 
+                            background: `${filiere.color}22`,
+                            border: `1px solid ${filiere.color}44`,
+                            display: "flex", 
+                            alignItems: "center", 
+                            justifyContent: "center", 
+                            flexShrink: 0 
+                          }}>
+                            {getSubjectIcon(sub, 22, filiere.color)}
                           </div>
 
                           {/* Nom + nombre de questions */}
@@ -352,8 +598,18 @@ export function QuizScreen({ user, onNavigate }) {
                           }}
                         >
                           <div style={{ width: 3, height: 36, borderRadius: 3, background: "#4B5EA8", flexShrink: 0 }} />
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(75,94,168,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <span style={{ fontSize: 18 }}>{allIcons[sub]}</span>
+                          <div style={{ 
+                            width: 40, 
+                            height: 40, 
+                            borderRadius: 10, 
+                            background: "rgba(75,94,168,0.15)",
+                            border: "1px solid rgba(75,94,168,0.2)",
+                            display: "flex", 
+                            alignItems: "center", 
+                            justifyContent: "center", 
+                            flexShrink: 0 
+                          }}>
+                            {getSubjectIcon(sub, 22, "#4B5EA8")}
                           </div>
                           <div style={{ flex: 1, textAlign: "left" }}>
                             <div style={{ color: "#E8EEFF", fontWeight: 600, fontSize: 13 }}>{sub}</div>
@@ -500,7 +756,7 @@ export function QuizScreen({ user, onNavigate }) {
             </div>
             <div className="text-white font-bold text-lg mt-1">{mention.label}</div>
             <div className="text-blue-300 text-sm mt-1 flex items-center justify-center gap-1">
-              {roundScore}/10 kòrèk {streak > 0 && <>• <FireIcon size={14} /> Streak {streak}</>}
+              {roundScore}/10 kòrèk {streak > 0 && <><FireIcon size={14} /> Streak {streak}</>}
             </div>
           </div>
 
@@ -517,7 +773,6 @@ export function QuizScreen({ user, onNavigate }) {
               </div>
             ))}
           </div>
-
           <p className="text-white font-bold text-center text-lg">Ou vle kontinye ?</p>
 
           <div className="flex gap-3">

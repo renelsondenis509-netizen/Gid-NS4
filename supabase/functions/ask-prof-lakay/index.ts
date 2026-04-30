@@ -524,18 +524,9 @@ async function getLeaderboard(
   const nameMap:         Record<string, string> = {};
   const schoolMap:       Record<string, string> = {};
 
-  // Meilleure note par matière pour chaque utilisateur
-const bestPerSubject: Record<string, Record<string, number>> = {};
-(allScores ?? []).forEach((row: any) => {
-  if (!bestPerSubject[row.phone]) bestPerSubject[row.phone] = {};
-  const cur = bestPerSubject[row.phone][row.subject] ?? 0;
-  if (row.note20 > cur) bestPerSubject[row.phone][row.subject] = row.note20;
-});
-// bestNoteMap = somme des meilleures notes par matière
-Object.entries(bestPerSubject).forEach(([phone, subjects]) => {
-  bestNoteMap[phone] = Math.round(
-    Object.values(subjects).reduce((a, b) => a + b, 0) * 10
-  ) / 10;
+  (allScores ?? []).forEach((row: any) => {
+  if (!bestNoteMap[row.phone] || row.note20 > bestNoteMap[row.phone])
+    bestNoteMap[row.phone] = row.note20;
     totalCorrectMap[row.phone] = (totalCorrectMap[row.phone] ?? 0) + row.score;
     if (row.name) nameMap[row.phone] = row.name;
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;

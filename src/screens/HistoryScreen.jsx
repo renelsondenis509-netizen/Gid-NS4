@@ -14,14 +14,44 @@ const IcoInbox = () => <svg width="48" height="48" viewBox="0 0 24 24" fill="non
 const IcoTrash = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>;
 const IcoLoader = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{animation:"spin 1s linear infinite"}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
 
+// 🎤 Icônes SVG pour la synthèse vocale
+const IcoVolumeUp = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
+const IcoStop = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/></svg>;
+
+const IcoVolumeUp = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
+const IcoStop = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/></svg>;
+
 export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   const [history, setHistory] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
+  const [speakingId, setSpeakingId] = useState(null);
 
   useEffect(() => {
     idbGetScans(user.phone).then(data => setHistory(data)).finally(() => setLoading(false));
+  }, []);
+
+  // 🎤 Fonction pour lire le texte
+  const handleSpeak = (text, id) => {
+    if (speakingId === id) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+    } else {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.rate = 0.9;
+      utterance.onend = () => setSpeakingId(null);
+      utterance.onerror = () => setSpeakingId(null);
+      window.speechSynthesis.speak(utterance);
+      setSpeakingId(id);
+    }
+  };
+
+  // Nettoyer la synthèse vocale quand le composant est démonté
+  useEffect(() => {
+    return () => window.speechSynthesis.cancel();
   }, []);
 
   const handleDelete = async (entry) => {
@@ -29,6 +59,10 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     await idbDeleteScan(entry.id);
     setHistory(h => h.filter(x => x.id !== entry.id));
     if (selected?.id === entry.id) setSelected(null);
+    if (speakingId === entry.id) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+    }
     setDeleting(null);
   };
 
@@ -40,69 +74,79 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   });
 
   if (selected) return (
-    <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
-      <div className="px-4 py-4 border-b flex items-center gap-3" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
-        <button onClick={() => setSelected(null)} className="text-blue-400 text-xl">←</button>
-        <div className="flex-1">
-          <h2 className="text-white font-bold">Detay rekèt yo</h2>
-          <p className="text-blue-400 text-xs">{selected.subject} • {selected.date}</p>
-        </div>
-        <button onClick={() => handleDelete(selected)} disabled={deleting === selected.id}
-          className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
-          style={{ background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
-          {deleting === selected.id ? <IcoLoader /> : <IcoTrash />} Efase
-        </button>
-     <button onClick={() => onStartExercice(selected)}
-  className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
-  style={{ background:"#1e3a8a22", color:"#60a5fa", border:"1px solid #3b82f633" }}>
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-  Fè yon egzèsis
-</button>
+  <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
+    <div className="px-4 py-4 border-b flex items-center gap-3" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
+      <button onClick={() => setSelected(null)} className="text-blue-400 text-xl">←</button>
+      <div className="flex-1">
+        <h2 className="text-white font-bold">Detay rekèt yo</h2>
+        <p className="text-blue-400 text-xs">{selected.subject} • {selected.date}</p>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {!selected._fallback ? (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#14532d22", border: "1px solid #22c55e22" }}>
-            <span style={{ color:"#86efac" }}><IcoDatabase /></span>
-            <span className="text-green-300 text-xs">• Image disponible hors-ligne</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#78350f22", border: "1px solid #f59e0b22" }}>
-            <span style={{ color:"#fcd34d" }}><IcoWarning /></span>
-            <span className="text-yellow-300 text-xs">Mode fallback — Image non disponible hors-ligne</span>
-          </div>
-        )}
-        {selected.image ? (
-          <div>
-            <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">
-              <IcoCamera /> Imaj ki analize
-            </p>
-            <img src={selected.image} alt="scan" className="w-full rounded-2xl object-contain max-h-56" style={{ border: "1px solid #1e3a8a44" }} />
-          </div>
-        ) : (
-          <div className="rounded-2xl px-4 py-3 flex items-center gap-3" style={{ background: "#1e3a8a11", border: "1px solid #1e3a8a22" }}>
-            <IcoChat />
-            <span className="text-blue-600 text-xs">Kesyon tèks sèlman. Pa gen imaj.</span>
-          </div>
-        )}
-        <div className="rounded-2xl p-4" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
-          <div className="flex items-center gap-2 mb-3">
+      <button onClick={() => handleDelete(selected)} disabled={deleting === selected.id}
+        className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
+        style={{ background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
+        {deleting === selected.id ? <IcoLoader /> : <IcoTrash />} Efase
+      </button>
+      <button onClick={() => onStartExercice(selected)}
+        className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1"
+        style={{ background:"#1e3a8a22", color:"#60a5fa", border:"1px solid #3b82f633" }}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Fè yon egzèsis
+      </button>
+    </div>
+    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      {!selected._fallback ? (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#14532d22", border: "1px solid #22c55e22" }}>
+          <span style={{ color:"#86efac" }}><IcoDatabase /></span>
+          <span className="text-green-300 text-xs">• Image disponible hors-ligne</span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#78350f22", border: "1px solid #f59e0b22" }}>
+          <span style={{ color:"#fcd34d" }}><IcoWarning /></span>
+          <span className="text-yellow-300 text-xs">Mode fallback — Image non disponible hors-ligne</span>
+        </div>
+      )}
+      {selected.image ? (
+        <div>
+          <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">
+            <IcoCamera /> Imaj ki analize
+          </p>
+          <img src={selected.image} alt="scan" className="w-full rounded-2xl object-contain max-h-56" style={{ border: "1px solid #1e3a8a44" }} />
+        </div>
+      ) : (
+        <div className="rounded-2xl px-4 py-3 flex items-center gap-3" style={{ background: "#1e3a8a11", border: "1px solid #1e3a8a22" }}>
+          <IcoChat />
+          <span className="text-blue-600 text-xs">Kesyon tèks sèlman. Pa gen imaj.</span>
+        </div>
+      )}
+      <div className="rounded-2xl p-4" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
+        {/* 🎤 LIGNE MODIFIÉE : bouton lecture vocale AJOUTÉ */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-xl overflow-hidden" style={{ background: "#fff" }}>
               <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <span className="text-white font-bold text-sm">Repons Prof Lakay</span>
           </div>
-          <div className="text-sm leading-relaxed" style={{ color: "#e0e8ff" }}>
-            <LatexText content={selected.response} />
-          </div>
+          <button
+            onClick={() => handleSpeak(selected.response, selected.id)}
+            className="p-2 rounded-xl transition-colors hover:bg-blue-500/20"
+            style={{ background: speakingId === selected.id ? "#d4002a22" : "#1e3a8a22", border: "1px solid #3b82f633" }}
+          >
+            {speakingId === selected.id ? <IcoStop /> : <IcoVolumeUp />}
+          </button>
         </div>
-        <div className="rounded-2xl px-4 py-3 flex justify-between" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a22" }}>
-          <span className="text-blue-400 text-xs">Rekèt itilize jou sa</span>
-          <span className="text-orange-300 font-bold text-xs">{selected.scansUsed}/{selected.dailyLimit || user.dailyScans}</span>
+        <div className="text-sm leading-relaxed" style={{ color: "#e0e8ff" }}>
+          <LatexText content={selected.response} />
         </div>
       </div>
-      <BottomNav active="history" onNavigate={onNavigate} />
+      <div className="rounded-2xl px-4 py-3 flex justify-between" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a22" }}>
+        <span className="text-blue-400 text-xs">Rekèt itilize jou sa</span>
+        <span className="text-orange-300 font-bold text-xs">{selected.scansUsed}/{selected.dailyLimit || user.dailyScans}</span>
+      </div>
     </div>
-  );
+    <BottomNav active="history" onNavigate={onNavigate} />
+  </div>
+);
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
@@ -175,7 +219,15 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                     <span className="text-blue-700 text-lg self-center">›</span>
                   </div>
                 </button>
-                <div className="px-4 pb-3 flex justify-end">
+                <div className="px-4 pb-3 flex justify-between items-center">
+                  {/* 🎤 Bouton lecture vocale dans la liste */}
+                  <button
+                    onClick={() => handleSpeak(h.response, h.id)}
+                    className="p-2 rounded-lg transition-colors hover:bg-blue-500/20"
+                    style={{ background: speakingId === h.id ? "#d4002a22" : "#1e3a8a22", border: "1px solid #3b82f633" }}
+                  >
+                    {speakingId === h.id ? <IcoStop /> : <IcoVolumeUp />}
+                  </button>
                   <button onClick={() => handleDelete(h)} disabled={deleting === h.id}
                     className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
                     style={{ background: "#d4002a15", color: "#ff8080", border: "1px solid #d4002a22" }}>
