@@ -544,18 +544,18 @@ Sois concis et va à l'essentiel — les élèves lisent sur téléphone.`;
     reply = await gemini(fullPrompt, imageBase64);
   }
 
-if (!reply || typeof reply !== "string" || reply.trim().length === 0) {
-  console.error("❌ Reply invalide avant retour:", reply);
-  throw new Error("Réponse générée invalide (vide)");
-}
-console.log("✅ Reply valide, longueur:", reply.length);
-  await db.from("scans").insert({
+ await db.from("scans").insert({
     phone,
     school_code: schoolCode,
     subject,
     has_image: hasImage,
     created_at: new Date().toISOString(),
   });
+if (!reply || typeof reply !== "string" || reply.trim().length === 0) {
+  console.error("❌ Reply invalide avant retour:", reply);
+  throw new Error("Réponse générée invalide (vide)");
+}
+console.log("✅ Reply valide, longueur:", reply.length);
 
   return { reply, scansUsed: (scansToday ?? 0) + 1, dailyLimit };
 }
