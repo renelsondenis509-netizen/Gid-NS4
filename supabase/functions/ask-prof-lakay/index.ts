@@ -293,26 +293,46 @@ async function hashMessage(msg: string): Promise<string> {
 
 // ─── Récupérer depuis le cache ─────────────────────────────────────────────
 async function getCachedAnswer(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string | null> {
-  const { data, error } = await db
-    .from("question_cache")
-    .select("id, answer, hit_count")
-    .eq("subject", subject)
-    .eq("question_hash", hash)
-    .maybeSingle();
+  try {
+    const { data, error } = await db
+      .from("question_cache")
+      .select("id, answer, hit_count")
+      .eq("subject", subject)
+      .eq("question_hash", hash)
+      .maybeSingle();
 
-  if (error) {
-    console.error("❌ getCachedAnswer error:", error);
+    if (error) {
+      console.error("❌ getCachedAnswer DB error:", error.message);
+      return null;
+    }
+    if (!data) {
+      console.log("📭 Cache miss:", subject, hash);
+      return null;
+    }
+
+    if (!data.answer || typeof data.answer !== "string") {
+      console.warn("⚠️ Cache answer invalide pour", subject, hash);
+      return null;
+    }
+
+    console.log("✅ Cache hit, answer length:", data.answer.length);
+
+    // Mise à jour hit_count sans bloquer
+    (async () => {
+      try {
+        await db.from("question_cache")
+          .update({ hit_count: (data.hit_count || 0) + 1 })
+          .eq("id", data.id);
+      } catch (e) {
+        console.warn("hit_count update failed", e);
+      }
+    })();
+
+    return data.answer;
+  } catch (err) {
+    console.error("❌ getCachedAnswer exception:", err);
     return null;
   }
-  if (!data) return null;
-
-  // Mise à jour non bloquante du compteur
-  db.from("question_cache")
-    .update({ hit_count: (data.hit_count || 0) + 1 })
-    .eq("id", data.id)
-    .catch(e => console.warn("hit_count update failed", e));
-
-  return data.answer;
 }
 
 // ─── Sauvegarder dans le cache (avec gestion des conflits) ─────────────────
@@ -524,6 +544,11 @@ Sois concis et va à l'essentiel — les élèves lisent sur téléphone.`;
     reply = await gemini(fullPrompt, imageBase64);
   }
 
+if (!reply || typeof reply !== "string" || reply.trim().length === 0) {
+  console.error("❌ Reply invalide avant retour:", reply);
+  throw new Error("Réponse générée invalide (vide)");
+}
+console.log("✅ Reply valide, longueur:", reply.length);
   await db.from("scans").insert({
     phone,
     school_code: schoolCode,
