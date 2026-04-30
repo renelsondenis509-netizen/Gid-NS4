@@ -294,7 +294,6 @@ async function hashMessage(msg: string): Promise<string> {
 
 async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string): Promise<boolean> {
   try {
-    // Tentative d'insertion
     const { error } = await db
       .from("question_cache")
       .insert({
@@ -308,7 +307,6 @@ async function saveCache(db: ReturnType<typeof createClient>, subject: string, h
 
     if (error) {
       if (error.code === "23505") {
-        // Conflit : mettre à jour l'entrée existante
         console.log("⚠️ Doublon détecté, mise à jour pour", subject, hash);
         const { error: updateError } = await db
           .from("question_cache")
@@ -329,7 +327,6 @@ async function saveCache(db: ReturnType<typeof createClient>, subject: string, h
     return false;
   }
 }
-
 // ─── ACTION : validate_code ───────────────────────────────────────────────────
 async function validateCode(
   db: ReturnType<typeof createClient>,
