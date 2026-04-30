@@ -111,7 +111,7 @@ export function ChatScreen({ user, onNavigate }) {
     setApiError(null); setLoading(true);
 
     try {
-      const subject = activeSubject || detectSubject(payload.currentInput);
+      const subject = detectSubject(payload.currentInput) || activeSubject || "Général";
       const result  = await callEdge({
         action:"ask", phone:user.phone, schoolCode:user.code,
         message:      payload.userMsg.content,
