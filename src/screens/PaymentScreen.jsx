@@ -2,19 +2,40 @@ import { useState, useEffect } from "react";
 import { callEdge } from "../api";
 
 export function PaymentScreen({ onBack }) {
+import { useState, useEffect } from "react";
+import { callEdge } from "../api";
+
+export function PaymentScreen({ onBack }) {
   const [payments, setPayments] = useState([]);
   const [copied, setCopied] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    callEdge({ action: "get_payment_numbers" })
-      .then(d => setPayments(d.payments || []))
-      .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669105" }]))
-      .finally(() => setLoading(false));
-  }, []);
+    callEdge({
+      action: "get_payment_numbers",
+      then: (d) => {
+        // ✅ Correction : la réponse contient "numbers" et non "payments"
+        if (d && d.numbers) {
+          setPayments(d.numbers);
+        } else {
+          // Fallback avec les vrais numéros formatés
+          setPayments([
+            { method: "Digicel", number: "+509 48 69 50 79" },
+            { method: "Natcom", number: "+509 40 66 91 05" }
+          ]);
+        }
+      }
+    }).catch(() => {
+      // Fallback en cas d'erreur réseau
+      setPayments([
+        { method: "Digicel", number: "+509 48 69 50 79" },
+        { method: "Natcom", number: "+509 40 66 91 05" }
+      ]);
+    }).finally(() => setLoading(false));
+  }, []); // ⚠️ N'oublie pas le tableau de dépendances vide pour n'exécuter qu'une fois
 
   const copy = (num, key) => {
-    navigator.clipboard?.writeText(num).catch(() => {});
+    navigator.clipboard.writeText(num).catch(() => {});
     setCopied(key); setTimeout(() => setCopied(null), 2500);
   };
 
