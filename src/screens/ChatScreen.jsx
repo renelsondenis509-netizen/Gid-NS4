@@ -176,14 +176,6 @@ const speak = (text) => {
   </div>
 </div>
       </div>
-      {/* TABS */}
-      <div style={{ padding:"8px 14px", display:"flex", gap:8, overflowX:"auto", background:"rgba(10,15,46,0.92)", borderBottom:"1px solid rgba(255,255,255,0.05)", scrollbarWidth:"none" }}>
-        {user.subjects.map((s,i) => (
-          <button key={i} onClick={() => setActiveSubject(s)}
-            style={{ flexShrink:0, padding:"4px 11px", borderRadius:20, background:activeSubject===s?"linear-gradient(135deg,#2563EB,#3B82F6)":"rgba(37,99,235,0.08)", color:activeSubject===s?"#fff":"#4B6ABA", border:activeSubject===s?"none":"1px solid rgba(37,99,235,0.2)", fontSize:11, fontWeight:activeSubject===s?700:500, whiteSpace:"nowrap" }}>
-            {s}
-          </button>
-        ))}
       </div>
       {/* MESSAGES */}
       <div ref={chatRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
