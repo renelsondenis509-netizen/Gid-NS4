@@ -788,17 +788,13 @@ async function createAnnouncement(
 }
 
 // ─── ACTION : get_payment_numbers (fonction manquante ajoutée) ────────────────
-async function getPaymentNumbers(db: ReturnType<typeof createClient>) {
-  const { data, error } = await db
-    .from("payment_config")
-    .select("method, number")
-    .eq("active", true)
-    .order("display_order", { ascending: true });
-  if (error) {
-    console.error("❌ getPaymentNumbers error:", error);
-    throw new Error("Impossible de récupérer les numéros de paiement");
-  }
-  return { numbers: data ?? [] };
+async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
+  return {
+    numbers: [
+      { method: "Digicel", number: "+509 48 69 50 79" },
+      { method: "Natcom", number: "+509 40 66 91 05" },
+    ],
+  };
 }
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
