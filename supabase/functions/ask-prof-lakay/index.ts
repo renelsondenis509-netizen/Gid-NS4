@@ -1,12 +1,10 @@
 // supabase/functions/ask-prof-lakay/index.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Edge Function Supabase — Gid NS4
-// ─────────────────────────────────────────────────────────────────────────────
+// Version corrigée – Cache fonctionnel + syntaxe réparée
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin":  "*",
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
@@ -17,7 +15,7 @@ const supabase = createClient(
 );
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
-function withTimeout(promise: Promise<Response>, ms = 8000): Promise<Response> {
+function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error("Timeout")), ms)
   );
@@ -25,7 +23,7 @@ function withTimeout(promise: Promise<Response>, ms = 8000): Promise<Response> {
 }
 
 // ─── Clés fournisseurs ────────────────────────────────────────────
-const OPENROUTER_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? ""; 
+const OPENROUTER_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? "";
 const GROQ_KEY       = Deno.env.get("GROQ_API_KEY") ?? "";
 const SAMBANOVA_KEY  = Deno.env.get("SAMBANOVA_API_KEY") ?? "";
 const MISTRAL_KEY    = Deno.env.get("MISTRAL_API_KEY") ?? "";
@@ -277,6 +275,66 @@ function getWeekKey(): string {
   return `${year}-W${String(week).padStart(2, "0")}`;
 }
 
+// ─── CACHE : fonctions corrigées ──────────────────────────────────────────────
+/** Normalisation forte pour le cache */
+function normalizeMessage(msg: string): string {
+  return msg
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // enlève accents
+    .replace(/[^\w\s]/g, "")                         // enlève ponctuation
+    .replace(/\s+/g, " ")                            // un seul espace
+    .trim();
+}
+
+async function hashMessage(msg: string): Promise<string> {
+  const normalized = normalizeMessage(msg);
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
+}
+
+async function getCachedAnswer(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string | null> {
+  const { data, error } = await db
+    .from("question_cache")
+    .select("id, answer, hit_count")
+    .eq("subject", subject)
+    .eq("question_hash", hash)
+    .maybeSingle();
+
+  if (error) {
+    console.error("❌ getCachedAnswer error:", error);
+    return null;
+  }
+  if (!data) return null;
+
+  // Incrémenter hit_count sans bloquer
+  db.from("question_cache")
+    .update({ hit_count: (data.hit_count || 0) + 1 })
+    .eq("id", data.id)
+    .catch(e => console.warn("hit_count update failed", e));
+
+  return data.answer;
+}
+
+async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string): Promise<boolean> {
+  try {
+    const { error } = await db
+      .from("question_cache")
+      .upsert(
+        { subject, question_hash: hash, question, answer, hit_count: 1 },
+        { onConflict: "subject,question_hash" }
+      );
+    if (error) {
+      console.error("❌ saveCache error:", JSON.stringify(error));
+      return false;
+    }
+    console.log("✅ Cache saved:", subject, hash);
+    return true;
+  } catch (err) {
+    console.error("❌ saveCache exception:", err);
+    return false;
+  }
+}
+
 // ─── ACTION : validate_code ───────────────────────────────────────────────────
 async function validateCode(
   db: ReturnType<typeof createClient>,
@@ -303,13 +361,11 @@ async function validateCode(
   const starts = new Date(school.starts_at);
   if (now < starts) return { valid: false, reason: "Kòd sa a poko aktif. Kontakte lekòl ou." };
 
-const { data: isTeacher } = await db
+  const { data: isTeacher } = await db
     .from("teachers")
     .select("phone")
     .eq("phone", phone)
     .maybeSingle();
-
-  console.log("🔍 isTeacher:", isTeacher, "phone:", phone, "schoolCode:", schoolCode);
 
   if (!isTeacher) {
     const { data: existingOtherSchool } = await db
@@ -319,12 +375,11 @@ const { data: isTeacher } = await db
       .neq("school_code", schoolCode)
       .maybeSingle();
 
-    console.log("🔍 existingOtherSchool:", existingOtherSchool);
-
     if (existingOtherSchool) {
       return { valid: false, reason: "Nimewo sa a deja anrejistre ak yon lòt kòd. Kontakte direksyon lekòl ou." };
     }
   }
+
   const { count: studentCount } = await db
     .from("profiles")
     .select("*", { count: "exact", head: true })
@@ -372,30 +427,7 @@ const { data: isTeacher } = await db
   };
 }
 
-// ─── ACTION : ask ─────────────────────────────────────────────────────────────
-async function hashMessage(msg: string): Promise<string> {
-  const normalized = msg.toLowerCase().trim().replace(/\s+/g, " ");
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("").slice(0,16);
-}
-
-async function getCached(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string|null> {
-  const { data, error } = await db.from("question_cache").select("id, answer, hit_count").eq("subject", subject).eq("question_hash", hash).maybeSingle();
-   
-  if (!data) return null;
-  await db.from("question_cache").update({ hit_count: data.hit_count + 1 }).eq("id", data.id);
-  return data.answer;
-}
-
-async function saveCache(db: ReturnType<typeof createClient>, subject: string, hash: string, question: string, answer: string) {
-  const { error } = await db.from("question_cache").upsert(
-    { subject, question_hash: hash, question, answer },
-    { onConflict: "subject,question_hash" }
-  );
-  if (error) console.error("❌ saveCache error:", JSON.stringify(error));
-  else console.log("✅ Cache saved:", subject, hash);
-}
-
+// ─── ACTION : ask (avec cache amélioré) ───────────────────────────────────────
 async function processAsk(
   db: ReturnType<typeof createClient>,
   gemini: typeof callGemini,
@@ -456,26 +488,31 @@ Sois concis et va à l'essentiel — les élèves lisent sur téléphone.`;
 
   const fullPrompt = `${systemPrompt}\n\n${historyText ? `Contexte récent:\n${historyText}\n\n` : ""}Élève: ${message}`;
 
-let reply: string;
-if (!imageBase64) {
-  const hash = await hashMessage(message);
-  const cached = await getCached(db, subject, hash);
-  if (cached) {
-    reply = cached;
+  let reply: string;
+  const hasImage = !!imageBase64;
+
+  if (!hasImage) {
+    const hash = await hashMessage(message);
+    const cached = await getCachedAnswer(db, subject, hash);
+    if (cached) {
+      reply = cached;
+      console.log("📦 Cache hit for", subject, hash);
+    } else {
+      reply = await gemini(fullPrompt, null);
+      await saveCache(db, subject, hash, message, reply);
+      console.log("💾 Cache saved for", subject, hash);
+    }
   } else {
+    // Ne pas cacher les réponses avec image (trop variables)
     reply = await gemini(fullPrompt, imageBase64);
-    await saveCache(db, subject, hash, message, reply);
   }
-} else {
-  reply = await gemini(fullPrompt, imageBase64);
-}
 
   await db.from("scans").insert({
     phone,
     school_code: schoolCode,
     subject,
-    has_image:   !!imageBase64,
-    created_at:  new Date().toISOString(),
+    has_image: hasImage,
+    created_at: new Date().toISOString(),
   });
 
   return { reply, scansUsed: (scansToday ?? 0) + 1, dailyLimit };
@@ -497,19 +534,18 @@ async function saveQuizScore(
   return { saved: true };
 }
 
-// ─── ACTION : get_leaderboard ─────────────────────────────────────────────────
+// ─── ACTION : get_leaderboard (corrigé) ───────────────────────────────────────
 async function getLeaderboard(
   db: ReturnType<typeof createClient>,
   body: { phone: string }
 ) {
   const { phone } = body;
 
-  // ── 1. Tous les scores (sans filtre école) ──
   const { data: allScores } = await db
     .from("quiz_scores")
-    .select("phone, name, note20, score, school_code");
+    .select("phone, name, note20, score, school_code, subject");
 
-  // ── 2. Noms des écoles ──
+  // ── Noms des écoles ──
   const codes = [...new Set((allScores ?? []).map((r: any) => r.school_code).filter(Boolean))];
   const { data: schools } = codes.length
     ? await db.from("schools").select("code, school_name").in("code", codes)
@@ -518,30 +554,35 @@ async function getLeaderboard(
   const schoolNameMap: Record<string, string> = {};
   (schools ?? []).forEach((s: any) => { schoolNameMap[s.code] = s.school_name; });
 
-  // ── 3. Agrégation globale ──
+  // ── Agrégation globale ──
   const totalCorrectMap: Record<string, number> = {};
-  const bestNoteMap:     Record<string, number> = {};
-  const nameMap:         Record<string, string> = {};
-  const schoolMap:       Record<string, string> = {};
+  const bestNoteMap: Record<string, number> = {};
+  const nameMap: Record<string, string> = {};
+  const schoolMap: Record<string, string> = {};
 
-// Meilleure note par matière pour chaque utilisateur
-const bestPerSubject: Record<string, Record<string, number>> = {};
-(allScores ?? []).forEach((row: any) => {
-  if (!bestPerSubject[row.phone]) bestPerSubject[row.phone] = {};
-  const cur = bestPerSubject[row.phone][row.subject] ?? 0;
-  if (row.note20 > cur) bestPerSubject[row.phone][row.subject] = row.note20;
-});
-// bestNoteMap = somme des meilleures notes par matière
-Object.entries(bestPerSubject).forEach(([phone, subjects]) => {
-  bestNoteMap[phone] = Math.round(
-    Object.values(subjects).reduce((a, b) => a + b, 0) * 10
-  ) / 10;
+  // 1. Meilleure note par matière pour chaque utilisateur
+  const bestPerSubject: Record<string, Record<string, number>> = {};
+  (allScores ?? []).forEach((row: any) => {
+    if (!bestPerSubject[row.phone]) bestPerSubject[row.phone] = {};
+    const cur = bestPerSubject[row.phone][row.subject] ?? 0;
+    if (row.note20 > cur) bestPerSubject[row.phone][row.subject] = row.note20;
+  });
+
+  // bestNoteMap = somme des meilleures notes par matière
+  Object.entries(bestPerSubject).forEach(([p, subjects]) => {
+    bestNoteMap[p] = Math.round(
+      Object.values(subjects).reduce((a, b) => a + b, 0) * 10
+    ) / 10;
+  });
+
+  // 2. Remplir les autres maps (totalCorrect, name, school)
+  (allScores ?? []).forEach((row: any) => {
     totalCorrectMap[row.phone] = (totalCorrectMap[row.phone] ?? 0) + row.score;
     if (row.name) nameMap[row.phone] = row.name;
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
 
-  // ── 4. Scores de la semaine (global) ──
+  // ── Scores de la semaine (global) ──
   const currentWeek = getWeekKey();
   const { data: weekScores } = await db
     .from("quiz_scores")
@@ -558,18 +599,18 @@ Object.entries(bestPerSubject).forEach(([phone, subjects]) => {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
       .map(([p, val], i) => ({
-        rank:   i + 1,
-        phone:  maskPhone(p),
-        name:   nameMap[p] || maskPhone(p),
+        rank: i + 1,
+        phone: maskPhone(p),
+        name: nameMap[p] || maskPhone(p),
         school: schoolMap[p] ?? null,
-        isMe:   p === myPhone,
-        value:  val,
+        isMe: p === myPhone,
+        value: val,
       }));
 
   return {
-    bestNote:     formatBoard(bestNoteMap,     phone),
+    bestNote: formatBoard(bestNoteMap, phone),
     totalCorrect: formatBoard(totalCorrectMap, phone),
-    thisWeek:     formatBoard(weekMap,         phone),
+    thisWeek: formatBoard(weekMap, phone),
     currentWeek,
   };
 }
@@ -616,14 +657,12 @@ async function processDashboard(
     subjectBreakdown[s.subject] = (subjectBreakdown[s.subject] ?? 0) + 1;
   });
 
-  // Activité par jour (7 derniers jours)
   const dailyActivity: Record<string, number> = {};
   (dailyData ?? []).forEach((s: { created_at: string }) => {
     const day = new Date(s.created_at).toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
     dailyActivity[day] = (dailyActivity[day] ?? 0) + 1;
   });
 
-  // Activité par semaine (30 derniers jours)
   const weeklyActivity: Record<string, number> = {};
   (weeklyData ?? []).forEach((s: { created_at: string }) => {
     const d = new Date(s.created_at);
@@ -634,7 +673,6 @@ async function processDashboard(
     weeklyActivity[key] = (weeklyActivity[key] ?? 0) + 1;
   });
 
-  // Stats quiz
   const quizStats = {
     totalQuizzes: (quizData ?? []).length,
     avgNote: (quizData ?? []).length > 0
@@ -663,17 +701,8 @@ async function processDashboard(
       return weak ? { subject: weak.sub, avg: weak.avg } : null;
     })(),
   };
-// Matière la plus faible (moy. note la plus basse)
-const subjectAvg: Record<string, { total: number; count: number }> = {};
-(quizData ?? []).forEach((q: any) => {
-  if (!subjectAvg[q.subject]) subjectAvg[q.subject] = { total: 0, count: 0 };
-  subjectAvg[q.subject].total += q.note20;
-  subjectAvg[q.subject].count += 1;
-});
-const weakSubject = Object.entries(subjectAvg)
-  .map(([sub, d]) => ({ sub, avg: Math.round(d.total / d.count * 10) / 10 }))
-  .sort((a, b) => a.avg - b.avg)[0] ?? null;
-  const expires  = new Date(school.expires_at);
+
+  const expires = new Date(school.expires_at);
   const daysLeft = Math.ceil((expires.getTime() - Date.now()) / 86400000);
 
   return {
@@ -727,8 +756,8 @@ Format exact :
   return parsed;
 }
 
-// ─── ACTION : get_announcements ───────────────────────────────────────────────
-async function getannouncements(
+// ─── ACTION : get_announcements (corrigé nom) ─────────────────────────────────
+async function getAnnouncements(
   db: ReturnType<typeof createClient>,
   body: { schoolCode: string }
 ) {
@@ -739,12 +768,12 @@ async function getannouncements(
     .eq("school_code", schoolCode)
     .order("created_at", { ascending: false })
     .limit(5);
-  console.log("📢 getannouncements:", schoolCode, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
+  console.log("📢 getAnnouncements:", schoolCode, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
   return { announcements: data ?? [] };
 }
 
 // ─── ACTION : create_announcement ────────────────────────────────────────────
-async function createannouncement(
+async function createAnnouncement(
   db: ReturnType<typeof createClient>,
   body: { schoolCode: string; directorCode: string; title: string; message: string; expiresAt?: string }
 ) {
@@ -758,6 +787,17 @@ async function createannouncement(
   return { created: true };
 }
 
+// ─── ACTION : get_payment_numbers (fonction manquante ajoutée) ────────────────
+async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
+  // Retourne des numéros fictifs ou récupère depuis une table settings
+  return {
+    numbers: [
+      { operator: "Digicel", number: "50948695079" },
+      { operator: "Natcom", number: "50940669105" },
+    ],
+  };
+}
+
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
@@ -767,7 +807,7 @@ Deno.serve(async (req) => {
     let result: unknown;
 
     switch (body.action) {
-      case "generate_quiz":       result = await generateQuiz(callGemini, body); break;     
+      case "generate_quiz":       result = await generateQuiz(callGemini, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
       case "ask":                 result = await processAsk(supabase, callGemini, body); break;
       case "save_quiz_score":     result = await saveQuizScore(supabase, body); break;
@@ -776,7 +816,7 @@ Deno.serve(async (req) => {
       case "get_payment_numbers": result = await getPaymentNumbers(supabase); break;
       case "get_announcements":   result = await getAnnouncements(supabase, body); break;
       case "create_announcement": result = await createAnnouncement(supabase, body); break;
- default:
+      default:
         return new Response(JSON.stringify({ error: "Action inconnue" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
