@@ -150,7 +150,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
       <div className="px-4 py-4 border-b" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
         <h2 className="text-white font-bold flex items-center gap-2"><IcoClipboard /> Istorik rekèt yo, kesyon/repons ou yo</h2>
         <div className="flex items-center gap-3 mt-0.5">
-          <p className="text-blue-400 text-xs">{history.length} scan{history.length !== 1 ? "s" : ""} total</p>
+          <p className="text-blue-400 text-xs">{history.length} requête {history.length !== 1 ? "s" : ""} total</p>
           <span className="text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1" style={{ background: "#14532d22", color: "#86efac", border: "1px solid #22c55e22" }}>
             <IcoDatabase />  • Hors-ligne
           </span>
@@ -184,7 +184,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         {!loading && history.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <IcoInbox />
-            <p className="text-blue-400 text-center text-sm">Poko gen istwa.<br />Fè yon premye rekèt nan chat la!</p>
+            <p className="text-blue-400 text-center text-sm">Istorik la poko kreye.<br />Fè yon premye rekèt nan chat la!</p>
             <button onClick={() => onNavigate("chat")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
               style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan chat la</button>
           </div>
