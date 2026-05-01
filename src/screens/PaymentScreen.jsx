@@ -8,7 +8,7 @@ export function PaymentScreen({ onBack }) {
 
   useEffect(() => {
     callEdge({ action: "get_payment_numbers" })
-      .then(d => setPayments(d.payments || []))
+      .then(d => setPayments(d.numbers || d.payments || []))
       .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669105" }]))
       .finally(() => setLoading(false));
   }, []);
@@ -51,8 +51,8 @@ export function PaymentScreen({ onBack }) {
     </svg>
   );
   const cardStyle = {
-    MonCash: { grad: "linear-gradient(135deg,#c0392b,#e74c3c)", icon: "https://i.postimg.cc/J4h15HZC/telechargement.jpg", sub: "Digicel Haiti" },
-    NatCash: { grad: "linear-gradient(135deg,#e67e22,#f39c12)", icon: "https://i.postimg.cc/1zXmJhDn/file-00000000ae3c71f788921fb0d044db44.jpg", sub: "Natcom Haiti" },
+    Digicel: { grad: "linear-gradient(135deg,#c0392b,#e74c3c)", icon: "https://i.postimg.cc/J4h15HZC/telechargement.jpg", sub: "Digicel Haiti" },
+    Natcom: { grad: "linear-gradient(135deg,#e67e22,#f39c12)", icon: "https://i.postimg.cc/1zXmJhDn/file-00000000ae3c71f788921fb0d044db44.jpg", sub: "Natcom Haiti" },
   };
 
   return (
