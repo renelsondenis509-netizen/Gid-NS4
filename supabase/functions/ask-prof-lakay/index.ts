@@ -31,7 +31,7 @@ const LLM7_KEY       = Deno.env.get("LLM7_API_KEY") ?? "";
 const CF_ACCOUNT_ID  = Deno.env.get("CF_ACCOUNT_ID") ?? "";
 const CF_API_TOKEN   = Deno.env.get("CF_API_TOKEN") ?? "";
 
-// ─── Niveau 1 — OpenRouter (vision + texte) ───────────────────────────────────
+// ─── Niveau 1 — OpenRouter (vision + texte) ───────────────────────────────
 async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Promise<string> {
   const res = await withTimeout(fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -40,7 +40,8 @@ async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Pro
       "Authorization": `Bearer ${OPENROUTER_KEY}`,
     },
     body: JSON.stringify({
-      model: "google/gemini-2.0-flash-lite-001",
+      model: "openrouter/free",
+      route: "fallback",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent },
