@@ -47,50 +47,34 @@ export function ChatScreen({ user, onNavigate }) {
     return () => el?.removeEventListener('scroll', onScroll);
   }, []);
 
-  const detectSubject = (text) => {
+const detectSubject = (text) => {
   const t = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   
-  // Sciences naturelles
-  if (t.includes("bio") || t.includes("cellule") || t.includes("adn") || t.includes("génétique") || t.includes("évolution") || t.includes("végétal") || t.includes("animal")) return "Biologie";
-  if (t.includes("econom") || t.includes("micro") || t.includes("macro") || t.includes("marche") || t.includes("offre") || t.includes("demande") || t.includes("pib") || t.includes("inflation") || t.includes("monnaie") || t.includes("entreprise")) return "Économie";
-  if (t.includes("geol") || t.includes("roche") || t.includes("mineral") || t.includes("tectonique") || t.includes("fossile") || t.includes("volcan")) return "Géologie";
-  if (t.includes("histoir") || t.includes("revolution") || t.includes("guerre") || t.includes("independance") || t.includes("colonisation") || t.includes("empire") || t.includes("dessalines") || t.includes("toussaint")) return "Histoire";
-  if (t.includes("geograph") || t.includes("continent") || t.includes("pays") || t.includes("capitale") || t.includes("carte") || t.includes("population") || t.includes("relief") || t.includes("fleuve")) return "Géographie";
-  if (t.includes("philo") || t.includes("conscience") || t.includes("liberte") || t.includes("verite") || t.includes("kant") || t.includes("descartes") || t.includes("sartre") || t.includes("platon")) return "Philosophie";
-  if (t.includes("physiol") || t.includes("organe") || t.includes("système") || t.includes("homéostasie") || t.includes("fonction")) return "Physiologie";
+  if (t.includes("bio") || t.includes("cellule") || t.includes("adn") || t.includes("génétique")) return "Biologie";
+  if (t.includes("géol") || t.includes("roche") || t.includes("minéral")) return "Géologie";
+  if (t.includes("physiol") || t.includes("organe") || t.includes("système")) return "Physiologie";
+  if (t.includes("chim") || t.includes("molécule") || t.includes("acide")) return "Chimie";
+  if (t.includes("phys") || t.includes("vitesse") || t.includes("force") || t.includes("énergie")) return "Physiques";
+  if (t.includes("analyse") || t.includes("limite") || t.includes("dérivée")) return "Analyse";
+  if (t.includes("algèbre") || t.includes("équation") || t.includes("fonction")) return "Algèbre";
+  if (t.includes("suite") || t.includes("arithmétique") || t.includes("géométrique")) return "Suite";
+  if (t.includes("complexe") || t.includes("imaginaire")) return "Complexe";
+  if (t.includes("probabilité") || t.includes("chance") || t.includes("dé")) return "Probabilité";
+  if (t.includes("géométrie") || t.includes("triangle") || t.includes("cercle")) return "Géométrie";
+  if (t.includes("économie") || t.includes("microéconomie") || t.includes("macroéconomie") || t.includes("offre") || t.includes("demande") || t.includes("pib")) return "Économie";
+  if (t.includes("philo") || t.includes("socrate")) return "Philosophie";
+  if (t.includes("histoire") || t.includes("révolution")) return "Histoire";
+  if (t.includes("géo") || t.includes("carte")) return "Géographie";
+  if (t.includes("créole")) return "Créole";
+  if (t.includes("français") || t.includes("grammaire")) return "Français";
+  if (t.includes("anglais")) return "Anglais";
+  if (t.includes("espagnol")) return "Espagnol";
+  if (t.includes("dissertation") || t.includes("rédaction")) return "Dissertation";
+  if (t.includes("esthétique") || t.includes("artistique")) return "Éducative Esthétique et Artistique";
+  if (t.includes("sport") || t.includes("éducation physique")) return "Éducation Physique et Sportive";
+  if (t.includes("citoyenneté") || t.includes("civique")) return "Éducation à la Citoyenneté";
+  if (t.includes("numérique") || t.includes("informatique")) return "Numérique et Informatique";
   
-  // Chimie / Physique
-  if (t.includes("chim") || t.includes("molécule") || t.includes("acide") || t.includes("réaction") || t.includes("atome") || t.includes("tableau périodique")) return "Chimie";
-  if (t.includes("phys") || t.includes("vitesse") || t.includes("force") || t.includes("energie") || t.includes("mouvement") || t.includes("electricite") || t.includes("onde")) return "Physique";
-  
-  // Mathématiques
-  if (t.includes("analyse") || t.includes("limite") || t.includes("derivee") || t.includes("integrale") || t.includes("continuite")) return "Analyse";
-  if (t.includes("algèbre") || t.includes("equation") || t.includes("inequation") || t.includes("fonction") || t.includes("polynome")) return "Algèbre";
-  if (t.includes("suite") || t.includes("arithmetique") || t.includes("geometrique") || t.includes("recurrence") || t.includes("suite numérique")) return "Suite";
-  if (t.includes("complexe") || t.includes("imaginaire") || t.includes("argument") || t.includes("module") || t.includes("nombre complexe")) return "Complexe";
-  if (t.includes("probabilité") || t.includes("chance") || t.includes("dé") || t.includes("loi normale") || t.includes("prob")) return "Probabilité";
-  if (t.includes("geometrie") || t.includes("triangle") || t.includes("cercle") || t.includes("vecteur") || t.includes("angle") || t.includes("droite")) return "Géométrie";
-  
-  // Humanités / Sciences sociales
-  
-  // Langues et lettres
-  if (t.includes("créole") || t.includes("grammaire créole")) return "Créole";
-  if (t.includes("français") || t.includes("grammaire fr") || t.includes("conjugaison") || t.includes("orthographe fr")) return "Français";
-  if (t.includes("anglais") || t.includes("english") || t.includes("vocabulaire anglais")) return "Anglais";
-  if (t.includes("espagnol") || t.includes("español") || t.includes("vocabulaire espagnol")) return "Espagnol";
-  if (t.includes("dissertation") || t.includes("rédaction") || t.includes("thèse") || t.includes("argumentation")) return "Dissertation";
-  
-  // Éducation, art, sport, citoyenneté, numérique
-  if (t.includes("esthétique") || t.includes("artistique") || t.includes("dessin") || t.includes("peinture") || t.includes("art")) return "Éducative Esthétique et Artistique";
-  if (t.includes("sport") || t.includes("éducation physique") || t.includes("ep") || t.includes("musculation") || t.includes("athlétisme")) return "Éducation Physique et Sportive";
-  if (t.includes("citoyenneté") || t.includes("civique") || t.includes("droit") || t.includes("devoir") || t.includes("constitution")) return "Éducation à la Citoyenneté";
-  if (t.includes("numérique") || t.includes("informatique") || t.includes("ordinateur") || t.includes("programmation") || t.includes("algorithme")) return "Numérique et Informatique";
-  
-  // Littérature (Haïtienne / Française) – on peut les distinguer
-  if (t.includes("littérature haïtienne") || t.includes("écrivain haïtien") || t.includes("price-mars") || t.includes("roumain") || t.includes("chauvet")) return "Littérature Haïtienne";
-  if (t.includes("littérature française") || t.includes("écrivain français") || t.includes("racine") || t.includes("molière") || t.includes("zola")) return "Littérature Française";
-
-  // En dernier recours, utiliser la première matière de l’utilisateur
   return (user.subjects && user.subjects[0]) || "Général";
 };
 
