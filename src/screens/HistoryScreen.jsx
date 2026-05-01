@@ -148,7 +148,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
       <div className="px-4 py-4 border-b" style={{ background: "rgba(10,15,46,0.98)", borderColor: "#ffffff10" }}>
-        <h2 className="text-white font-bold flex items-center gap-2"><IcoClipboard /> Istorik Rekèt Yo, Kesyon/Repons Ou Yo</h2>
+        <h2 className="text-white font-bold flex items-center gap-2"><IcoClipboard /> Istorik rekèt yo, kesyon/repons ou yo</h2>
         <div className="flex items-center gap-3 mt-0.5">
           <p className="text-blue-400 text-xs">{history.length} scan{history.length !== 1 ? "s" : ""} total</p>
           <span className="text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1" style={{ background: "#14532d22", color: "#86efac", border: "1px solid #22c55e22" }}>
