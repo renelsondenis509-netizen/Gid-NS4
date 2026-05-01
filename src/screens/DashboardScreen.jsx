@@ -280,7 +280,7 @@ export function DashboardScreen({ onBack, userCode }) {
         </div>
         <div className="rounded-2xl p-4" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
           <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
-            <BookIcon color="#a855f7" /> Matières autorisées
+            <BookIcon color="#a855f7" /> Matières
           </h3>
           <div className="flex flex-wrap gap-2">
             {school.subjects.map((s, i) => (
@@ -294,7 +294,7 @@ export function DashboardScreen({ onBack, userCode }) {
         {subjectEntries.length > 0 && (
           <div className="rounded-2xl p-5" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
             <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-              <ChartIcon /> Matières les plus visitées
+              <ChartIcon /> Matières les plus sollicitées
             </h3>
             <div className="space-y-3">
               {subjectEntries.map(([sub, count], i) => (
