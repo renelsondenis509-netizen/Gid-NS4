@@ -98,7 +98,7 @@ export function FavoritesScreen({ user, onNavigate }) {
         {favorites.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <p className="text-blue-300 text-center text-base">Pa gen favori kounye a.<br/>Klike sou ☆ anba repons Prof Lakay!</p>
+            <p className="text-blue-300 text-center text-base">Pa gen favori kounye a.<br/>Klike sou ☆ anba repons Prof Lakay la!</p>
             <button onClick={() => onNavigate("chat")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
               style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan chat la</button>
           </div>
