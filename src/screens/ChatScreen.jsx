@@ -52,12 +52,16 @@ export function ChatScreen({ user, onNavigate }) {
   
   // Sciences naturelles
   if (t.includes("bio") || t.includes("cellule") || t.includes("adn") || t.includes("génétique") || t.includes("évolution") || t.includes("végétal") || t.includes("animal")) return "Biologie";
+  if (t.includes("économ") || t.includes("micro") || t.includes("macro") || t.includes("marché") || t.includes("offre") || t.includes("demande") || t.includes("pib") || t.includes("inflation") || t.includes("monnaie") || t.includes("entreprise")) return "Économie";
   if (t.includes("géol") || t.includes("roche") || t.includes("minéral") || t.includes("tectonique") || t.includes("fossile") || t.includes("volcan")) return "Géologie";
+  if (t.includes("histoir") || t.includes("révolution") || t.includes("guerre") || t.includes("indépendance") || t.includes("colonisation") || t.includes("empire") || t.includes("dessalines") || t.includes("toussaint")) return "Histoire";
+  if (t.includes("géograph") || t.includes("continent") || t.includes("pays") || t.includes("capitale") || t.includes("carte") || t.includes("population") || t.includes("relief") || t.includes("fleuve")) return "Géographie";
+  if (t.includes("philo") || t.includes("conscience") || t.includes("liberté") || t.includes("vérité") || t.includes("kant") || t.includes("descartes") || t.includes("sartre") || t.includes("platon")) return "Philosophie";
   if (t.includes("physiol") || t.includes("organe") || t.includes("système") || t.includes("homéostasie") || t.includes("fonction")) return "Physiologie";
   
   // Chimie / Physique
   if (t.includes("chim") || t.includes("molécule") || t.includes("acide") || t.includes("réaction") || t.includes("atome") || t.includes("tableau périodique")) return "Chimie";
-  if (t.includes("phys") || t.includes("vitesse") || t.includes("force") || t.includes("énergie") || t.includes("mouvement") || t.includes("électricité") || t.includes("onde")) return "Physiques";
+  if (t.includes("phys") || t.includes("vitesse") || t.includes("force") || t.includes("énergie") || t.includes("mouvement") || t.includes("électricité") || t.includes("onde")) return "Physique";
   
   // Mathématiques
   if (t.includes("analyse") || t.includes("limite") || t.includes("dérivée") || t.includes("intégrale") || t.includes("continuité")) return "Analyse";
@@ -68,10 +72,6 @@ export function ChatScreen({ user, onNavigate }) {
   if (t.includes("géométrie") || t.includes("triangle") || t.includes("cercle") || t.includes("vecteur") || t.includes("angle") || t.includes("droite")) return "Géométrie";
   
   // Humanités / Sciences sociales
-  if (t.includes("philo") || t.includes("socrate") || t.includes("kant") || t.includes("conscience") || t.includes("liberté") || t.includes("justice")) return "Philosophie";
-  if (t.includes("histoire") || t.includes("révolution") || t.includes("guerre") || t.includes("colonie") || t.includes("indépendance")) return "Histoire";
-  if (t.includes("géo") || t.includes("carte") || t.includes("population") || t.includes("climat") || t.includes("relief")) return "Géographie";
-  if (t.includes("économie") || t.includes("marché") || t.includes("offre") || t.includes("demande") || t.includes("pib")) return "Économie";
   
   // Langues et lettres
   if (t.includes("créole") || t.includes("grammaire créole")) return "Créole";
