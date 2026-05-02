@@ -237,16 +237,48 @@ export function DashboardScreen({ onBack, userCode }) {
         <div className="flex-1">
           <h2 className="text-white font-bold">Dashboard</h2>
           <p className="text-blue-400 text-xs">{school.name}</p>
-        </div>
-        <button onClick={() => generateAndSharePDF(school, s)} className="px-3 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-2 active:scale-95 transition-transform" style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>
-          <FileIcon /> PDF
-        </button>
-       <button onClick={() => { localStorage.removeItem(_dirKey); setAuthorized(false); setStats(null); }}
-  className="px-3 py-2 rounded-xl text-xs font-bold"
-  style={{ background:"#ffffff10", color:"#94a3b8", border:"1px solid #ffffff15" }}>
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-</button> 
-      </div>
+        <div className="flex items-center gap-3 px-4 py-4 border-b" style={{ borderColor: "#ffffff10" }}>
+  <button onClick={onBack} className="text-blue-400 text-xl">←</button>
+  <div className="flex-1">
+    <h2 className="text-white font-bold">Dashboard</h2>
+    <p className="text-blue-400 text-xs">{school.name}</p>
+  </div>
+  <button onClick={() => generateAndSharePDF(school, s)} className="px-3 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-2 active:scale-95 transition-transform" style={{ background: "linear-gradient(135deg,#d4002a,#ff6b35)" }}>
+    <FileIcon /> PDF
+  </button>
+  {/* Nouveau bouton power simple */}
+  <button
+    onClick={() => {
+      localStorage.removeItem(_dirKey);
+      setAuthorized(false);
+      setStats(null);
+    }}
+    style={{
+      background: "transparent",
+      border: "1px solid rgba(255,255,255,0.2)",
+      borderRadius: "40px",
+      padding: "8px 12px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      transition: "all 0.2s",
+    }}
+    onMouseEnter={e => {
+      e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+      e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.background = "transparent";
+      e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+    }}
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="2" x2="12" y2="12" />
+    </svg>
+  </button>
+</div>
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         <div className="rounded-2xl px-4 py-3 flex justify-between items-center"
           style={{ background: school.daysRemaining <= 7 ? "#d4002a22" : "#14532d22", border: `1px solid ${school.daysRemaining <= 7 ? "#d4002a44" : "#22c55e33"}` }}>
