@@ -21,7 +21,7 @@ export function FavoritesScreen({ user, onNavigate }) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'fr-FR';
-      utterance.rate = 0.9;
+      utterance.rate = 1.1;
       utterance.onend = () => setSpeakingId(null);
       utterance.onerror = () => setSpeakingId(null);
       window.speechSynthesis.speak(utterance);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { callEdge } from "../api";
 import { BottomNav } from "../components/UI";
+import { idbSaveExercice } from "../utils/idb";
 
 export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const [questions, setQuestions] = useState([]);
@@ -13,11 +13,68 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const [answers, setAnswers]     = useState([]);
 
   useEffect(() => {
-    callEdge({ action:"generate_quiz", content: scan.response, subject: scan.subject })
-      .then(data => setQuestions(data.questions || []))
-      .catch(() => setError("Imposib jenere egzèsis la. Eseye ankò."))
-      .finally(() => setLoading(false));
+    // Génération locale hors-ligne
+    try {
+      const questions = generateLocalQuiz(scan.response, scan.subject);
+      if (questions.length > 0) {
+        setQuestions(questions);
+      } else {
+        setError("Pa gen ase kontni pou jenere egzèsis la.");
+      }
+    } catch {
+      setError("Imposib jenere egzèsis la. Eseye ankò.");
+    }
+    setLoading(false);
   }, []);
+
+  function generateLocalQuiz(text, subject) {
+    // Extraire les phrases clés du texte
+    const sentences = text
+      .replace(/\*\*/g, '')
+      .replace(/#{1,6}\s/g, '')
+      .split(/[.!?\n]/)
+      .map(s => s.trim())
+      .filter(s => s.length > 40 && s.length < 200);
+
+    const questions = [];
+    const used = new Set();
+
+    for (let i = 0; i < sentences.length && questions.length < 5; i++) {
+      const sentence = sentences[i];
+      // Chercher une phrase avec un mot-clé important (majuscule ou terme clé)
+      const words = sentence.split(' ').filter(w => w.length > 4);
+      if (words.length < 5) continue;
+
+      // Trouver un mot important à cacher
+      const keyWord = words.find(w => w[0] === w[0].toUpperCase() && w.length > 4 && !used.has(w))
+        || words.find(w => w.length > 6 && !used.has(w));
+      if (!keyWord) continue;
+      used.add(keyWord);
+
+      const question = sentence.replace(keyWord, '___________');
+      // Générer 3 distracteurs depuis d'autres mots du texte
+      const distractors = words
+        .filter(w => w !== keyWord && w.length > 4 && /^[a-zA-ZÀ-ÿ]/.test(w))
+        .slice(0, 3);
+      while (distractors.length < 3) distractors.push(`Opsyon ${distractors.length + 1}`);
+
+      const choices = [keyWord, ...distractors.slice(0, 3)];
+      // Mélanger les choix
+      for (let j = choices.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [choices[j], choices[k]] = [choices[k], choices[j]];
+      }
+      const answer = choices.indexOf(keyWord);
+
+      questions.push({
+        q: `Konplete fraz sa a : "${question}"`,
+        choices,
+        answer,
+        note: sentence,
+      });
+    }
+    return questions;
+  }
 
   const handleChoice = (idx) => {
     if (selected !== null) return;
@@ -28,7 +85,17 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   };
 
   const next = () => {
-    if (current + 1 >= questions.length) { setDone(true); return; }
+    if (current + 1 >= questions.length) {
+      setDone(true);
+      idbSaveExercice(user.phone, {
+        subject: scan.subject,
+        score: score,
+        total: questions.length,
+        date: new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" }),
+        scanId: scan.id,
+      });
+      return;
+    }
     setCurrent(c => c + 1);
     setSelected(null);
   };
