@@ -144,7 +144,7 @@ const badges = computeBadges();
           <div style={{ flexShrink: 0 }}><LockIcon /></div>
           <div>
             <div className="text-green-300 text-sm font-semibold">Koneksyon Sekirize</div>
-            <div className="text-green-800 text-xs">Done sekirize</div>
+            <div className="text-green-800 text-xs">Done pwoteje</div>
           </div>
         </div>
       </div>
