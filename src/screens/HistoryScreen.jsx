@@ -14,9 +14,9 @@ const IcoInbox = () => <svg width="48" height="48" viewBox="0 0 24 24" fill="non
 const IcoTrash = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>;
 const IcoLoader = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{animation:"spin 1s linear infinite"}}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
 
-// Icônes pour synthèse vocale
-const IcoVolumeUp = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
-const IcoStop = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/></svg>;
+// Icônes pour synthèse vocale (style voyant)
+const IcoVolumeUp = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
+const IcoStop = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/></svg>;
 
 export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   const [history, setHistory] = useState([]);
@@ -89,7 +89,6 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         </button>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {/* Fallback / image sections unchanged */}
         {!selected._fallback ? (
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#14532d22", border: "1px solid #22c55e22" }}>
             <span style={{ color:"#86efac" }}><IcoDatabase /></span>
@@ -124,10 +123,23 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             </div>
             <button
               onClick={() => handleSpeak(selected.response, selected.id)}
-              className="p-2 rounded-xl transition-colors hover:bg-blue-500/20"
-              style={{ background: speakingId === selected.id ? "#d4002a22" : "#1e3a8a22", border: "1px solid #3b82f633" }}
+              style={{
+                background: speakingId === selected.id ? "#dc2626" : "#2563eb",
+                border: "2px solid white",
+                borderRadius: "9999px",
+                padding: "6px 14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                color: "white",
+                fontWeight: "bold",
+                fontSize: "12px",
+                cursor: "pointer",
+              }}
             >
               {speakingId === selected.id ? <IcoStop /> : <IcoVolumeUp />}
+              <span>{speakingId === selected.id ? "Stop" : "Lire"}</span>
             </button>
           </div>
           <div className="text-sm leading-relaxed" style={{ color: "#e0e8ff" }}>
@@ -150,7 +162,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         <div className="flex items-center gap-3 mt-0.5">
           <p className="text-blue-400 text-xs">{history.length} requête{history.length !== 1 ? "s" : ""} totales</p>
           <span className="text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1" style={{ background: "#14532d22", color: "#86efac", border: "1px solid #22c55e22" }}>
-            <IcoDatabase />  • Hors-ligne
+            <IcoDatabase /> Hors-ligne
           </span>
         </div>
       </div>
@@ -216,10 +228,23 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                 <div className="px-4 pb-3 flex justify-between items-center">
                   <button
                     onClick={() => handleSpeak(h.response, h.id)}
-                    className="p-2 rounded-lg transition-colors hover:bg-blue-500/20"
-                    style={{ background: speakingId === h.id ? "#d4002a22" : "#1e3a8a22", border: "1px solid #3b82f633" }}
+                    style={{
+                      background: speakingId === h.id ? "#dc2626" : "#2563eb",
+                      border: "2px solid white",
+                      borderRadius: "9999px",
+                      padding: "6px 14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                    }}
                   >
                     {speakingId === h.id ? <IcoStop /> : <IcoVolumeUp />}
+                    <span>{speakingId === h.id ? "Stop" : "Lire"}</span>
                   </button>
                   <button onClick={() => handleDelete(h)} disabled={deleting === h.id}
                     className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1"
