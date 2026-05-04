@@ -202,7 +202,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         {!loading && history.length > 0 && (
           <>
             <h3 className="text-blue-400 text-xs font-semibold uppercase tracking-wider">Tout rekèt, kesyon/repons ou yo</h3>
-            {history.map(h => (
+            {[...history].reverse().map(h => (
               <div key={h.id} className="rounded-2xl overflow-hidden" style={{ background: "#0f1e4a", border: "1px solid #1e3a8a33" }}>
                 <button onClick={() => setSelected(h)} className="w-full text-left active:scale-95 transition-transform">
                   <div className="flex gap-3 p-4">
