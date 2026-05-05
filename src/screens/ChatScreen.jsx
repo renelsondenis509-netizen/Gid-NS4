@@ -8,6 +8,76 @@ import { LatexText } from "../components/LatexText";
 import { ErrorToast, ExpiryBanner } from "../components/UI";
 import { BottomNav } from "../components/UI";
 
+// ─── Icônes SVG ───────────────────────────────────────────────────────────────
+const SignalIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4.93 4.93A10 10 0 0 1 19.07 19.07" />
+    <path d="M7.76 7.76A6 6 0 0 1 16.24 16.24" />
+    <path d="M10.59 10.59a2 2 0 0 0 2.83 2.83" />
+    <line x1="2" y1="2" x2="22" y2="22" />
+  </svg>
+);
+
+const AttachmentIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+  </svg>
+);
+
+const ClockIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+const StarFullIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="none">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const StarOutlineIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const ArrowRightIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
+
+const CameraIconSmall = () => (
+  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+    <circle cx="12" cy="13" r="4" />
+  </svg>
+);
+
+const EditIconSmall = () => (
+  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="15" y1="9" x2="9" y2="15" />
+    <line x1="9" y1="9" x2="15" y2="15" />
+  </svg>
+);
+
 export function ChatScreen({ user, onNavigate }) {
   const offline = useOffline();
 
@@ -77,7 +147,6 @@ export function ChatScreen({ user, onNavigate }) {
   };
 
   const sendMessage = async (retryPayload = null) => {
-    // Guard offline
     if (offline) {
       setApiError({ type: "network", message: "Pa gen koneksyon entènèt !", detail: "Konekte epi eseye ankò.", icon: "📶", retry: false });
       return;
@@ -160,30 +229,27 @@ export function ChatScreen({ user, onNavigate }) {
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
-      {/* Freemium banner */}
       <ExpiryBanner daysRemaining={user.daysRemaining} />
 
-      {/* Offline banner */}
       {offline && (
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "center",
           gap: 8, padding: "7px 16px", background: "#78350f",
           borderBottom: "1px solid #f59e0b55", fontSize: 12, color: "#fcd34d",
         }}>
-          <span>📶</span>
+          <SignalIcon />
           <span>Mode hors-ligne — Istorik ou disponib, pa ka voye nouvo kesyon</span>
           <button
             onClick={() => onNavigate("history")}
-            style={{ marginLeft: 8, padding: "2px 10px", borderRadius: 8, background: "#f59e0b22", color: "#fcd34d", border: "1px solid #f59e0b55", fontSize: 11, cursor: "pointer" }}
+            style={{ marginLeft: 8, padding: "2px 10px", borderRadius: 8, background: "#f59e0b22", color: "#fcd34d", border: "1px solid #f59e0b55", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
           >
-            Istorik →
+            Istorik <ArrowRightIcon />
           </button>
         </div>
       )}
 
       {/* HEADER */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "rgba(10,15,46,0.98)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
-        {/* Logo */}
         <div style={{ width: 40, height: 40, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
           <img src={APP_LOGO} alt="Gid NS4" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
@@ -204,7 +270,7 @@ export function ChatScreen({ user, onNavigate }) {
             })}
           </div>
           <span style={{ fontSize: 9, fontWeight: 700, color: imgDone ? "#3B4A6B" : "#ff6b35" }}>
-            {imgDone ? "✓ Fini" : <span style={{ display: "flex", alignItems: "center", gap: 3 }}>{IMG_MAX - imgUsed}/{IMG_MAX} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>}
+            {imgDone ? (<span style={{ display: "flex", alignItems: "center", gap: 3 }}><CheckIcon /> Fini</span>) : (<span style={{ display: "flex", alignItems: "center", gap: 3 }}>{IMG_MAX - imgUsed}/{IMG_MAX} <CameraIconSmall /></span>)}
           </span>
         </div>
         {/* Token texte */}
@@ -216,7 +282,7 @@ export function ChatScreen({ user, onNavigate }) {
             })}
           </div>
           <span style={{ fontSize: 9, fontWeight: 700, color: textDone ? "#3B4A6B" : "#60A5FA" }}>
-            {textDone ? "✓ Fini" : <span style={{ display: "flex", alignItems: "center", gap: 3 }}>{TEXT_MAX - textUsed}/{TEXT_MAX} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>}
+            {textDone ? (<span style={{ display: "flex", alignItems: "center", gap: 3 }}><CheckIcon /> Fini</span>) : (<span style={{ display: "flex", alignItems: "center", gap: 3 }}>{TEXT_MAX - textUsed}/{TEXT_MAX} <EditIconSmall /></span>)}
           </span>
         </div>
       </div>
@@ -236,8 +302,8 @@ export function ChatScreen({ user, onNavigate }) {
                 <LatexText content={msg.content} />
               </div>
               {msg.role === "assistant" && (
-                <button onClick={() => toggleFav(msg, i)} style={{ marginTop: 4, padding: "2px 8px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "#fbbf24" }}>
-                  {favorites.findIndex(f => f.id === i) >= 0 ? "★" : "☆"}
+                <button onClick={() => toggleFav(msg, i)} style={{ marginTop: 4, padding: "2px 8px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "#fbbf24", display: "inline-flex", alignItems: "center" }}>
+                  {favorites.findIndex(f => f.id === i) >= 0 ? <StarFullIcon /> : <StarOutlineIcon />}
                 </button>
               )}
             </div>
@@ -264,8 +330,8 @@ export function ChatScreen({ user, onNavigate }) {
         )}
 
         {allDone && !offline && (
-          <div className="mx-2 px-4 py-3 rounded-2xl text-sm text-center" style={{ background: "#d4002a22", border: "1px solid #d4002a44", color: "#ff8080" }}>
-            🕐 Ou itilize tout scan ak kesyon ou yo pou jodi a. Tounen demen !
+          <div className="mx-2 px-4 py-3 rounded-2xl text-sm text-center" style={{ background: "#d4002a22", border: "1px solid #d4002a44", color: "#ff8080", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <ClockIcon /> Ou itilize tout scan ak kesyon ou yo pou jodi a. Tounen demen !
           </div>
         )}
         <div ref={bottomRef} />
@@ -290,8 +356,12 @@ export function ChatScreen({ user, onNavigate }) {
         {image && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "6px 8px", background: "rgba(37,99,235,0.1)", borderRadius: 10, border: "1px solid rgba(37,99,235,0.2)" }}>
             <img src={image} alt="" style={{ width: 36, height: 36, borderRadius: 8, objectFit: "cover" }} />
-            <span style={{ color: "#6B8ADB", fontSize: 11, flex: 1 }}>📎 Image prête</span>
-            <button onClick={() => setImage(null)} style={{ color: "#E8002A", background: "none", border: "none", fontSize: 16, cursor: "pointer" }}>✕</button>
+            <span style={{ color: "#6B8ADB", fontSize: 11, flex: 1, display: "flex", alignItems: "center", gap: 6 }}>
+              <AttachmentIcon /> Image prête
+            </span>
+            <button onClick={() => setImage(null)} style={{ color: "#E8002A", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+              <CloseIcon />
+            </button>
           </div>
         )}
         <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
@@ -301,8 +371,8 @@ export function ChatScreen({ user, onNavigate }) {
             style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: (imgDone || offline) ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg,#2563EB,#3B82F6)", border: "none", cursor: (imgDone || offline) ? "not-allowed" : "pointer" }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={(imgDone || offline) ? "#3B4A6B" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
             </svg>
           </button>
           <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }} />
@@ -324,8 +394,8 @@ export function ChatScreen({ user, onNavigate }) {
             style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: (loading || allDone || offline) ? "rgba(59,130,246,0.4)" : "linear-gradient(135deg,#2563EB,#3B82F6)", border: "none", cursor: (loading || allDone || offline) ? "not-allowed" : "pointer" }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
             </svg>
           </button>
         </div>
