@@ -304,7 +304,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
               className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2"
               style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)" }}>
               {current + 1 >= questions.length
-                ? <><IcoGraduation size={18} /><span>Wè Rezilta</span></>
+                ? <><IcoCheck size={18} /><span>Wè Rezilta</span></>
                 : <><span>Kesyon Swivan</span><IcoArrowRight /></>
               }
             </button>
