@@ -72,7 +72,7 @@ export function BottomNav({ active, onNavigate }) {
             onTouchStart={e => e.currentTarget.style.transform="scale(0.88)"}
             onTouchEnd={e   => e.currentTarget.style.transform="scale(1)"}>
             {on && <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:32, height:2, borderRadius:2, background:"linear-gradient(90deg,#E8002A,#FF5C35)" }} />}
-            <span style={{ color:on?"#FF5C35":"#4B5EA8", position:"relative" }}>
+            <span style={{ color: on ? "#FF5C35" : "white", position:"relative" }}>
               {tab.icon}
               {tab.badge > 0 && (
                 <div style={{ position:"absolute", top:-8, right:-8, background:"linear-gradient(135deg,#EF4444,#DC2626)", color:"#fff", fontSize:10, fontWeight:800, minWidth:18, height:18, borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 5px", border:"2px solid #0a0f2e" }}>
@@ -80,11 +80,10 @@ export function BottomNav({ active, onNavigate }) {
                 </div>
               )}
             </span>
-            <span style={{ fontSize:9, fontWeight:on?700:500, color:on?"#FF5C35":"#4B5EA8", marginTop:2 }}>{tab.label}</span>
+            <span style={{ fontSize:9, fontWeight:on?700:500, color:on?"#FF5C35":"white", marginTop:2 }}>{tab.label}</span>
           </button>
         );
       })}
     </div>
   );
 }
-
