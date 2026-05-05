@@ -435,34 +435,44 @@ async function validateCode(
   }
 
   await db.from("profiles").upsert(
-    { phone, school_code: schoolCode, last_seen: new Date().toISOString() },
-    { onConflict: "phone,school_code" }
-  );
+  { phone, school_code: schoolCode, last_seen: new Date().toISOString() },
+  { onConflict: "phone,school_code" }
+);
 
-  const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
-  const { count: scansToday } = await db
-    .from("scans")
-    .select("*", { count: "exact", head: true })
-    .eq("phone", phone)
-    .eq("school_code", schoolCode)
-    .gte("created_at", `${today}T05:00:00Z`);
+// Récupérer le profil pour obtenir freemium_expires_at
+const { data: profile, error: profileError } = await db
+  .from("profiles")
+  .select("freemium_expires_at")
+  .eq("phone", phone)
+  .eq("school_code", schoolCode)
+  .maybeSingle();
 
-  const daysRemaining = Math.ceil((expires.getTime() - now.getTime()) / 86400000);
+const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+const { count: scansToday } = await db
+  .from("scans")
+  .select("*", { count: "exact", head: true })
+  .eq("phone", phone)
+  .eq("school_code", schoolCode)
+  .gte("created_at", `${today}T05:00:00Z`);
 
-  return {
-    valid: true,
-    school: {
-      name:            school.school_name,
-      subjects:        school.subjects ?? [],
-      dailyScans:      school.daily_scans ?? 5,
-      dailyImageScans: school.daily_image_scans ?? 1,
-      dailyTextScans:  school.daily_text_scans  ?? 4,
-      daysRemaining,
-      expiresAt:       school.expires_at,
-      maxStudents:     school.max_students,
-    },
-    scansToday: scansToday ?? 0,
-  };
+const daysRemaining = Math.ceil((expires.getTime() - now.getTime()) / 86400000);
+
+return {
+  valid: true,
+  school: {
+    name:            school.school_name,
+    subjects:        school.subjects ?? [],
+    dailyScans:      school.daily_scans ?? 5,
+    dailyImageScans: school.daily_image_scans ?? 1,
+    dailyTextScans:  school.daily_text_scans  ?? 4,
+    daysRemaining,
+    expiresAt:       school.expires_at,
+    maxStudents:     school.max_students,
+  },
+  scansToday: scansToday ?? 0,
+  freemiumExpiresAt: profile?.freemium_expires_at ?? null,   // <-- AJOUT
+};
+
 }
 
 // ─── ACTION : ask (avec cache amélioré) ───────────────────────────────────────
