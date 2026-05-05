@@ -265,7 +265,7 @@ export function ChatScreen({ user, onNavigate }) {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "5px 9px", borderRadius: 12, background: imgDone ? "rgba(255,255,255,0.04)" : "rgba(212,0,42,0.15)", border: `1px solid ${imgDone ? "rgba(255,255,255,0.08)" : "rgba(212,0,42,0.35)"}`, minWidth: 52 }}>
           <div style={{ display: "flex", gap: 3, marginBottom: 3 }}>
             {Array.from({ length: 5 }).map((_, i) => {
-              const filled = i < Math.round((imgUsed / IMG_MAX) * 5);
+              const filled = i < Math.round((imgUsed / IMG_MAX) * 3);
               return <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: filled ? "#d4002a" : "rgba(255,255,255,0.12)", boxShadow: filled ? "0 0 4px #d4002a88" : "none", transition: "all .3s" }} />;
             })}
           </div>
@@ -277,7 +277,7 @@ export function ChatScreen({ user, onNavigate }) {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "5px 9px", borderRadius: 12, background: textDone ? "rgba(255,255,255,0.04)" : "rgba(37,99,235,0.15)", border: `1px solid ${textDone ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.35)"}`, minWidth: 52 }}>
           <div style={{ display: "flex", gap: 3, marginBottom: 3 }}>
             {Array.from({ length: 5 }).map((_, i) => {
-              const filled = i < Math.round((textUsed / TEXT_MAX) * 5);
+              const filled = i < Math.round((textUsed / TEXT_MAX) * 10);
               return <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: filled ? "#2563EB" : "rgba(255,255,255,0.12)", boxShadow: filled ? "0 0 4px #2563EB88" : "none", transition: "all .3s" }} />;
             })}
           </div>
