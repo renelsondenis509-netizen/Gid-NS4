@@ -850,6 +850,42 @@ async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
   };
 }
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
+
+async function freemiumLogin(
+  db: ReturnType<typeof createClient>,
+  body: { phone: string; name: string }
+) {
+  const { phone, name } = body;
+  const FREEMIUM_DAYS = 3;
+
+  // Upsert profil
+  const expiresAt = new Date(Date.now() + FREEMIUM_DAYS * 86400000).toISOString();
+  const { data: existing } = await db.from("profiles").select("freemium_expires_at").eq("phone", phone).maybeSingle();
+
+  if (!existing) {
+    await db.from("profiles").insert({ phone, school_code: "FREEMIUM", last_seen: new Date().toISOString(), freemium_expires_at: expiresAt });
+  } else {
+    await db.from("profiles").update({ last_seen: new Date().toISOString() }).eq("phone", phone);
+  }
+
+  const freemiumExpiresAt = existing?.freemium_expires_at ?? expiresAt;
+  const ms = new Date(freemiumExpiresAt).getTime() - Date.now();
+  const daysRemaining = Math.max(0, Math.ceil(ms / 86400000));
+
+  const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+  const { count: scansToday } = await db.from("scans").select("*", { count: "exact", head: true }).eq("phone", phone).gte("created_at", `${today}T05:00:00Z`);
+
+  return {
+    success: true,
+    freemiumExpiresAt,
+    daysRemaining,
+    scansToday: scansToday ?? 0,
+    dailyScans: 5,
+    dailyImageScans: 1,
+    dailyTextScans: 4,
+    subjects: ["Biologie","Géologie","Chimie","Physique","Histoire","Géographie","Économie","Philosophie","Analyse","Algèbre","Suite","Complexe","Probabilité","Géométrie","Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
+  };
+}
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
 
@@ -859,6 +895,7 @@ Deno.serve(async (req) => {
 
     switch (body.action) {
       case "generate_quiz":       result = await generateQuiz(callGemini, body); break;
+      case "freemium_login":      result = await freemiumLogin(supabase, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
       case "ask":                 result = await processAsk(supabase, callGemini, body); break;
       case "save_quiz_score":     result = await saveQuizScore(supabase, body); break;
