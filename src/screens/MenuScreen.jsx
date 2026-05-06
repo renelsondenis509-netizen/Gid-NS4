@@ -114,6 +114,15 @@ const badges = computeBadges();
             </div>
           </div>
         </div>
+      </span>
+{user.isFreemium && (
+  <span style={{
+    background: "rgba(251,191,36,0.12)",
+    border: "1px solid rgba(251,191,36,0.30)",
+    borderRadius: 20, padding: "2px 8px",
+    color: "#fbbf24", fontSize: 10, fontWeight: 700
+  }}>✦ Freemium</span>
+)}
         <div style={{ color:"#3B5BA8", fontSize:11, textAlign:"center", marginTop:10 }}>{user.school}</div>
 {badges.length > 0 && (<div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:10, justifyContent:"center" }}>{badges.map((b, i) => (<div key={i} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", borderRadius:20, background:`${b.color}18`, border:`1px solid ${b.color}44`, fontSize:10, fontWeight:700, color:b.color }}><span style={{ fontSize:12 }}>{b.icon}</span> {b.label}</div>))}</div>)}        <div className="mt-4 rounded-xl px-4 py-3 flex justify-between items-center"
           style={{ background: user.daysRemaining <= 7 ? "#d4002a22" : "#14532d22", border: `1px solid ${user.daysRemaining <= 7 ? "#d4002a44" : "#22c55e33"}` }}>
