@@ -48,6 +48,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
       <path d="m13 7-2-2a1 1 0 1 0-3 1.732l9.163 9.163a3 3 0 0 1-4.243 0l-.132-.132a1 1 0 0 0-1.414 0l-.132.132a3 3 0 0 1-4.243 0L4 12.732" />
     </svg>
   );
+
   const LockIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#22c55e" }}>
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -62,24 +63,26 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
     { icon: <HandshakeIcon />, label: "Patenarya", screen: "partner" },
     { icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>, label:"Repons Favori", screen:"favorites" },
   ];
-const computeBadges = () => {
-  const badges = [];
-  try {
-    const grades = JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}");
-    const allGrades = Object.values(grades).flat();
-    const perfect = allGrades.filter(g => g.note20 >= 20).length;
-    const subjects20 = new Set(Object.keys(grades).filter(k => grades[k]?.note20 >= 20));
-    const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
-    const imgUsed = parseInt(localStorage.getItem(`gid_img_${user.phone}_${today}`) || "0");
-    const txtUsed = parseInt(localStorage.getItem(`gid_txt_${user.phone}_${today}`) || "0");
-    if (imgUsed + txtUsed >= 1) badges.push({ icon:"🎯", label:"Premye Kesyon", color:"#fbbf24" });
-    if (allGrades.length >= 1)  badges.push({ icon:"⭐", label:"Premye Quiz",   color:"#f59e0b" });
-    if (perfect >= 1)           badges.push({ icon:"🏆", label:"Pafè 20/20",    color:"#fbbf24" });
-    if (subjects20.size >= 3)   badges.push({ icon:"💎", label:"Maèt",          color:"#a855f7" });
-  } catch {}
-  return badges;
-};
-const badges = computeBadges();
+
+  const computeBadges = () => {
+    const badges = [];
+    try {
+      const grades = JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}");
+      const allGrades = Object.values(grades).flat();
+      const perfect = allGrades.filter(g => g.note20 >= 20).length;
+      const subjects20 = new Set(Object.keys(grades).filter(k => grades[k]?.note20 >= 20));
+      const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
+      const imgUsed = parseInt(localStorage.getItem(`gid_img_${user.phone}_${today}`) || "0");
+      const txtUsed = parseInt(localStorage.getItem(`gid_txt_${user.phone}_${today}`) || "0");
+      if (imgUsed + txtUsed >= 1) badges.push({ icon:"🎯", label:"Premye Kesyon", color:"#fbbf24" });
+      if (allGrades.length >= 1)  badges.push({ icon:"⭐", label:"Premye Quiz",   color:"#f59e0b" });
+      if (perfect >= 1)           badges.push({ icon:"🏆", label:"Pafè 20/20",    color:"#fbbf24" });
+      if (subjects20.size >= 3)   badges.push({ icon:"💎", label:"Maèt",          color:"#a855f7" });
+    } catch {}
+    return badges;
+  };
+  const badges = computeBadges();
+
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
       <div style={{ padding:"32px 20px 20px", borderBottom:"1px solid rgba(255,255,255,0.10)" }}>
@@ -111,20 +114,31 @@ const badges = computeBadges();
               }}>
                 <KeyIcon /> {user.code}
               </span>
+              {user.isFreemium && (
+                <span style={{
+                  background: "rgba(251,191,36,0.12)",
+                  border: "1px solid rgba(251,191,36,0.30)",
+                  borderRadius: 20, padding: "2px 8px",
+                  color: "#fbbf24", fontSize: 10, fontWeight: 700
+                }}>✦ Freemium</span>
+              )}
             </div>
           </div>
         </div>
-      </span>
-{user.isFreemium && (
-  <span style={{
-    background: "rgba(251,191,36,0.12)",
-    border: "1px solid rgba(251,191,36,0.30)",
-    borderRadius: 20, padding: "2px 8px",
-    color: "#fbbf24", fontSize: 10, fontWeight: 700
-  }}>✦ Freemium</span>
-)}
+
         <div style={{ color:"#3B5BA8", fontSize:11, textAlign:"center", marginTop:10 }}>{user.school}</div>
-{badges.length > 0 && (<div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:10, justifyContent:"center" }}>{badges.map((b, i) => (<div key={i} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", borderRadius:20, background:`${b.color}18`, border:`1px solid ${b.color}44`, fontSize:10, fontWeight:700, color:b.color }}><span style={{ fontSize:12 }}>{b.icon}</span> {b.label}</div>))}</div>)}        <div className="mt-4 rounded-xl px-4 py-3 flex justify-between items-center"
+
+        {badges.length > 0 && (
+          <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:10, justifyContent:"center" }}>
+            {badges.map((b, i) => (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", borderRadius:20, background:`${b.color}18`, border:`1px solid ${b.color}44`, fontSize:10, fontWeight:700, color:b.color }}>
+                <span style={{ fontSize:12 }}>{b.icon}</span> {b.label}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4 rounded-xl px-4 py-3 flex justify-between items-center"
           style={{ background: user.daysRemaining <= 7 ? "#d4002a22" : "#14532d22", border: `1px solid ${user.daysRemaining <= 7 ? "#d4002a44" : "#22c55e33"}` }}>
           <div>
             <div className="text-xs font-bold flex items-center gap-2" style={{ color: user.daysRemaining <= 7 ? "#ff8080" : "#86efac" }}>
@@ -139,6 +153,7 @@ const badges = computeBadges();
           </div>
         </div>
       </div>
+
       <div className="flex-1 px-4 py-4 space-y-2">
         {menuItems.map((item, i) => (
           <button key={item.screen} onClick={() => onNavigate(item.screen)}
@@ -157,10 +172,12 @@ const badges = computeBadges();
           </div>
         </div>
       </div>
+
       <div className="px-4 pb-4">
         <button onClick={onLogout} className="w-full py-4 rounded-2xl text-red-400 font-semibold"
           style={{ background: "#d4002a15", border: "1px solid #d4002a30" }}>Dekonekte</button>
       </div>
+
       <BottomNav active="menu" onNavigate={onNavigate} />
     </div>
   );
