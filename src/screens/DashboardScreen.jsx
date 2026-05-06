@@ -281,29 +281,35 @@ export function DashboardScreen({ onBack, userCode }) {
             setStats(null);
           }}
           style={{
-            background: "transparent",
-            border: "1px solid rgba(255,255,255,0.2)",
-            borderRadius: "40px",
-            padding: "8px 12px",
+            background: "rgba(212,0,42,0.12)",
+            border: "1px solid rgba(212,0,42,0.35)",
+            borderRadius: "12px",
+            padding: "8px 14px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            gap: 6,
             cursor: "pointer",
             transition: "all 0.2s",
+            color: "#ff8080",
+            fontSize: 12,
+            fontWeight: 600,
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-            e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+            e.currentTarget.style.background = "rgba(212,0,42,0.25)";
+            e.currentTarget.style.borderColor = "rgba(212,0,42,0.6)";
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+            e.currentTarget.style.background = "rgba(212,0,42,0.12)";
+            e.currentTarget.style.borderColor = "rgba(212,0,42,0.35)";
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="2" x2="12" y2="12" />
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff8080" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
+          Déconnexion
         </button>
       </div>
 
