@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Politique de Confidentialité — Gid NS4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --bg: #04081A;
+    --surface: #080E24;
+    --surface2: #0f1a3a;
+    --accent: #2563EB;
+    --accent2: #E8002A;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* Background mesh */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(37,99,235,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 10% 80%, rgba(232,0,42,0.05) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(37,99,235,0.3);
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  header p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 48px;
+  }
+
+  .hero h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .hero h2 span {
+    background: linear-gradient(90deg, var(--accent), #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 520px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(37,99,235,0.12);
+    border: 1px solid rgba(37,99,235,0.3);
+    color: #60a5fa;
+    margin-bottom: 16px;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    transition: border-color 0.2s;
+  }
+
+  .section:hover {
+    border-color: rgba(37,99,235,0.2);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .section p, .section li {
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .section ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .section ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .section ul li::before {
+    content: '→';
+    color: var(--accent);
+    font-size: 13px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .highlight-box {
+    background: rgba(37,99,235,0.07);
+    border: 1px solid rgba(37,99,235,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #93c5fd;
+  }
+
+  .warn-box {
+    background: rgba(232,0,42,0.07);
+    border: 1px solid rgba(232,0,42,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #fca5a5;
+  }
+
+  /* Contact */
+  .contact-card {
+    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(37,99,235,0.05));
+    border: 1px solid rgba(37,99,235,0.25);
+    border-radius: 20px;
+    padding: 28px;
+    text-align: center;
+    margin-top: 48px;
+  }
+
+  .contact-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .contact-card p { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+  .contact-card a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--accent);
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .contact-card a:hover { opacity: 0.85; }
+
+  /* Footer */
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  footer strong { color: #475569; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="logo-box">G</div>
+    <div>
+      <h1>Gid NS4 — Prof Lakay</h1>
+      <p>Application d'aide à la préparation du Baccalauréat haïtien</p>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="badge">📄 Document légal</div>
+    <h2>Politique de <span>Confidentialité</span></h2>
+    <p>Dernière mise à jour : 6 mai 2026 · Développeur : Renelson Denis · Haïti</p>
+  </div>
+
+  <!-- 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(37,99,235,0.15)">📋</div>
+      <h3>1. Introduction</h3>
+    </div>
+    <p>Gid NS4 (aussi appelé <strong>Prof Lakay</strong>) est une application mobile éducative destinée aux élèves haïtiens préparant l'examen national NS4 (Baccalauréat). Cette politique explique quelles données nous collectons, pourquoi, et comment nous les protégeons.</p>
+    <div class="highlight-box">En utilisant l'application, vous acceptez les pratiques décrites dans cette politique.</div>
+  </div>
+
+  <!-- 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(251,191,36,0.12)">🗂️</div>
+      <h3>2. Données collectées</h3>
+    </div>
+    <ul>
+      <li><strong>Nom complet</strong> — pour personnaliser l'expérience dans l'application</li>
+      <li><strong>Numéro de téléphone</strong> — utilisé comme identifiant unique (jamais partagé)</li>
+      <li><strong>Code établissement</strong> — pour associer l'élève à son école</li>
+      <li><strong>Historique des questions posées</strong> — stocké localement sur l'appareil</li>
+      <li><strong>Scores de quiz</strong> — sauvegardés dans notre base de données pour le classement</li>
+      <li><strong>Images scannées</strong> — traitées par l'IA et <strong>non stockées</strong> de façon permanente</li>
+    </ul>
+    <div class="warn-box">⚠️ Nous ne collectons jamais de données financières, de mots de passe, ni d'informations de géolocalisation.</div>
+  </div>
+
+  <!-- 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(34,197,94,0.12)">🎯</div>
+      <h3>3. Utilisation des données</h3>
+    </div>
+    <p>Les données collectées sont utilisées exclusivement pour :</p>
+    <ul>
+      <li>Authentifier l'élève et associer son compte à son établissement</li>
+      <li>Générer des réponses pédagogiques personnalisées via l'IA</li>
+      <li>Afficher le classement anonymisé (numéros masqués)</li>
+      <li>Calculer les statistiques d'utilisation de l'établissement (tableau de bord directeur)</li>
+      <li>Améliorer la qualité du service</li>
+    </ul>
+  </div>
+
+  <!-- 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(168,85,247,0.12)">🤝</div>
+      <h3>4. Partage des données</h3>
+    </div>
+    <p>Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers à des fins commerciales.</p>
+    <ul>
+      <li><strong>Fournisseurs d'IA</strong> (OpenRouter, SambaNova, Groq, Mistral, Cloudflare) — uniquement le contenu de vos questions, sans données d'identification</li>
+      <li><strong>Supabase</strong> — hébergement sécurisé de la base de données (serveurs chiffrés)</li>
+      <li><strong>Directeurs d'établissement</strong> — statistiques agrégées uniquement (pas de données individuelles identifiables)</li>
+    </ul>
+  </div>
+
+  <!-- 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(37,99,235,0.15)">🔒</div>
+      <h3>5. Sécurité des données</h3>
+    </div>
+    <ul>
+      <li>Toutes les communications sont chiffrées via HTTPS/TLS</li>
+      <li>Les clés API sont stockées comme secrets côté serveur (jamais exposées)</li>
+      <li>Les numéros de téléphone sont masqués dans les classements publics</li>
+      <li>L'accès aux données est restreint par des politiques Row Level Security (RLS) dans Supabase</li>
+    </ul>
+  </div>
+
+  <!-- 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(251,146,60,0.12)">👶</div>
+      <h3>6. Mineurs</h3>
+    </div>
+    <p>Gid NS4 est destiné aux élèves de NS4 (généralement 16–20 ans). Pour les utilisateurs mineurs, nous recommandons l'approbation parentale avant utilisation. Nous ne collectons pas sciemment de données sur des enfants de moins de 13 ans.</p>
+  </div>
+
+  <!-- 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(34,197,94,0.12)">✅</div>
+      <h3>7. Vos droits</h3>
+    </div>
+    <p>Vous avez le droit de :</p>
+    <ul>
+      <li>Accéder à vos données personnelles stockées</li>
+      <li>Demander la correction de données inexactes</li>
+      <li>Demander la suppression de votre compte et données associées</li>
+      <li>Retirer votre consentement à tout moment en cessant d'utiliser l'application</li>
+    </ul>
+    <div class="highlight-box">Pour exercer ces droits, contactez-nous à l'adresse ci-dessous.</div>
+  </div>
+
+  <!-- 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(148,163,184,0.12)">🗃️</div>
+      <h3>8. Conservation des données</h3>
+    </div>
+    <p>Les données de profil et scores sont conservés tant que le compte est actif. En cas d'inactivité de plus de 12 mois ou sur demande, les données sont supprimées. L'historique local (sur l'appareil) peut être effacé depuis l'application à tout moment.</p>
+  </div>
+
+  <!-- 9 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(232,0,42,0.12)">🔄</div>
+      <h3>9. Modifications de cette politique</h3>
+    </div>
+    <p>Cette politique peut être mise à jour. En cas de modification substantielle, une notification sera affichée dans l'application. La date de dernière mise à jour est toujours indiquée en haut de ce document.</p>
+  </div>
+
+  <!-- Contact -->
+  <div class="contact-card">
+    <h3>Une question sur vos données ?</h3>
+    <p>Contactez le développeur directement pour toute demande liée à la confidentialité.</p>
+    <a href="mailto:renelsondenis509@gmail.com">✉️ renelsondenis509@gmail.com</a>
+  </div>
+
+  <footer>
+    <p>© 2026 <strong>Gid NS4 / Prof Lakay</strong> · Développé par Renelson Denis · Haïti</p>
+    <p style="margin-top:6px">Cette politique est rédigée conformément aux exigences de Google Play Store et aux bonnes pratiques RGPD.</p>
+  </footer>
+
+</div>
+</body>
+</html>
