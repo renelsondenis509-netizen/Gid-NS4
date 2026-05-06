@@ -210,7 +210,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                       <div className="p-4">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-white font-semibold text-sm truncate">{exo.title||"Egzèsis"}</p>
+                            <p className="text-white font-semibold text-sm truncate">{exo.questions?.[0]?.q?.slice(0,60)||"Egzèsis"}…</p>
                             <p className="text-blue-400 text-xs mt-0.5">{exo.date}</p>
                             <p className="text-blue-600 text-xs mt-1">{exo.questions?.length||0} kesyon • {exo.score}/{exo.total}</p>
                           </div>

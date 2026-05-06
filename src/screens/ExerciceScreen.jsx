@@ -31,23 +31,56 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   }, []);
 
   function generateLocalQuiz(text) {
-    const sentences = text.replace(/\*\*/g,"").replace(/#{1,6}\s/g,"")
-      .split(/[.!?\n]/).map(s=>s.trim()).filter(s=>s.length>40&&s.length<200);
+    const clean = text.replace(/\*\*/g,"").replace(/#{1,6}\s/g,"").replace(/\n+/g," ");
+    const sentences = clean.split(/[.!?]/).map(s=>s.trim()).filter(s=>s.length>25&&s.length<300);
     const qs=[], used=new Set();
+    const allWords = sentences.flatMap(s=>s.split(" ").filter(w=>w.length>4&&/^[a-zA-ZÀ-ÿ]/.test(w)));
+
+    function shuffle(arr){ for(let j=arr.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[arr[j],arr[k]]=[arr[k],arr[j]];} return arr; }
+
+    function makeDistractors(exclude, pool, n=3){
+      const d=[...new Set(pool.filter(w=>w!==exclude&&!used.has(w)))].slice(0,n);
+      while(d.length<n) d.push(`Opsyon ${d.length+1}`);
+      return d;
+    }
+
     for (let i=0; i<sentences.length&&qs.length<5; i++) {
       const sentence=sentences[i];
-      const words=sentence.split(" ").filter(w=>w.length>4);
-      if (words.length<5) continue;
-      const keyWord=words.find(w=>w[0]===w[0].toUpperCase()&&w.length>4&&!used.has(w))||words.find(w=>w.length>6&&!used.has(w));
-      if (!keyWord) continue;
-      used.add(keyWord);
-      const question=sentence.replace(keyWord,"___________");
-      const distractors=words.filter(w=>w!==keyWord&&w.length>4&&/^[a-zA-ZÀ-ÿ]/.test(w)).slice(0,3);
-      while (distractors.length<3) distractors.push(`Opsyon ${distractors.length+1}`);
-      const choices=[keyWord,...distractors.slice(0,3)];
-      for (let j=choices.length-1;j>0;j--) { const k=Math.floor(Math.random()*(j+1));[choices[j],choices[k]]=[choices[k],choices[j]]; }
-      const answer=choices.indexOf(keyWord);
-      qs.push({q:`Konplete fraz sa a : "${question}"`,choices,answer,note:sentence});
+      const words=sentence.split(" ").filter(w=>w.length>4&&/^[a-zA-ZÀ-ÿ]/.test(w));
+      if (words.length<4) continue;
+
+      const type = qs.length % 3;
+
+      if (type === 0) {
+        // Trou: Konplete fraz
+        const keyWord=words.find(w=>!used.has(w)&&w.length>5)||words[0];
+        if (!keyWord) continue;
+        used.add(keyWord);
+        const question=sentence.replace(keyWord,"___________");
+        const choices=shuffle([keyWord,...makeDistractors(keyWord,allWords)]);
+        qs.push({q:`Konplete fraz sa a : "${question}"`,choices,answer:choices.indexOf(keyWord),note:sentence});
+
+      } else if (type === 1) {
+        // Vré/Fo
+        const isTrue = Math.random()>0.4;
+        let stmt = sentence;
+        if (!isTrue) {
+          const keyWord=words.find(w=>!used.has(w)&&w.length>5)||words[1];
+          if (!keyWord) continue;
+          const replacement=makeDistractors(keyWord,allWords,1)[0];
+          stmt=sentence.replace(keyWord,replacement);
+        }
+        const choices=shuffle(["Vré","Fo"]);
+        qs.push({q:`Èske afirmasyon sa a kòrèk ? "${stmt}"`,choices,answer:choices.indexOf(isTrue?"Vré":"Fo"),note:sentence});
+
+      } else {
+        // QCM définition
+        const keyWord=words.find(w=>!used.has(w)&&w.length>6)||words[0];
+        if (!keyWord) continue;
+        used.add(keyWord);
+        const choices=shuffle([keyWord,...makeDistractors(keyWord,allWords)]);
+        qs.push({q:`Ki mo ki koresponn ak konsèp sa a : "${sentence}" ?`,choices,answer:choices.indexOf(keyWord),note:sentence});
+      }
     }
     return qs;
   }
