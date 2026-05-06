@@ -168,7 +168,10 @@ export function ChatScreen({ user, onNavigate }) {
           <img src={APP_LOGO} alt="Gid NS4" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
         <div style={{ flex: 1 }}>
-          <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Prof Lakay</span>
+          <div style={{ display:"flex", flexDirection:"column" }}>
+            <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Prof Lakay</span>
+            {!offline && <span style={{ color:"#22C55E", fontSize:11, fontWeight:500 }}>● En ligne</span>}
+          </div>
           {user.isFreemium && (
             <span style={{ marginLeft: 8, fontSize: 10, padding: "1px 7px", borderRadius: 8, background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
               Freemium — {user.daysRemaining}j
