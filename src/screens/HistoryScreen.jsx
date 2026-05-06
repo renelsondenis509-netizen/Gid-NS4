@@ -185,7 +185,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                         </div>
                       </button>
                       <div className="px-4 pb-3 flex justify-between items-center">
-                        <button onClick={() => handleSpeak(h.response,h.id)} className="p-2 rounded-lg" style={{background:speakingId===h.id?"#d4002a22":"#1e3a8a22",border:"1px solid #3b82f633"}}>
+                        <button onClick={() => handleSpeak(h.response,h.id)} className="p-2 rounded-lg" style={{background:speakingId===h.id?"rgba(212,0,42,0.25)":"rgba(37,99,235,0.15)",border:`1px solid ${speakingId===h.id?"#d4002a88":"rgba(37,99,235,0.5)"}`,color:"#60a5fa",minWidth:36,display:"flex",alignItems:"center",justifyContent:"center"}}>
                           {speakingId===h.id?<IcoStop/>:<IcoVolumeUp/>}
                         </button>
                         <button onClick={() => handleDeleteScan(h)} disabled={deleting===h.id} className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1" style={{background:"#d4002a15",color:"#ff8080",border:"1px solid #d4002a22"}}>

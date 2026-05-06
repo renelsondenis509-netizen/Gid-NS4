@@ -212,7 +212,7 @@ export function ChatScreen({ user, onNavigate }) {
                   <button onClick={() => toggleFav(msg, i)} style={{ padding: "2px 8px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "#fbbf24", display: "inline-flex", alignItems: "center" }}>
                     {favorites.findIndex(f => f.id === i) >= 0 ? <StarFullIcon /> : <StarOutlineIcon />}
                   </button>
-                  <button onClick={() => speak(msg.content)} style={{ padding: "2px 8px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", opacity: 0.8, color: "#60a5fa", display: "inline-flex", alignItems: "center" }}>
+                  <button onClick={() => speak(msg.content)} style={{ padding: "6px 10px", borderRadius: 10, background: "rgba(37,99,235,0.15)", border: "1px solid rgba(37,99,235,0.35)", cursor: "pointer", color: "#60a5fa", display: "inline-flex", alignItems: "center" }}>
                     <SpeakIcon />
                   </button>
                 </div>
