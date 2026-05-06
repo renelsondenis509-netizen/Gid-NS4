@@ -27,7 +27,8 @@ export function LoginScreen({ onLogin, onNavigate }) {
         dailyImageScans: result.school.dailyImageScans ?? 1,
         dailyTextScans:  result.school.dailyTextScans  ?? 4,
         daysRemaining:   result.school.daysRemaining,
-        expiresAt:       result.school.expiresAt,
+        expiresAt:           result.school.expiresAt,
+        freemiumExpiresAt:   result.freemiumExpiresAt ?? null,
         scansToday:      result.scansToday,
       });
     } catch (e) { setError(parseApiError(e).message); }

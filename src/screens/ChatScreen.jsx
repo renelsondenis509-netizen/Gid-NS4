@@ -153,7 +153,6 @@ export function ChatScreen({ user, onNavigate }) {
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
-      <ExpiryBanner daysRemaining={user.daysRemaining} />
 
       {/* Banner offline */}
       {offline && (
