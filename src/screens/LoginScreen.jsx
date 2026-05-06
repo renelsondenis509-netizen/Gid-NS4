@@ -37,7 +37,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
   const inputs = [
     { label:"Non Konplè",      type:"text", val:name,  fn:e=>setName(e.target.value),                   ph:"Marie Joseph",  extra:{} },
     { label:"Nimewo Telefòn",  type:"tel",  val:phone, fn:e=>setPhone(e.target.value),                  ph:"50934567890",   extra:{} },
-    { label:"Kòd Etablisman",  type:"text", val:code,  fn:e=>setCode(e.target.value.toUpperCase()),     ph:"DEMO-2026",     extra:{ fontFamily:"monospace", letterSpacing:"0.12em", fontWeight:700 } },
+    { label:"Kòd Etablisman",  type:"text", val:code,  fn:e=>setCode(e.target.value.toUpperCase()),     ph:"DNMM-0000",     extra:{ fontFamily:"monospace", letterSpacing:"0.12em", fontWeight:700 } },
   ];
 
   return (
