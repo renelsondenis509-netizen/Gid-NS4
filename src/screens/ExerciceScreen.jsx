@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BottomNav } from "../components/UI";
 import { idbSaveExercice } from "../utils/idb";
+import { callEdge } from "../api";
 
 const IcoArrowLeft = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>);
 const IcoArrowRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>);
@@ -22,74 +23,15 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const [answers,   setAnswers]   = useState([]);
 
   useEffect(() => {
-    try {
-      const qs = generateLocalQuiz(scan.response, scan.subject);
-      if (qs.length > 0) setQuestions(qs);
-      else setError("Pa gen ase kontni pou jenere egzèsis la.");
-    } catch { setError("Imposib jenere egzèsis la. Eseye ankò."); }
-    setLoading(false);
+    callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général" })
+      .then(r => {
+        if (r.questions?.length > 0) setQuestions(r.questions);
+        else setError("Pa gen ase kontni pou jenere egzèsis la.");
+      })
+      .catch(() => setError("Imposib jenere egzèsis la. Eseye ankò."))
+      .finally(() => setLoading(false));
   }, []);
 
-  function generateLocalQuiz(text) {
-    const clean = text.replace(/\*\*/g,"").replace(/#{1,6}\s/g,"").replace(/\n+/g," ");
-    const EXCLUDE = /^(par exemple|prenons|considér|imaginons|voici|notez|rappelons|ainsi|donc|or |mais |car |en effet|c'est pourquoi|c'est ainsi|dans ce cas|dans notre|puisque|bonjou|prof lakay|ann al|bac ns4|il est essentiel|bien comprendre|pour mieux|pour comprendre|étudions|nous allons|je vais|je t'invite|allons voir|en résumé|en conclusion|pour résumer|pour conclure|exemple[^s])/i;
-    const sentences = clean.split(/[.!?]/).map(s=>s.trim()).filter(s=>
-      s.length>35 && s.length<250 &&
-      !EXCLUDE.test(s) &&
-      /[a-zA-ZÀ-ÿ]{4}/.test(s) &&
-      s.split(" ").length >= 6
-    );
-    const qs=[], used=new Set();
-    const allWords = sentences.flatMap(s=>s.split(" ").filter(w=>w.length>4&&/^[a-zA-ZÀ-ÿ]/.test(w)));
-
-    function shuffle(arr){ for(let j=arr.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[arr[j],arr[k]]=[arr[k],arr[j]];} return arr; }
-
-    function makeDistractors(exclude, pool, n=3){
-      const d=[...new Set(pool.filter(w=>w!==exclude&&!used.has(w)))].slice(0,n);
-      while(d.length<n) d.push(`Opsyon ${d.length+1}`);
-      return d;
-    }
-
-    for (let i=0; i<sentences.length&&qs.length<5; i++) {
-      const sentence=sentences[i];
-      const words=sentence.split(" ").filter(w=>w.length>4&&/^[a-zA-ZÀ-ÿ]/.test(w));
-      if (words.length<4) continue;
-
-      const type = qs.length % 3;
-
-      if (type === 0) {
-        // Trou: Konplete fraz
-        const keyWord=words.find(w=>!used.has(w)&&w.length>5)||words[0];
-        if (!keyWord) continue;
-        used.add(keyWord);
-        const question=sentence.replace(keyWord,"___________");
-        const choices=shuffle([keyWord,...makeDistractors(keyWord,allWords)]);
-        qs.push({q:`Konplete fraz sa a : "${question}"`,choices,answer:choices.indexOf(keyWord),note:sentence});
-
-      } else if (type === 1) {
-        // Vré/Fo
-        const isTrue = Math.random()>0.4;
-        let stmt = sentence;
-        if (!isTrue) {
-          const keyWord=words.find(w=>!used.has(w)&&w.length>5)||words[1];
-          if (!keyWord) continue;
-          const replacement=makeDistractors(keyWord,allWords,1)[0];
-          stmt=sentence.replace(keyWord,replacement);
-        }
-        const choices=shuffle(["Vré","Fo"]);
-        qs.push({q:`Èske afirmasyon sa a kòrèk ? "${stmt}"`,choices,answer:choices.indexOf(isTrue?"Vré":"Fo"),note:sentence});
-
-      } else {
-        // QCM définition
-        const keyWord=words.find(w=>!used.has(w)&&w.length>6)||words[0];
-        if (!keyWord) continue;
-        used.add(keyWord);
-        const choices=shuffle([keyWord,...makeDistractors(keyWord,allWords)]);
-        qs.push({q:`Ki mo ki koresponn ak konsèp sa a : "${sentence}" ?`,choices,answer:choices.indexOf(keyWord),note:sentence});
-      }
-    }
-    return qs;
-  }
 
   const handleChoice = (idx) => {
     if (selected!==null) return;

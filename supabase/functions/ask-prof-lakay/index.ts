@@ -855,6 +855,38 @@ async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
 }
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 
+async function generateQuiz(_db: unknown, body: Record<string, string>) {
+  const { content, subject } = body;
+  if (!content) throw { status: 400, error: "Contenu manquant" };
+
+  const prompt = `Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti.
+Génère exactement 5 questions basées UNIQUEMENT sur ce contenu de ${subject || "cours"}.
+Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte.
+N'invente rien qui ne soit pas dans le texte.
+Alterne les types : QCM (4 choix), Vré/Fo (2 choix), Trou (4 choix).
+RÉPONDS UNIQUEMENT avec un JSON valide, sans texte avant ou après, sans backticks :
+{"questions":[{"q":"question","choices":["A","B","C","D"],"answer":0,"note":"phrase source"},...]}`
+
+Contenu:
+${content.slice(0, 3000)}`;
+
+  const systemPrompt = "Tu es un générateur d'exercices. Réponds UNIQUEMENT en JSON valide.";
+  const fullPrompt = `${systemPrompt}
+
+Élève: ${prompt}`;
+  let raw = "";
+  try { raw = await callOpenRouter(systemPrompt, [{ type: "text", text: prompt }]); } catch {
+    try { raw = await callSambaNova(systemPrompt, [{ type: "text", text: prompt }]); } catch {
+      try { raw = await callGroq(systemPrompt, prompt); } catch(e) { throw { status: 500, error: "IA indisponible" }; }
+    }
+  }
+  const clean = raw.replace(/```json|```/g, "").trim();
+  try {
+    const parsed = JSON.parse(clean);
+    return parsed;
+  } catch { throw { status: 500, error: "Format JSON invalide" }; }
+}
+
 async function freemiumLogin(
   db: ReturnType<typeof createClient>,
   body: { phone: string; name: string }
@@ -899,6 +931,7 @@ Deno.serve(async (req) => {
 
     switch (body.action) {
       case "generate_quiz":       result = await generateQuiz(callGemini, body); break;
+      case "generate_quiz":        result = await generateQuiz(supabase, body); break;
       case "freemium_login":      result = await freemiumLogin(supabase, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
       case "ask":                 result = await processAsk(supabase, callGemini, body); break;
