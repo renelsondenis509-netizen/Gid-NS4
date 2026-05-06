@@ -266,7 +266,7 @@ export function ChatScreen({ user, onNavigate }) {
           <button
             onClick={() => { if (!allDone && !offline) fileRef.current?.click(); }}
             disabled={allDone || offline}
-            style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: (allDone || offline) ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg,#2563EB,#3B82F6)", border: "none", cursor: (allDone || offline) ? "not-allowed" : "pointer" }}>
+            style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: (allDone || offline) ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg,#2563EB,#3B82F6)", border: "none", cursor: (allDone || offline) ? "not-allowed" : "pointer", color: "#ffffff" }}>
             <CameraIcon />
           </button>
           <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }} />
