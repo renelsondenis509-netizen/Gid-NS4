@@ -32,7 +32,13 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
 
   function generateLocalQuiz(text) {
     const clean = text.replace(/\*\*/g,"").replace(/#{1,6}\s/g,"").replace(/\n+/g," ");
-    const sentences = clean.split(/[.!?]/).map(s=>s.trim()).filter(s=>s.length>25&&s.length<300);
+    const EXCLUDE = /^(par exemple|prenons|considér|imaginons|voici|notez|rappelons|ainsi|donc|or |mais |car |en effet|c'est pourquoi|c'est ainsi|dans ce cas|dans notre|puisque|bonjou|prof lakay|ann al|bac ns4|il est essentiel|bien comprendre|pour mieux|pour comprendre|étudions|nous allons|je vais|je t'invite|allons voir|en résumé|en conclusion|pour résumer|pour conclure|exemple[^s])/i;
+    const sentences = clean.split(/[.!?]/).map(s=>s.trim()).filter(s=>
+      s.length>35 && s.length<250 &&
+      !EXCLUDE.test(s) &&
+      /[a-zA-ZÀ-ÿ]{4}/.test(s) &&
+      s.split(" ").length >= 6
+    );
     const qs=[], used=new Set();
     const allWords = sentences.flatMap(s=>s.split(" ").filter(w=>w.length>4&&/^[a-zA-ZÀ-ÿ]/.test(w)));
 
