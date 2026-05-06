@@ -189,7 +189,8 @@ export function ChatScreen({ user, onNavigate }) {
           </span>
         </div>
       </div>
-
+      {/* EXPIRY BANNER */}
+<ExpiryBanner daysRemaining={user.daysRemaining} />
       {/* MESSAGES */}
       <div ref={chatRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
         {messages.map((msg, i) => (

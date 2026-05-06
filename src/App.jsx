@@ -18,7 +18,7 @@ import { FavoritesScreen }   from "./screens/FavoritesScreen";
 /** Enrichit l'objet user avec le statut freemium calculé côté client. */
 function enrichUser(u) {
   const { isFreemium, daysRemaining } = getFreemiumStatus(u);
-  return { ...u, isFreemium, daysRemaining };
+  return { ...u, isFreemium, daysRemaining, freemiumExpiresAt: u.freemiumExpiresAt ?? null };
 }
 
 export default function App() {
