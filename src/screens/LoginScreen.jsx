@@ -35,6 +35,27 @@ export function LoginScreen({ onLogin, onNavigate }) {
     setLoading(false);
   };
 
+  const handleFreemium = async () => {
+    setError("");
+    if (!name.trim() || name.trim().length < 2) { setError("Antre non ou ki valid (omwen 2 lèt)."); return; }
+    if (!phone.trim() || phone.length < 8) { setError("Antre yon nimewo telefòn valid."); return; }
+    setLoading(true);
+    try {
+      const result = await callEdge({ action: "freemium_login", phone: phone.trim(), name: name.trim() });
+      onLogin({
+        name: name.trim(), phone: phone.trim(),
+        code: "FREEMIUM", school: "Freemium",
+        subjects: ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
+        dailyScans: 3, dailyImageScans: 1, dailyTextScans: 2,
+        daysRemaining: result.daysRemaining,
+        expiresAt: result.freemiumExpiresAt,
+        freemiumExpiresAt: result.freemiumExpiresAt,
+        scansToday: 0,
+      });
+    } catch (e) { setError(parseApiError(e).message); }
+    setLoading(false);
+  };
+
   const inputs = [
     { label:"Non Konplè",      type:"text", val:name,  fn:e=>setName(e.target.value),                   ph:"Marie Joseph",  extra:{} },
     { label:"Nimewo Telefòn",  type:"tel",  val:phone, fn:e=>setPhone(e.target.value),                  ph:"50934567890",   extra:{} },
@@ -69,6 +90,10 @@ export function LoginScreen({ onLogin, onNavigate }) {
           <button onClick={handleLogin} disabled={loading}
             style={{ width:"100%", padding:"15px", borderRadius:14, background:loading?"#2E4080":"linear-gradient(135deg,#E8002A,#FF5C35)", color:"white", fontWeight:800, fontSize:15, border:"none", boxShadow:loading?"none":"0 6px 24px #E8002A33", cursor:loading?"not-allowed":"pointer" }}>
             {loading ? "Verifikasyon..." : "Rantre"}
+          </button>
+          <button onClick={handleFreemium} disabled={loading}
+            style={{ width:"100%", padding:"13px", borderRadius:14, background:"transparent", color:"#60a5fa", fontWeight:700, fontSize:14, border:"1px solid rgba(37,99,235,0.35)", cursor:loading?"not-allowed":"pointer", marginTop:10 }}>
+            ✦ Eseye gratis — 3 jou
           </button>
           <div style={{ textAlign:"center", marginTop:16 }}>
             <span style={{ color:"#4b5ea8", fontSize:12 }}>Ou poko gen kòd paw la? </span>
