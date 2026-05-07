@@ -875,6 +875,9 @@ async function freemiumLogin(
   const freemiumExpiresAt = existing?.freemium_expires_at ?? expiresAt;
   const ms = new Date(freemiumExpiresAt).getTime() - Date.now();
   const daysRemaining = Math.max(0, Math.ceil(ms / 86400000));
+  if (existing && daysRemaining === 0) {
+    throw { status: 403, error: "Peryòd gratis ou a fini. Kontakte direksyon lekòl ou pou yon kòd." };
+  }
 
   const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
   const { count: scansToday } = await db.from("scans").select("*", { count: "exact", head: true }).eq("phone", phone).gte("created_at", `${today}T05:00:00Z`);
