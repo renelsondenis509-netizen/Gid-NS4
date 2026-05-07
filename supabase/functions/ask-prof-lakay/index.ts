@@ -477,6 +477,7 @@ return {
   },
   scansToday: scansToday ?? 0,
   freemiumExpiresAt: profile?.freemium_expires_at ?? null,   // <-- AJOUT
+  dailyScans: schoolCode === "FREEMIUM" ? 3 : (school.daily_scans ?? 5),
 };
 
 }
