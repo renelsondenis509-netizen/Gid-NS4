@@ -81,7 +81,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
         <span style={{ color:"#2E4080", fontSize:12 }}>·</span>
         <button onClick={() => onNavigate("partner")} style={{ color:"#3B5BA8", fontSize:12, background:"none", border:"none" }}>Vin Patnè</button>
         <span style={{ color:"#2E4080", fontSize:12 }}>·</span>
-        <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>Konfidyalite</a>
+        <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>Politik Konfidansyalite</a>
       </div>
     </div>
   );
