@@ -113,13 +113,15 @@ export function DashboardScreen({ onBack, userCode }) {
   const [stats, setStats] = useState(null);
 
   const FREEMIUM_DEMO = {
-    school: { school_name: "Lekòl Demo — Gid NS4", code: "FREEMIUM", active: true, expires_at: new Date(Date.now()+3*86400000).toISOString(), daily_scans: 3, max_students: 30 },
-    totalStudents: 28, totalScans: 312, scansToday: 14, imageScans: 87, textScans: 225,
-    subjects: [["Biologie",98],["Chimie",74],["Physique",61],["Mathématiques",55],["Histoire",42]],
-    dailyData: [["Lun",40],["Mar",55],["Mer",38],["Jeu",62],["Ven",70],["Sam",30],["Dim",17]].map(([d,v])=>({date:d,count:v})),
-    weeklyData: [["S1",180],["S2",220],["S3",195],["S4",310]].map(([w,v])=>({week:w,count:v})),
-    recentScans: [{name:"Marie J.",subject:"Biologie",created_at:new Date().toISOString()},{name:"Jean P.",subject:"Chimie",created_at:new Date().toISOString()},{name:"Rose M.",subject:"Physique",created_at:new Date().toISOString()}],
-    quizData: [{subject:"Biologie",avg_note:16.4,count:45},{subject:"Chimie",avg_note:14.2,count:32}],
+    school: { school_name: "Lekòl Demo — Gid NS4", code: "FREEMIUM", active: true, expires_at: new Date(Date.now()+3*86400000).toISOString(), daily_scans: 3, max_students: 30, subjects: ["Biologie","Chimie","Physique","Histoire","Géographie","Mathématiques","Créole","Français","Anglais","Géologie","Économie","Philosophie"] },
+    stats: {
+      totalStudents: 28, totalScans: 312, scansToday: 14, imageScans: 87, textScans: 225,
+      subjectBreakdown: {"Biologie":98,"Chimie":74,"Physique":61,"Mathématiques":55,"Histoire":42},
+      dailyData: [["Lun",40],["Mar",55],["Mer",38],["Jeu",62],["Ven",70],["Sam",30],["Dim",17]].map(([d,v])=>({date:d,count:v})),
+      weeklyData: [["S1",180],["S2",220],["S3",195],["S4",310]].map(([w,v])=>({week:w,count:v})),
+      recentScans: [{name:"Marie J.",subject:"Biologie",created_at:new Date().toISOString()},{name:"Jean P.",subject:"Chimie",created_at:new Date().toISOString()},{name:"Rose M.",subject:"Physique",created_at:new Date().toISOString()}],
+      quizData: [{subject:"Biologie",avg_note:16.4,count:45},{subject:"Chimie",avg_note:14.2,count:32}],
+    },
   };
 
 
