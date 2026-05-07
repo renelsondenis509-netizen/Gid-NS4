@@ -131,9 +131,16 @@ export function DashboardScreen({ onBack, userCode }) {
     quizData: [{subject:"Biologie",avg_note:16.4,count:45},{subject:"Chimie",avg_note:14.2,count:32}],
   };
 
+
   useEffect(() => {
+    const saved = localStorage.getItem(_dirKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setStats(parsed);
+      setAuthorized(true);
+    }
     if (userCode === "FREEMIUM") { setStats(FREEMIUM_DEMO); setAuthorized(true); }
-  }, [userCode]);
+  }, []);
 
   const handleAuth = async () => {
     setLoading(true);
