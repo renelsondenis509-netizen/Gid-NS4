@@ -790,34 +790,6 @@ async function processDashboard(
   };
 }
 
-// ─── ACTION : generate_quiz ───────────────────────────────────────────────────
-async function generateQuiz(
-  gemini: typeof callGemini,
-  body: { content: string; subject: string }
-) {
-  const { content, subject } = body;
-
-  const prompt = `Tu es Prof Lakay, expert NS4 Haïti.
-À partir du contenu suivant, génère exactement 4 questions QCM en français.
-Matière : ${subject}
-
-Contenu :
-${content.slice(0, 1500)}
-
-RÈGLE ABSOLUE : Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après, sans backticks.
-Format exact :
-{"questions":[{"q":"question","choices":["A","B","C","D"],"answer":0,"explanation":"explication courte"}]}
-
-- answer est l'index (0-3) de la bonne réponse
-- Les 4 choix doivent être plausibles
-- Les questions doivent porter sur le contenu fourni
-- Explication en 1 phrase maximum`;
-
-  const reply = await gemini(prompt, null);
-  const clean = reply.replace(/```json|```/g, "").trim();
-  const parsed = JSON.parse(clean);
-  return parsed;
-}
 
 // ─── ACTION : get_announcements (corrigé nom) ─────────────────────────────────
 async function getAnnouncements(
