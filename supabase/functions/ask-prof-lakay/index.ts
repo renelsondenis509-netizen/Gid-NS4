@@ -916,7 +916,7 @@ async function freemiumLogin(
     freemiumExpiresAt,
     daysRemaining,
     scansToday: scansToday ?? 0,
-    dailyScans: 5,
+    dailyScans: 3,
     dailyImageScans: 1,
     dailyTextScans: 4,
     subjects: ["Biologie","Géologie","Chimie","Physique","Histoire","Géographie","Économie","Philosophie","Analyse","Algèbre","Suite","Complexe","Probabilité","Géométrie","Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],

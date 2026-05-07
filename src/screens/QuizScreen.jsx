@@ -356,7 +356,7 @@ export function QuizScreen({ user, onNavigate }) {
     const note20 = scoreToNote20(finalScore, finalTotal);
     saveQuizGrade(user.phone, subject, note20, finalScore, finalTotal);
     try {
-      await callEdge({
+      if (!user.isFreemium) await callEdge({
         action: "save_quiz_score",
         phone: user.phone, schoolCode: user.code,
         name: user.name || user.phone,
@@ -424,7 +424,10 @@ export function QuizScreen({ user, onNavigate }) {
 
   // ── SELECT (ACCORDION) ────────────────────────────────────────────────────────
   if (phase === "select") {
-    const totalAvailable = Object.values(FILIERES).flatMap(f => f.subjects)
+    const visibleFilieres = user.isFreemium
+      ? Object.fromEntries(Object.entries(FILIERES).filter(([k]) => k === "LLA"))
+      : FILIERES;
+    const totalAvailable = Object.values(visibleFilieres).flatMap(f => f.subjects)
       .filter(s => user.subjects.includes(s) && QUIZ_DATA[s]).length;
 
     return (
@@ -461,7 +464,7 @@ export function QuizScreen({ user, onNavigate }) {
           </p>
 
           {/* Accordion par branche */}
-          {Object.entries(FILIERES).map(([key, filiere]) => {
+          {Object.entries(visibleFilieres).map(([key, filiere]) => {
             const isOpen = openBranch === key;
             const availableInBranch = filiere.subjects.filter(
               s => user.subjects.includes(s) && QUIZ_DATA[s]

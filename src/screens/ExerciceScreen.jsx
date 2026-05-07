@@ -52,7 +52,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         scanId:scan.id,
       });
       const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
-      callEdge({
+      if (!user.isFreemium) callEdge({
         action: "save_quiz_score",
         phone: user.phone,
         schoolCode: user.code || "FREEMIUM",
