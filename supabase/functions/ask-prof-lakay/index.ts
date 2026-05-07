@@ -40,8 +40,14 @@ async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Pro
       "Authorization": `Bearer ${OPENROUTER_KEY}`,
     },
     body: JSON.stringify({
-      model: "openrouter/free",
-      route: "fallback",
+      models: [
+          "google/gemma-4-31b-it:free",        
+          "google/gemma-3n-e4b-it:free",       
+          "google/gemma-3-27b-it:free",        
+          "qwen/qwen3.6-plus-preview:free",    
+          "meta-llama/llama-4-maverick:free"   
+      ],
+      route: "fallback",                   
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent },
