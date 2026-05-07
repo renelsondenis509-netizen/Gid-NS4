@@ -51,6 +51,16 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         date:new Date().toLocaleString("fr-HT",{timeZone:"America/Port-au-Prince"}),
         scanId:scan.id,
       });
+      const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
+      callEdge({
+        action: "save_quiz_score",
+        phone: user.phone,
+        schoolCode: user.code || "FREEMIUM",
+        subject: scan.subject || "Général",
+        score, total: questions.length,
+        note20, streak: score === questions.length ? 1 : 0,
+        name: user.name,
+      }).catch(() => {});
       setDone(true); return;
     }
     setCurrent(c=>c+1); setSelected(null);
