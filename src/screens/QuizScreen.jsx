@@ -424,9 +424,7 @@ export function QuizScreen({ user, onNavigate }) {
 
   // ── SELECT (ACCORDION) ────────────────────────────────────────────────────────
   if (phase === "select") {
-    const visibleFilieres = user.isFreemium
-      ? Object.fromEntries(Object.entries(FILIERES).filter(([k]) => k === "LLA"))
-      : FILIERES;
+    const visibleFilieres = FILIERES;
     const totalAvailable = Object.values(visibleFilieres).flatMap(f => f.subjects)
       .filter(s => user.subjects.includes(s) && QUIZ_DATA[s]).length;
 
@@ -466,6 +464,7 @@ export function QuizScreen({ user, onNavigate }) {
           {/* Accordion par branche */}
           {Object.entries(visibleFilieres).map(([key, filiere]) => {
             const isOpen = openBranch === key;
+            const isLocked = user.isFreemium && key !== "LLA";
             const availableInBranch = filiere.subjects.filter(
               s => user.subjects.includes(s) && QUIZ_DATA[s]
             ).length;
@@ -476,10 +475,10 @@ export function QuizScreen({ user, onNavigate }) {
 
                 {/* En-tête de branche (cliquable) */}
                 <button
-                  onClick={() => setOpenBranch(isOpen ? null : key)}
+                  onClick={() => !isLocked && setOpenBranch(isOpen ? null : key)}
                   style={{
                     width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12,
-                    background: isOpen ? `${filiere.color}18` : "rgba(15,28,60,0.90)",
+                    background: isLocked ? "rgba(15,28,60,0.50)" : isOpen ? `${filiere.color}18` : "rgba(15,28,60,0.90)",
                     border: "none", cursor: "pointer", transition: "background .25s",
                   }}
                   onTouchStart={e => { e.currentTarget.style.opacity = "0.85"; }}
@@ -505,6 +504,7 @@ export function QuizScreen({ user, onNavigate }) {
 
                   {/* Indicateur disponibilité + chevron */}
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {isLocked && <span style={{ fontSize: 14, opacity: 0.5 }}>🔒</span>}
                     {availableInBranch > 0 && (
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: filiere.color, boxShadow: `0 0 6px ${filiere.color}` }} />
                     )}
