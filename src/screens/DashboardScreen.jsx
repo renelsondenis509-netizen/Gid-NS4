@@ -110,7 +110,7 @@ export function DashboardScreen({ onBack, userCode }) {
   const _dirKey = `gid_dir_v2_${userCode}`;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState(null); // init done in useEffect
 
   const FREEMIUM_DEMO = {
     school: { school_name: "Lekòl Demo — Gid NS4", code: "FREEMIUM", active: true, expires_at: new Date(Date.now()+3*86400000).toISOString(), daily_scans: 3, max_students: 30, subjects: ["Biologie","Chimie","Physique","Histoire","Géographie","Mathématiques","Créole","Français","Anglais","Géologie","Économie","Philosophie"] },
