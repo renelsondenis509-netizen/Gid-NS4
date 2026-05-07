@@ -865,16 +865,7 @@ async function generateQuiz(_db: unknown, body: Record<string, string>) {
   const { content, subject } = body;
   if (!content) throw { status: 400, error: "Contenu manquant" };
 
-  const prompt = `Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti.
-Génère exactement 5 questions basées UNIQUEMENT sur ce contenu de ${subject || "cours"}.
-Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte.
-N'invente rien qui ne soit pas dans le texte.
-Alterne les types : QCM (4 choix), Vré/Fo (2 choix), Trou (4 choix).
-RÉPONDS UNIQUEMENT avec un JSON valide, sans texte avant ou après, sans backticks :
-{"questions":[{"q":"question","choices":["A","B","C","D"],"answer":0,"note":"phrase source"},...]}`
-
-Contenu:
-${content.slice(0, 3000)}`;
+  const prompt = "Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti. " + "Génère exactement 5 questions basées UNIQUEMENT sur ce contenu de " + (subject || "cours") + ". " + "Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte. " + "N'invente rien qui ne soit pas dans le texte. " + "Alterne les types : QCM (4 choix), Vrè/Fo (2 choix), Trou (4 choix). " + 'RÉPONDS UNIQUEMENT avec un JSON valide sans backticks. Format: {"questions":[{"q":"...","choices":["A","B","C","D"],"answer":0,"note":"..."}]}' + "\n\nContenu:\n" + content.slice(0, 3000);
 
   const systemPrompt = "Tu es un générateur d'exercices. Réponds UNIQUEMENT en JSON valide.";
   const fullPrompt = `${systemPrompt}
