@@ -181,8 +181,8 @@ export function ChatScreen({ user, onNavigate }) {
         {/* Compteur unique */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "5px 12px", borderRadius: 12, background: allDone ? "rgba(255,255,255,0.04)" : "rgba(37,99,235,0.15)", border: `1px solid ${allDone ? "rgba(255,255,255,0.08)" : "rgba(37,99,235,0.35)"}`, minWidth: 64 }}>
           <div style={{ display: "flex", gap: 3, marginBottom: 3 }}>
-            {Array.from({ length: 20 }).map((_, i) => {
-              const filled = i < Math.round((scansUsed / DAILY_MAX) * 5);
+            {Array.from({ length: DAILY_MAX }).map((_, i) => {
+              const filled = i < scansUsed;
               return <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: filled ? "#d4002a" : "rgba(255,255,255,0.12)", boxShadow: filled ? "0 0 4px #d4002a88" : "none", transition: "all .3s" }} />;
             })}
           </div>
