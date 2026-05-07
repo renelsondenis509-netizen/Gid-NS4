@@ -112,15 +112,6 @@ export function DashboardScreen({ onBack, userCode }) {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
 
-  useEffect(() => {
-    const saved = localStorage.getItem(_dirKey);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setStats(parsed);
-      setAuthorized(true);
-    }
-  }, []);
-
   const FREEMIUM_DEMO = {
     school: { school_name: "Lekòl Demo — Gid NS4", code: "FREEMIUM", active: true, expires_at: new Date(Date.now()+3*86400000).toISOString(), daily_scans: 3, max_students: 30 },
     totalStudents: 28, totalScans: 312, scansToday: 14, imageScans: 87, textScans: 225,
