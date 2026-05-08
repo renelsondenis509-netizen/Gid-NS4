@@ -502,18 +502,30 @@ async function processAsk(
 ) {
   const { phone, schoolCode, message, subject, imageBase64, history } = body;
 
-  const { data: school } = await db
-    .from("schools")
-    .select("subjects, daily_scans, active, expires_at")
-    .eq("code", schoolCode)
-    .single();
+  let allowedSubjects: string[];
+  let dailyLimitOverride: number | null = null;
 
-  if (!school || !school.active) throw { status: 403, error: "Kòd la pa valid oswa dezaktive." };
-  if (new Date() > new Date(school.expires_at)) throw { status: 403, error: "Kòd ou a ekspire. Kontakte direksyon lekòl ou." };
+  if (schoolCode === "FREEMIUM") {
+    const { data: profile } = await db.from("profiles").select("freemium_expires_at").eq("phone", phone).maybeSingle();
+    if (!profile?.freemium_expires_at || new Date() > new Date(profile.freemium_expires_at)) {
+      throw { status: 403, error: "Peryòd gratis ou a fini. Kontakte direksyon lekòl ou." };
+    }
+    allowedSubjects = ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"];
+    dailyLimitOverride = 3;
+  } else {
+    const { data: school } = await db
+      .from("schools")
+      .select("subjects, daily_scans, active, expires_at")
+      .eq("code", schoolCode)
+      .single();
 
-  const allowedSubjects: string[] = school.subjects ?? [];
-  if (subject !== "Général" && !allowedSubjects.includes(subject)) {
-    throw { status: 403, error: `Matière ${subject} pa otorize ak kòd sa a.` };
+    if (!school || !school.active) throw { status: 403, error: "Kòd la pa valid oswa dezaktive." };
+    if (new Date() > new Date(school.expires_at)) throw { status: 403, error: "Kòd ou a ekspire. Kontakte direksyon lekòl ou." };
+    allowedSubjects = school.subjects ?? [];
+    dailyLimitOverride = school.daily_scans ?? 5;
+    if (subject !== "Général" && !allowedSubjects.includes(subject)) {
+      throw { status: 403, error: `Matière ${subject} pa otorize ak kòd sa a.` };
+    }
   }
 
   const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
@@ -524,7 +536,7 @@ async function processAsk(
     .eq("school_code", schoolCode)
     .gte("created_at", `${today}T05:00:00Z`);
 
-  const dailyLimit = school.daily_scans ?? 5;
+  const dailyLimit = dailyLimitOverride ?? 5;
   if ((scansToday ?? 0) >= dailyLimit) {
     throw { status: 429, quotaExceeded: true, error: `Ou rive nan limit ${dailyLimit} scan pou jodi a. Tounen demen !` };
   }
