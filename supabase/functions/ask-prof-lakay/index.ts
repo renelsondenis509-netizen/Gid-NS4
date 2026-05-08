@@ -50,7 +50,7 @@ async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Pro
       route: "fallback",                   
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userContent },
+        { role: "user", content: imageBase64 ? userContent : userText },
       ],
     }),
   }));
