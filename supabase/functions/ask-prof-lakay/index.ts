@@ -40,7 +40,7 @@ async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Pro
       "Authorization": `Bearer ${OPENROUTER_KEY}`,
     },
     body: JSON.stringify({
-      model: "meta-llama/llama-3.3-70b-instruct:free",                   
+      model: "openrouter/auto",                   
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
