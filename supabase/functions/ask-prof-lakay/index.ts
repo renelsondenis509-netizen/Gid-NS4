@@ -41,16 +41,16 @@ async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Pro
     },
     body: JSON.stringify({
       models: [
-          "google/gemma-4-31b-it:free",        
-          "google/gemma-3n-e4b-it:free",       
+          "meta-llama/llama-4-scout:free",        
+          "meta-llama/llama-3.3-70b-instruct:free",       
           "google/gemma-3-27b-it:free",        
-          "qwen/qwen3.6-plus-preview:free",    
-          "meta-llama/llama-4-maverick:free"   
+          "qwen/qwen-2.5-72b-instruct:free",    
+          "mistralai/mistral-7b-instruct:free"   
       ],
       route: "fallback",                   
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: imageBase64 ? userContent : userText },
+        { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
       ],
     }),
   }));
