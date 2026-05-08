@@ -187,13 +187,15 @@ async function callGemini(prompt: string, imageBase64?: string | null): Promise<
 
   const hasImage = !!imageBase64;
 
-  // Niveau 1 — OpenRouter (vision + texte)
-  try {
-    const reply = await callOpenRouter(systemPrompt, userContent);
-    console.log("✅ Fournisseur utilisé: OpenRouter");
-    return reply;
-  } catch (e) {
-    console.warn("❌ OpenRouter échoué:", e);
+  // Niveau 1 — Groq (texte seulement, meilleure qualité créole)
+  if (!hasImage) {
+    try {
+      const reply = await callGroq(systemPrompt, userText);
+      console.log("✅ Fournisseur utilisé: Groq");
+      return reply;
+    } catch (e) {
+      console.warn("❌ Groq échoué:", e);
+    }
   }
 
   // Niveau 2 — SambaNova (vision + texte)
@@ -205,15 +207,13 @@ async function callGemini(prompt: string, imageBase64?: string | null): Promise<
     console.warn("❌ SambaNova échoué:", e);
   }
 
-  // Niveau 3 — Groq (texte seulement)
-  if (!hasImage) {
-    try {
-      const reply = await callGroq(systemPrompt, userText);
-      console.log("✅ Fournisseur utilisé: Groq");
-      return reply;
-    } catch (e) {
-      console.warn("❌ Groq échoué:", e);
-    }
+  // Niveau 3 — OpenRouter (vision + texte, backup)
+  try {
+    const reply = await callOpenRouter(systemPrompt, userContent);
+    console.log("✅ Fournisseur utilisé: OpenRouter");
+    return reply;
+  } catch (e) {
+    console.warn("❌ OpenRouter échoué:", e);
   }
 
   // Niveau 4 — Mistral AI (texte seulement)
