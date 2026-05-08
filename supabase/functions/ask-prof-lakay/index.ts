@@ -533,7 +533,9 @@ async function processAsk(
     throw { status: 429, quotaExceeded: true, error: `Ou rive nan limit ${dailyLimit} scan pou jodi a. Tounen demen !` };
   }
 
-  const detectedLang = /[àèòûw]|mwen|ou |li |nou |yo |ki |ak |pou |nan |gen |pa |se |te |ap |kay|lekòl|egzèsis/i.test(message) ? "ht" : "fr";
+  const creoleWords = message.toLowerCase().split(/\s+/);
+  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","se","te","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini"];
+  const detectedLang = creoleMarkers.some(w => creoleWords.includes(w)) ? "ht" : "fr";
   const langRule = detectedLang === "ht"
     ? "RÈGLE LANGUE: L'élève écrit en créole haïtien. Réponds UNIQUEMENT en créole haïtien standard selon l'orthographe officielle IPN/CSLC. Exemples corrects: mwen(je), ou(tu), li(il), nou(nous), yo(ils), ak(avec), pou(pour), nan(dans), gen(avoir), ap(en train de), te(passé), se(c'est), ki(qui/quel), fòmil(formule), egzamen(examen), pwoblèm(problème), repons(réponse), konprann(comprendre). INTERDIT: francismes, mots français, orthographe phonétique inventée."
     : "RÈGLE LANGUE: L'élève écrit en français. Réponds UNIQUEMENT en français. Zéro mot créole dans ta réponse.";
