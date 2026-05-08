@@ -860,8 +860,8 @@ async function generateQuiz(_db: unknown, body: Record<string, string>) {
   const systemPrompt = "Tu es un générateur d'exercices. Réponds UNIQUEMENT en JSON valide.";
   const fullPrompt = systemPrompt + "\n\nÉlève: " + prompt;
   let raw = "";
-  try { raw = await callOpenRouter(systemPrompt, [{ type: "text", text: prompt }]); } catch {
-    try { raw = await callSambaNova(systemPrompt, [{ type: "text", text: prompt }]); } catch {
+  try { raw = await callOpenRouter(systemPrompt, [prompt]); } catch {
+    try { raw = await callSambaNova(systemPrompt, [prompt]); } catch {
       try { raw = await callGroq(systemPrompt, prompt); } catch(e) { throw { status: 500, error: "IA indisponible" }; }
     }
   }
