@@ -186,12 +186,11 @@ async function callGemini(prompt: string, imageBase64?: string | null): Promise<
 
   const userContent: unknown[] = [];
   if (imageBase64) {
-    userContent.push({
-      type: "image_url",
-      image_url: { url: `data:image/jpeg;base64,${imageBase64}` },
-    });
+    userContent.push({ type: "image_url", image_url: { url: `data:image/jpeg;base64,${imageBase64}` } });
+    userContent.push({ type: "text", text: userText });
+  } else {
+    userContent.push(userText);
   }
-  userContent.push({ type: "text", text: userText });
 
   const hasImage = !!imageBase64;
 
