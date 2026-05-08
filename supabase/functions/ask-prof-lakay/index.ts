@@ -86,7 +86,7 @@ async function callGroq(systemPrompt: string, userText: string): Promise<string>
       "Authorization": `Bearer ${GROQ_KEY}`,
     },
     body: JSON.stringify({
-      model: "gemma2-9b-it",
+      model: "llama-3.3-70b-versatile",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userText },
