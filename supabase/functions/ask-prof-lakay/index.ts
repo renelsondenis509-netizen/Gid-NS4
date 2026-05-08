@@ -537,7 +537,7 @@ async function processAsk(
   const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","se","te","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini"];
   const detectedLang = creoleMarkers.some(w => creoleWords.includes(w)) ? "ht" : "fr";
   const langRule = detectedLang === "ht"
-    ? "RÈGLE LANGUE: L'élève écrit en créole haïtien. Réponds UNIQUEMENT en créole haïtien standard selon l'orthographe officielle IPN/CSLC. Exemples corrects: mwen(je), ou(tu), li(il), nou(nous), yo(ils), ak(avec), pou(pour), nan(dans), gen(avoir), ap(en train de), te(passé), se(c'est), ki(qui/quel), fòmil(formule), egzamen(examen), pwoblèm(problème), repons(réponse), konprann(comprendre). INTERDIT: francismes, mots français, orthographe phonétique inventée."
+    ? "RÈGLE LANGUE: Réponds UNIQUEMENT en créole haïtien standard (IPN/CSLC). INTERDIT: mots anglais, mots français, répéter la question, traduire en anglais. Écris directement ta réponse sans préambule."
     : "RÈGLE LANGUE: L'élève écrit en français. Réponds UNIQUEMENT en français. Zéro mot créole dans ta réponse.";
   const systemPrompt = `${langRule}
 
