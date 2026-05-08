@@ -386,6 +386,11 @@ async function validateCode(
 ) {
   const { phone, schoolCode } = body;
 
+  if (schoolCode === "FREEMIUM") {
+    const fr = await freemiumLogin(db, { phone, name: body.name || phone });
+    return { valid: true, ...fr, school: { name: "Freemium", daily_scans: 3, dailyScans: 3, dailyImageScans: 1, dailyTextScans: 2, subjects: [], daysRemaining: fr.daysRemaining, expiresAt: fr.freemiumExpiresAt } };
+  }
+
   const { data: school, error } = await db
     .from("schools")
     .select("*")
