@@ -83,7 +83,7 @@ async function callGroq(systemPrompt: string, userText: string): Promise<string>
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${GROQ_KEY}`,
+      "Authorization": `Bearer ${Math.random() < 0.5 ? GROQ_KEY : (Deno.env.get("GROQ_KEY_2") || GROQ_KEY)}`,
     },
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",

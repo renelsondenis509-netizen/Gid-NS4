@@ -172,7 +172,7 @@ export function ChatScreen({ user, onNavigate }) {
             <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Prof Lakay</span>
             {!offline && <span style={{ color:"#22C55E", fontSize:11, fontWeight:500 }}>● En ligne</span>}
           </div>
-          {user.isFreemium && (
+          {(user.isFreemium || user.code === "FREEMIUM") && user.daysRemaining > 0 && (
             <span style={{ marginLeft: 8, fontSize: 10, padding: "1px 7px", borderRadius: 8, background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
               Freemium — {user.daysRemaining}j
             </span>
@@ -192,7 +192,7 @@ export function ChatScreen({ user, onNavigate }) {
         </div>
       </div>
       {/* EXPIRY BANNER */}
-<ExpiryBanner daysRemaining={user.daysRemaining} />
+{user.daysRemaining > 0 && <ExpiryBanner daysRemaining={user.daysRemaining} />}
       {/* MESSAGES */}
       <div ref={chatRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
         {messages.map((msg, i) => (

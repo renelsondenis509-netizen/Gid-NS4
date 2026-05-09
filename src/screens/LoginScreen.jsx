@@ -8,6 +8,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
   const [code, setCode]   = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [hasTriedFreemium] = useState(() => !!localStorage.getItem("gid_freemium_used"));
 
   const handleLogin = async () => {
     setError("");
@@ -28,7 +29,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
         dailyTextScans:  result.school.dailyTextScans  ?? 4,
         daysRemaining:   result.school.daysRemaining,
         expiresAt:           result.school.expiresAt,
-        freemiumExpiresAt:   result.freemiumExpiresAt ?? null,
+        freemiumExpiresAt:   null,
         scansToday:      result.scansToday,
       });
     } catch (e) { setError(parseApiError(e).message); }
@@ -91,10 +92,12 @@ export function LoginScreen({ onLogin, onNavigate }) {
             style={{ width:"100%", padding:"15px", borderRadius:14, background:loading?"#2E4080":"linear-gradient(135deg,#E8002A,#FF5C35)", color:"white", fontWeight:800, fontSize:15, border:"none", boxShadow:loading?"none":"0 6px 24px #E8002A33", cursor:loading?"not-allowed":"pointer" }}>
             {loading ? "Verifikasyon..." : "Rantre"}
           </button>
+          {!hasTriedFreemium && (
           <button onClick={handleFreemium} disabled={loading}
             style={{ width:"100%", padding:"13px", borderRadius:14, background:"transparent", color:"#60a5fa", fontWeight:700, fontSize:14, border:"1px solid rgba(37,99,235,0.35)", cursor:loading?"not-allowed":"pointer", marginTop:10 }}>
             ✦ Eseye gratis — 3 jou
           </button>
+          )}
           <div style={{ textAlign:"center", marginTop:16 }}>
             <span style={{ color:"#4b5ea8", fontSize:12 }}>Ou poko gen kòd paw la? </span>
             <span style={{ color:"#4B6ABA", fontSize:12 }}>Pale ak direksyon lekòl ou a.</span>
