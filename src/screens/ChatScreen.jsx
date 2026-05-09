@@ -101,7 +101,7 @@ export function ChatScreen({ user, onNavigate }) {
     try {
       const subject = detectSubject(payload.currentInput + " " + (payload.userMsg.content || "")) || activeSubject || "Général";
       const result  = await callEdge({
-        action: "ask", phone: user.phone, schoolCode: user.code || "FREEMIUM",
+        action: "ask", phone: user.phone, schoolCode: user.code || "FREEMIUM", name: user.name || "",
         message:     payload.userMsg.content,
         imageBase64: payload.userMsg.image ? payload.userMsg.image.split(",")[1] : null,
         history:     messages.slice(-6), subject,
