@@ -875,8 +875,11 @@ async function freemiumLogin(
   const { phone, name } = body;
   const FREEMIUM_DAYS = 3;
 
-  // Upsert profil
-  const expiresAt = new Date(Date.now() + FREEMIUM_DAYS * 86400000).toISOString();
+  // Upsert profil — expiration basée sur minuit heure Haïti
+  const nowHaiti = new Date(new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }));
+  nowHaiti.setHours(23, 59, 59, 0);
+  nowHaiti.setDate(nowHaiti.getDate() + FREEMIUM_DAYS);
+  const expiresAt = nowHaiti.toISOString();
   const { data: existing } = await db.from("profiles").select("freemium_expires_at").eq("phone", phone).maybeSingle();
 
   if (!existing) {
