@@ -74,7 +74,7 @@ export function ChatScreen({ user, onNavigate }) {
     if (t.includes("anglais")) return "Anglais";
     if (t.includes("espagnol")) return "Espagnol";
     if (t.includes("dissertation") || t.includes("redaction")) return "Dissertation";
-    return (user.subjects && user.subjects[0]) || "Général";
+    return "Général";
   };
 
   const sendMessage = async (retryPayload = null) => {
