@@ -126,13 +126,20 @@ export function DashboardScreen({ onBack, userCode }) {
 
 
   useEffect(() => {
+    if (userCode === "FREEMIUM") { setStats(FREEMIUM_DEMO); setAuthorized(true); return; }
     const saved = localStorage.getItem(_dirKey);
     if (saved) {
       const parsed = JSON.parse(saved);
       setStats(parsed);
       setAuthorized(true);
+      // Rafraîchit en arrière-plan
+      const { directorCode } = parsed._auth || {};
+      if (directorCode) {
+        callEdge({ action: "dashboard", schoolCode: userCode, directorCode })
+          .then(result => { setStats(result); localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode } })); })
+          .catch(() => {});
+      }
     }
-    if (userCode === "FREEMIUM") { setStats(FREEMIUM_DEMO); setAuthorized(true); }
   }, []);
 
   const handleAuth = async () => {
@@ -142,7 +149,7 @@ export function DashboardScreen({ onBack, userCode }) {
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim() });
       setStats(result);
       setAuthorized(true);
-      localStorage.setItem(_dirKey, JSON.stringify(result));
+      localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } }));
     } catch (e) {
       setError(parseApiError(e).message);
     }
