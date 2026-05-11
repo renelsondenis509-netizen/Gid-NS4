@@ -99,7 +99,7 @@ export function ChatScreen({ user, onNavigate }) {
     setApiError(null); setLoading(true);
 
     try {
-      const subject = detectSubject(payload.currentInput + " " + (payload.userMsg.content || "")) || activeSubject || "Général";
+      const subject = activeSubject || detectSubject(payload.currentInput + " " + (payload.userMsg.content || "")) || "Général";
       const result  = await callEdge({
         action: "ask", phone: user.phone, schoolCode: user.code || "FREEMIUM", name: user.name || "",
         message:     payload.userMsg.content,
@@ -255,6 +255,20 @@ export function ChatScreen({ user, onNavigate }) {
 
       {/* INPUT */}
       <div style={{ padding: "10px 12px", background: "rgba(10,15,46,0.98)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+        {/* SÉLECTEUR MATIÈRE */}
+        {user.subjects && user.subjects.length > 0 && (
+          <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:8, scrollbarWidth:"none" }}>
+            {user.subjects.map(s => (
+              <button key={s} onClick={() => setActiveSubject(s)}
+                style={{ flexShrink:0, padding:"4px 12px", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid", cursor:"pointer", whiteSpace:"nowrap",
+                  background: activeSubject === s ? "#2563EB" : "rgba(255,255,255,0.04)",
+                  color: activeSubject === s ? "#fff" : "#6B8ADB",
+                  borderColor: activeSubject === s ? "#2563EB" : "rgba(255,255,255,0.1)" }}>
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
         {image && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "6px 8px", background: "rgba(37,99,235,0.1)", borderRadius: 10, border: "1px solid rgba(37,99,235,0.2)" }}>
             <img src={image} alt="" style={{ width: 36, height: 36, borderRadius: 8, objectFit: "cover" }} />
