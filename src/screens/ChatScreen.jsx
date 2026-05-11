@@ -87,6 +87,13 @@ export function ChatScreen({ user, onNavigate }) {
     if (scansUsed >= DAILY_MAX) return;
     if (loading) return;
 
+    // Guard matière non sélectionnée
+    if (!activeSubject) {
+      setMessages(p => [...p, { role: "assistant", content: "⚠️ **Chwazi yon matyè anvan!**
+
+Klike sou youn nan matyè ki anba a (Biologie, Chimie, Physique...) pou mwen ka ede ou kòmsadwa." }]);
+      return;
+    }
     await new Promise(r => setTimeout(r, 300));
     const isImage = retryPayload ? !!retryPayload.isImage : !!image;
     const payload = retryPayload || {
