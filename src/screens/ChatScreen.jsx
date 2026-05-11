@@ -89,9 +89,7 @@ export function ChatScreen({ user, onNavigate }) {
 
     // Guard matière non sélectionnée
     if (!activeSubject) {
-      setMessages(p => [...p, { role: "assistant", content: "⚠️ **Chwazi yon matyè anvan!**
-
-Klike sou youn nan matyè ki anba a (Biologie, Chimie, Physique...) pou mwen ka ede ou kòmsadwa." }]);
+      setMessages(p => [...p, { role: 'assistant', content: '⚠️ **Chwazi yon matyè anvan!**\n\nKlike sou youn nan matyè ki anba a (Biologie, Chimie, Physique...) pou mwen ka ede ou kòmsadwa.' }]);
       return;
     }
     await new Promise(r => setTimeout(r, 300));
