@@ -30,7 +30,7 @@ export function ChatScreen({ user, onNavigate }) {
   const [loading,      setLoading]      = useState(false);
   const [apiError,     setApiError]     = useState(null);
   const [lastPayload,  setLastPayload]  = useState(null);
-  const [activeSubject,setActiveSubject]= useState(user.subjects?.[0] || null);
+  const [activeSubject,setActiveSubject]= useState(null);
   const [showScrollBtn,setShowScrollBtn]= useState(false);
   const [favorites,    setFavorites]    = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
 
