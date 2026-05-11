@@ -43,7 +43,7 @@ export function LatexText({ content }) {
 
   if (html) return (
     <span dangerouslySetInnerHTML={{ __html: html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") }}
-      style={{ lineHeight:1.7 }} />
+      style={{ lineHeight:1.7, display:"block", overflowX:"auto", maxWidth:"100%" }} />
   );
   return (
     <span>
