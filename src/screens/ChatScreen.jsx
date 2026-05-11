@@ -236,11 +236,11 @@ export function ChatScreen({ user, onNavigate }) {
                 style={{ transition:"stroke-dashoffset .4s ease" }}
               />
             </svg>
-            <span style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, color: allDone?"#374151":"#60a5fa" }}>
-              {allDone ? <CheckIcon/> : `${DAILY_MAX-scansUsed}`}
+            <span style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:0 }}>
+              {allDone ? <span style={{color:"#374151"}}><CheckIcon/></span> : <><span style={{fontSize:13,fontWeight:900,color:"#60a5fa",lineHeight:1}}>{scansUsed}</span><span style={{fontSize:13,fontWeight:900,color:"#3b82f6",lineHeight:1}}>/{DAILY_MAX}</span></>}
             </span>
           </div>
-          <span style={{ fontSize:8, color:"#3b4a6b", fontWeight:600, letterSpacing:"0.05em" }}>REKÈT</span>
+          <span style={{ fontSize:10, color:"#4b6cb7", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
         </div>
       </div>
 
