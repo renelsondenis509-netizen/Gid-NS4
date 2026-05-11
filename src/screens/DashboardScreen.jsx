@@ -128,18 +128,22 @@ export function DashboardScreen({ onBack, userCode }) {
   useEffect(() => {
     if (userCode === "FREEMIUM") { setStats(FREEMIUM_DEMO); setAuthorized(true); return; }
     const saved = localStorage.getItem(_dirKey);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setStats(parsed);
-      setAuthorized(true);
-      // Rafraîchit en arrière-plan
-      const { directorCode } = parsed._auth || {};
-      if (directorCode) {
-        callEdge({ action: "dashboard", schoolCode: userCode, directorCode })
-          .then(result => { setStats(result); localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode } })); })
-          .catch(() => {});
-      }
-    }
+    if (!saved) return;
+    const parsed = JSON.parse(saved);
+    const { directorCode } = parsed._auth || {};
+    if (!directorCode) return;
+    setLoading(true);
+    callEdge({ action: "dashboard", schoolCode: userCode, directorCode })
+      .then(result => {
+        setStats({ ...result, _auth: { directorCode } });
+        setAuthorized(true);
+        localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode } }));
+      })
+      .catch(() => {
+        setStats(parsed);
+        setAuthorized(true);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const handleAuth = async () => {
