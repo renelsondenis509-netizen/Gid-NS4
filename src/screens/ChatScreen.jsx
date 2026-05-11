@@ -116,6 +116,7 @@ export function ChatScreen({ user, onNavigate }) {
       setScansUsed(next);
       try { localStorage.setItem(_scanKey, String(next)); } catch {}
       setLastPayload(null);
+      setActiveSubject(null);
       await idbSaveScan(user.phone, {
         date:      new Date().toLocaleString("fr-HT", { timeZone: "America/Port-au-Prince" }),
         scanDate:  new Date().toISOString().split("T")[0],
