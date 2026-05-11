@@ -253,7 +253,7 @@ export function ChatScreen({ user, onNavigate }) {
           <div key={i} style={{ display:"flex", gap:10, justifyContent:msg.role==="user"?"flex-end":"flex-start", animation:"fadeIn .3s ease both" }}>
             {msg.role === "assistant" && (
               <div style={{ width:34, height:34, borderRadius:10, flexShrink:0, overflow:"hidden", background:"#fff", boxShadow:"0 2px 12px rgba(0,0,0,0.4)", marginTop:2 }}>
-                <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }} />
               </div>
             )}
             <div style={{ maxWidth:"80%" }}>
@@ -296,7 +296,7 @@ export function ChatScreen({ user, onNavigate }) {
         {loading && (
           <div style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
             <div style={{ width:34, height:34, borderRadius:10, flexShrink:0, overflow:"hidden", background:"#fff", boxShadow:"0 2px 12px rgba(0,0,0,0.4)" }}>
-              <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+              <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }} />
             </div>
             <div style={{ padding:"14px 18px", borderRadius:"6px 20px 20px 20px", background:"rgba(12,20,50,0.92)", border:"1px solid rgba(37,99,235,0.12)", borderLeft:"3px solid rgba(37,99,235,0.3)" }}>
               <div style={{ display:"flex", gap:5, alignItems:"center" }}>
