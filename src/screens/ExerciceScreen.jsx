@@ -28,7 +28,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         if (r.questions?.length > 0) setQuestions(r.questions);
         else setError("Pa gen ase kontni pou jenere egzèsis la.");
       })
-      .catch(() => setError("Imposib jenere egzèsis la. Eseye ankò."))
+      .catch(() => setError("Enposib jenere egzèsis la. Eseye ankò."))
       .finally(() => setLoading(false));
   }, []);
 
