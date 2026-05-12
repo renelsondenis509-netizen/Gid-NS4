@@ -102,7 +102,8 @@ const HistoryCard = ({ h, onSelect, onSpeak, onDelete, speakingId, deleting }) =
       transition: "box-shadow 0.3s",
     }}>
       {/* Tap zone */}
-      <button onClick={() => onSelect(h)} className="w-full text-left active:scale-95 transition-transform">
+      <button onClick={() => onSelect(h)}
+        style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
         <div style={{ display: "flex", gap: 12, padding: "14px 14px 10px" }}>
           {/* Thumbnail */}
           {h.image
