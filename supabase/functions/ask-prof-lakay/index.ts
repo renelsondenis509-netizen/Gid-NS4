@@ -31,6 +31,41 @@ const LLM7_KEY       = Deno.env.get("LLM7_API_KEY") ?? "";
 const CF_ACCOUNT_ID  = Deno.env.get("CF_ACCOUNT_ID") ?? "";
 const CF_API_TOKEN   = Deno.env.get("CF_API_TOKEN") ?? "";
 
+
+// ─── Chargement ordre fallback depuis app_config ──────────────────────────────
+async function loadFallbackOrder(): Promise<string[]> {
+  try {
+    const { data } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "fallback_order")
+      .single();
+    if (data?.value && Array.isArray(data.value)) return data.value as string[];
+  } catch (_) { /* utilise défaut */ }
+  return ["groq", "sambanova", "openrouter", "mistral", "llm7", "cloudflare"];
+}
+
+// ─── Providers texte-seulement ────────────────────────────────────────────────
+const TEXT_ONLY_PROVIDERS = new Set(["groq", "mistral", "llm7"]);
+
+// ─── Dispatcher dynamique ─────────────────────────────────────────────────────
+async function callProvider(
+  name: string,
+  systemPrompt: string,
+  userText: string,
+  userContent: unknown[]
+): Promise<string> {
+  switch (name) {
+    case "groq":       return await callGroq(systemPrompt, userText);
+    case "sambanova":  return await callSambaNova(systemPrompt, userContent);
+    case "openrouter": return await callOpenRouter(systemPrompt, userContent);
+    case "mistral":    return await callMistral(systemPrompt, userText);
+    case "llm7":       return await callLLM7(systemPrompt, userText);
+    case "cloudflare": return await callCloudflare(systemPrompt, userContent);
+    default: throw new Error(`Provider inconnu: ${name}`);
+  }
+}
+
 // ─── Niveau 1 — OpenRouter (vision + texte) ───────────────────────────────
 async function callOpenRouter(systemPrompt: string, userContent: unknown[]): Promise<string> {
   const res = await withTimeout(fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -187,67 +222,22 @@ async function callGemini(prompt: string, imageBase64?: string | null): Promise<
 
   const hasImage = !!imageBase64;
 
-  // Niveau 1 — Groq (texte seulement, meilleure qualité créole)
-  if (!hasImage) {
+  // Fallback dynamique — ordre lu depuis app_config
+  const order = await loadFallbackOrder();
+  const errors: string[] = [];
+  for (const provider of order) {
+    if (hasImage && TEXT_ONLY_PROVIDERS.has(provider)) continue;
     try {
-      const reply = await callGroq(systemPrompt, userText);
-      console.log("✅ Fournisseur utilisé: Groq");
+      const reply = await callProvider(provider, systemPrompt, userText, userContent);
+      console.log(`✅ Fournisseur utilisé: ${provider}`);
       return reply;
     } catch (e) {
-      console.warn("❌ Groq échoué:", e);
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`❌ ${provider} échoué:`, msg);
+      errors.push(`${provider}: ${msg}`);
     }
   }
-
-  // Niveau 2 — SambaNova (vision + texte)
-  try {
-    const reply = await callSambaNova(systemPrompt, userContent);
-    console.log("✅ Fournisseur utilisé: SambaNova");
-    return reply;
-  } catch (e) {
-    console.warn("❌ SambaNova échoué:", e);
-  }
-
-  // Niveau 3 — OpenRouter (vision + texte, backup)
-  try {
-    const reply = await callOpenRouter(systemPrompt, userContent);
-    console.log("✅ Fournisseur utilisé: OpenRouter");
-    return reply;
-  } catch (e) {
-    console.warn("❌ OpenRouter échoué:", e);
-  }
-
-  // Niveau 4 — Mistral AI (texte seulement)
-  if (!hasImage) {
-    try {
-      const reply = await callMistral(systemPrompt, userText);
-      console.log("✅ Fournisseur utilisé: Mistral AI");
-      return reply;
-    } catch (e) {
-      console.warn("❌ Mistral échoué:", e);
-    }
-  }
-
-  // Niveau 5 — LLM7.io (texte seulement)
-  if (!hasImage) {
-    try {
-      const reply = await callLLM7(systemPrompt, userText);
-      console.log("✅ Fournisseur utilisé: LLM7");
-      return reply;
-    } catch (e) {
-      console.warn("❌ LLM7 échoué:", e);
-    }
-  }
-
-  // Niveau 6 — Cloudflare (vision + texte)
-  try {
-    const reply = await callCloudflare(systemPrompt, userContent);
-    console.log("✅ Fournisseur utilisé: Cloudflare");
-    return reply;
-  } catch (e) {
-    console.warn("❌ Cloudflare échoué:", e);
-  }
-
-  throw new Error("Tout les fournisseurs sont indisponibles. Eseye ankò nan kèk minit.");
+  throw { status: 503, error: `Tous les fournisseurs ont échoué: ${errors.join(" | ")}` };
 }
 
 // ─── Système haïtien de mentions ─────────────────────────────────────────────
@@ -856,10 +846,14 @@ async function generateQuiz(_db: unknown, body: Record<string, string>) {
   const systemPrompt = "Tu es un générateur d'exercices. Réponds UNIQUEMENT en JSON valide.";
   const fullPrompt = systemPrompt + "\n\nÉlève: " + prompt;
   let raw = "";
-  try { raw = await callOpenRouter(systemPrompt, [prompt]); } catch {
-    try { raw = await callSambaNova(systemPrompt, [prompt]); } catch {
-      try { raw = await callGroq(systemPrompt, prompt); } catch(e) { throw { status: 500, error: "IA indisponible" }; }
-    }
+  const quizOrder = await loadFallbackOrder();
+  for (const p of quizOrder) {
+    try {
+      raw = TEXT_ONLY_PROVIDERS.has(p)
+        ? await callProvider(p, systemPrompt, prompt, [prompt])
+        : await callProvider(p, systemPrompt, prompt, [prompt]);
+      break;
+    } catch { /* essaie suivant */ }
   }
   const clean = raw.replace(/```json|```/g, "").trim();
   try {
@@ -917,7 +911,6 @@ Deno.serve(async (req) => {
     let result: unknown;
 
     switch (body.action) {
-      case "generate_quiz":       result = await generateQuiz(callGemini, body); break;
       case "generate_quiz":        result = await generateQuiz(supabase, body); break;
       case "freemium_login":      result = await freemiumLogin(supabase, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
