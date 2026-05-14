@@ -404,6 +404,7 @@ async function validateCode(
       .select("school_code")
       .eq("phone", phone)
       .neq("school_code", schoolCode)
+      .neq("school_code", "FREEMIUM")
       .maybeSingle();
 
     if (existingOtherSchool) {
