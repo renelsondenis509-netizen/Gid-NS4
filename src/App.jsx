@@ -14,6 +14,7 @@ import { PaymentScreen }     from "./screens/PaymentScreen";
 import { DashboardScreen }   from "./screens/DashboardScreen";
 import { PartnerScreen }     from "./screens/PartnerScreen";
 import { FavoritesScreen }   from "./screens/FavoritesScreen";
+import AdminScreen            from "./screens/AdminScreen";
 
 /** Enrichit l'objet user avec le statut freemium calculé côté client. */
 function enrichUser(u) {
@@ -62,7 +63,7 @@ export default function App() {
     <HistoryScreen
       user={user}
       onNavigate={nav}
-      onStartExercice={(scan) => { setActiveScan(scan); setScreen("exercice"); }}
+      onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); setScreen("exercice"); }}
     />
   );
   if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
@@ -73,6 +74,7 @@ export default function App() {
     <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />
   );
   if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
+  if (screen === "admin")       return <AdminScreen onBack={() => nav("menu")} />;
 
   return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
 }

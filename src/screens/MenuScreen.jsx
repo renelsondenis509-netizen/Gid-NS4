@@ -57,11 +57,15 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
   );
 
   // ─── MENU ITEMS DATA ─────────────────────────────────────────────────────
+  const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE ?? "";
+  const isAdmin = user?.phone === ADMIN_PHONE;
+
   const menuItems = [
     { icon: <ChartBarIcon />, label: "Aksè Direksyon", screen: "dashboard" },
     { icon: <CreditCardIcon />, label: "Pèman", screen: "payment" },
     { icon: <HandshakeIcon />, label: "Patenarya", screen: "partner" },
     { icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>, label:"Repons Favori", screen:"favorites" },
+    ...(isAdmin ? [{ icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 14l2 2 4-4"/></svg>, label: "Admin", screen: "admin" }] : []),
   ];
 
   const computeBadges = () => {
