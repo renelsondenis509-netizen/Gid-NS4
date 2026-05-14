@@ -13,13 +13,24 @@ export function FavoritesScreen({ user, onNavigate }) {
   const [selected, setSelected] = useState(null);
   const [speakingId, setSpeakingId] = useState(null);
 
+    const cleanForTTS = (text) => (text || "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/_{1,2}(.*?)_{1,2}/g, "$1")
+    .replace(/#{1,6}\s*/g, "")
+    .replace(/`{1,3}[^`]*`{1,3}/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\n{2,}/g, ". ")
+    .replace(/\n/g, ", ")
+    .trim();
+
   const handleSpeak = (text, id) => {
     if (speakingId === id) {
       window.speechSynthesis.cancel();
       setSpeakingId(null);
     } else {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(cleanForTTS(text));
       utterance.lang = 'fr-FR';
       utterance.rate = 1.1;
       utterance.onend = () => setSpeakingId(null);

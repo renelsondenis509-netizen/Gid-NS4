@@ -146,11 +146,20 @@ export function DashboardScreen({ onBack, userCode }) {
       .finally(() => setLoading(false));
   }, []);
 
+  const getDeviceId = () => {
+    const key = "gid_device_id";
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now());
+      localStorage.setItem(key, id);
+    }
+    return id;
+  };
   const handleAuth = async () => {
     setLoading(true);
     setError("");
     try {
-      const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim() });
+      const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim(), deviceId: getDeviceId() });
       setStats(result);
       setAuthorized(true);
       localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } }));

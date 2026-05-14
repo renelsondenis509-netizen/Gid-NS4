@@ -691,6 +691,33 @@ async function processDashboard(
 
   const { data: school } = await db.from("schools").select("*").eq("code", schoolCode).single();
   if (!school || school.director_code !== directorCode) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
+  // Verrouillage appareil
+  if (body.deviceId) {
+    if (!school.device_id) {
+      // Premier login — enregistre l'appareil
+      await db.from("schools").update({ device_id: body.deviceId }).eq("code", schoolCode);
+    } else if (school.device_id !== body.deviceId) {
+      throw { status: 403, error: "Kont sa a deja aktif sou yon lòt aparèy. Kontakte direksyon Gid NS4." };
+    }
+  }
+  // Verrouillage appareil
+  if (body.deviceId) {
+    if (!school.device_id) {
+      // Premier login — enregistre l'appareil
+      await db.from("schools").update({ device_id: body.deviceId }).eq("code", schoolCode);
+    } else if (school.device_id !== body.deviceId) {
+      throw { status: 403, error: "Kont sa a deja aktif sou yon lòt aparèy. Kontakte direksyon Gid NS4." };
+    }
+  }
+  // Verrouillage appareil
+  if (body.deviceId) {
+    if (!school.device_id) {
+      // Premier login — enregistre l'appareil
+      await db.from("schools").update({ device_id: body.deviceId }).eq("code", schoolCode);
+    } else if (school.device_id !== body.deviceId) {
+      throw { status: 403, error: "Kont sa a deja aktif sou yon lòt aparèy. Kontakte direksyon Gid NS4." };
+    }
+  }
 
   const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
   const currentWeek = getWeekKey();

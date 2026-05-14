@@ -23,7 +23,12 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const [answers,   setAnswers]   = useState([]);
 
   useEffect(() => {
-    callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général" })
+      if (scan.questions?.length > 0) {
+    setQuestions(scan.questions);
+    setLoading(false);
+    return;
+  }
+  callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général" })
       .then(r => {
         if (r.questions?.length > 0) setQuestions(r.questions);
         else setError("Pa gen ase kontni pou jenere egzèsis la.");

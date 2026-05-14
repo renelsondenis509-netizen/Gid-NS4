@@ -22,6 +22,7 @@ const IcoStar       = () => (<svg width="11" height="11" viewBox="0 0 24 24" fil
 
 /* ─── Palette matières ───────────────────────────────────────────────── */
 const SUBJECT_COLORS = {
+  /* ── Créole ── */
   "Matematik":      { bg: "#1e3a8a", accent: "#60a5fa", glow: "#3b82f6" },
   "Fizik":          { bg: "#4c1d95", accent: "#c084fc", glow: "#9333ea" },
   "Chimie":         { bg: "#064e3b", accent: "#34d399", glow: "#10b981" },
@@ -37,6 +38,20 @@ const SUBJECT_COLORS = {
   "SES":            { bg: "#1e3a8a", accent: "#93c5fd", glow: "#3b82f6" },
   "SMP":            { bg: "#4c1d95", accent: "#c084fc", glow: "#9333ea" },
   "LLA":            { bg: "#7f1d1d", accent: "#fca5a5", glow: "#ef4444" },
+  /* ── Français (noms sauvegardés par ChatScreen) ── */
+  "Mathématiques":  { bg: "#1e3a8a", accent: "#60a5fa", glow: "#3b82f6" },
+  "Maths":          { bg: "#1e3a8a", accent: "#60a5fa", glow: "#3b82f6" },
+  "Physique":       { bg: "#4c1d95", accent: "#c084fc", glow: "#9333ea" },
+  "Biologie":       { bg: "#14532d", accent: "#86efac", glow: "#22c55e" },
+  "Histoire":       { bg: "#78350f", accent: "#fbbf24", glow: "#f59e0b" },
+  "Philosophie":    { bg: "#3b0764", accent: "#e879f9", glow: "#a855f7" },
+  "Français":       { bg: "#7f1d1d", accent: "#fca5a5", glow: "#ef4444" },
+  "Anglais":        { bg: "#0c4a6e", accent: "#38bdf8", glow: "#0ea5e9" },
+  "Espagnol":       { bg: "#431407", accent: "#fb923c", glow: "#f97316" },
+  "Économie":       { bg: "#1c1917", accent: "#a8a29e", glow: "#78716c" },
+  "Géographie":     { bg: "#052e16", accent: "#4ade80", glow: "#16a34a" },
+  "Sciences":       { bg: "#14532d", accent: "#86efac", glow: "#22c55e" },
+  "Informatique":   { bg: "#0c4a6e", accent: "#38bdf8", glow: "#0ea5e9" },
 };
 const DEFAULT_COLOR = { bg: "#1e3a8a", accent: "#60a5fa", glow: "#3b82f6" };
 
@@ -56,7 +71,7 @@ const SubjectPill = ({ subject }) => {
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 4,
-      padding: "2px 8px", borderRadius: 99, fontSize: 10, fontWeight: 700,
+      padding: "2px 8px", borderRadius: 99, fontSize: 12, fontWeight: 700,
       letterSpacing: "0.04em", color: accent,
       background: `${glow}22`,
       border: `1px solid ${glow}44`,
@@ -95,16 +110,15 @@ const HistoryCard = ({ h, onSelect, onSpeak, onDelete, speakingId, deleting }) =
   const { glow } = getSubjectColor(subject);
   return (
     <div style={{
-      borderRadius: 18, overflow: "hidden",
+      borderRadius: 18,
       background: "linear-gradient(145deg,#0f1e4a,#0a1535)",
       border: `1px solid ${subject ? glow + "44" : "#1e3a8a33"}`,
       boxShadow: subject ? `0 0 18px ${glow}18` : "none",
       transition: "box-shadow 0.3s",
     }}>
       {/* Tap zone */}
-      <button onClick={() => onSelect(h)}
-        style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
-        <div style={{ display: "flex", gap: 12, padding: "14px 14px 10px" }}>
+      <div onClick={() => onSelect(h)}
+        style={{ cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 14px 10px" }}>
           {/* Thumbnail */}
           {h.image
             ? <img src={h.image} alt="" style={{ width: 56, height: 56, borderRadius: 14,
@@ -116,41 +130,37 @@ const HistoryCard = ({ h, onSelect, onSpeak, onDelete, speakingId, deleting }) =
               </div>
           }
           {/* Content */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Subject pill + date */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5, flexWrap: "wrap" }}>
-              {subject && <SubjectPill subject={subject}/>}
-              <span style={{ fontSize: 10, color: "#475569" }}>{h.date}</span>
+          <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+            <div style={{ marginBottom: 4 }}>
+              <span style={{ fontSize: 12, color: "#475569" }}>{h.date}</span>
             </div>
             <p style={{
-              fontSize: 12, color: "#93c5fd", lineHeight: 1.5,
-              display: "-webkit-box", WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical", overflow: "hidden",
+              fontSize: 14, color: "#93c5fd", lineHeight: 1.5,
+              overflow: "hidden", maxHeight: "3em",
             }}>
               {h.response?.slice(0, 110)}…
             </p>
           </div>
           <span style={{ color: "#1e3a8a", fontSize: 18, alignSelf: "center" }}>›</span>
-        </div>
-      </button>
+      </div>
 
       {/* Action bar */}
-      <div style={{ padding: "0 14px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 14px 12px" }}>
         <button onClick={() => onSpeak(h.response, h.id)}
           style={{
             padding: "6px 10px", borderRadius: 10, display: "flex", alignItems: "center", gap: 5,
-            fontSize: 11, fontWeight: 600, cursor: "pointer",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
             background: speakingId === h.id ? "rgba(212,0,42,0.2)" : "rgba(37,99,235,0.12)",
             border: `1px solid ${speakingId === h.id ? "#d4002a55" : "rgba(37,99,235,0.4)"}`,
             color: speakingId === h.id ? "#ff8080" : "#60a5fa",
           }}>
           {speakingId === h.id ? <IcoStop/> : <IcoVolumeUp/>}
-          {speakingId === h.id ? "Stop" : "Ekute"}
+          {speakingId === h.id ? "Stop" : "Tande"}
         </button>
         <button onClick={() => onDelete(h)} disabled={deleting === h.id}
           style={{
             padding: "6px 12px", borderRadius: 10, display: "flex", alignItems: "center", gap: 5,
-            fontSize: 11, fontWeight: 600, cursor: "pointer",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
             background: "#d4002a15", color: "#ff8080", border: "1px solid #d4002a22",
           }}>
           {deleting === h.id ? <IcoLoader/> : <IcoTrash/>} Efase
@@ -175,17 +185,17 @@ const ExerciceCard = ({ exo, onRedo, onDelete, deleting }) => {
         <ScoreRing score={exo.score} total={exo.total}/>
         <div style={{ flex: 1, minWidth: 0 }}>
           {subject && <div style={{ marginBottom: 4 }}><SubjectPill subject={subject}/></div>}
-          <p style={{ color: "#e0e8ff", fontWeight: 600, fontSize: 13, marginBottom: 3,
+          <p style={{ color: "#e0e8ff", fontWeight: 600, fontSize: 15, marginBottom: 3,
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {exo.questions?.[0]?.q?.slice(0, 55) || "Egzèsis"}…
           </p>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <span style={{ fontSize: 10, color: "#475569" }}>{exo.date}</span>
-            <span style={{ fontSize: 10, color: "#60a5fa", fontWeight: 600 }}>
+            <span style={{ fontSize: 12, color: "#475569" }}>{exo.date}</span>
+            <span style={{ fontSize: 12, color: "#60a5fa", fontWeight: 600 }}>
               {exo.questions?.length || 0} kesyon
             </span>
             <span style={{ display: "flex", alignItems: "center", gap: 3,
-              fontSize: 10, fontWeight: 700,
+              fontSize: 12, fontWeight: 700,
               color: (exo.score / exo.total) >= 0.7 ? "#4ade80" :
                      (exo.score / exo.total) >= 0.4 ? "#fbbf24" : "#f87171" }}>
               <IcoStar/> {exo.score}/{exo.total}
@@ -195,13 +205,13 @@ const ExerciceCard = ({ exo, onRedo, onDelete, deleting }) => {
         {/* Buttons */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <button onClick={() => onRedo(exo)}
-            style={{ padding: "6px 12px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+            style={{ padding: "6px 12px", borderRadius: 10, fontSize: 13, fontWeight: 700,
               display: "flex", alignItems: "center", gap: 4, cursor: "pointer",
               background: "#1e3a8a22", color: "#60a5fa", border: "1px solid #3b82f633" }}>
             <IcoPencil/> Refè
           </button>
           <button onClick={() => onDelete(exo)} disabled={deleting === exo.id}
-            style={{ padding: "6px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
+            style={{ padding: "6px 10px", borderRadius: 10, fontSize: 13, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer",
               background: "#d4002a15", color: "#ff8080", border: "1px solid #d4002a22" }}>
             {deleting === exo.id ? <IcoLoader/> : <IcoTrash/>}
@@ -231,11 +241,22 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
 
   useEffect(() => () => window.speechSynthesis.cancel(), []);
 
+  const cleanForTTS = (text) => (text || "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/_{1,2}(.*?)_{1,2}/g, "$1")
+    .replace(/#{1,6}\s*/g, "")
+    .replace(/`{1,3}[^`]*`{1,3}/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\n{2,}/g, ". ")
+    .replace(/\n/g, ", ")
+    .trim();
+
   const handleSpeak = (text, id) => {
     if (speakingId === id) { window.speechSynthesis.cancel(); setSpeakingId(null); }
     else {
       window.speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(text);
+      const utt = new SpeechSynthesisUtterance(cleanForTTS(text));
       utt.lang = "fr-FR"; utt.rate = 0.9;
       utt.onend = () => setSpeakingId(null);
       utt.onerror = () => setSpeakingId(null);
@@ -289,16 +310,16 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
               <h2 style={{ color: "#fff", fontWeight: 700, fontSize: 15, margin: 0 }}>Detay rekèt la</h2>
               {subject && <SubjectPill subject={subject}/>}
             </div>
-            <p style={{ color: "#475569", fontSize: 11, margin: 0 }}>{selected.date}</p>
+            <p style={{ color: "#475569", fontSize: 13, margin: 0 }}>{selected.date}</p>
           </div>
           <button onClick={() => handleDeleteScan(selected)} disabled={deleting === selected.id}
-            style={{ padding: "6px 12px", borderRadius: 12, fontSize: 11, fontWeight: 700,
+            style={{ padding: "6px 12px", borderRadius: 12, fontSize: 13, fontWeight: 700,
               display: "flex", alignItems: "center", gap: 5, cursor: "pointer",
               background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
             {deleting === selected.id ? <IcoLoader/> : <IcoTrash/>} Efase
           </button>
           <button onClick={() => onStartExercice(selected)}
-            style={{ padding: "6px 12px", borderRadius: 12, fontSize: 11, fontWeight: 700,
+            style={{ padding: "6px 12px", borderRadius: 12, fontSize: 13, fontWeight: 700,
               display: "flex", alignItems: "center", gap: 5, cursor: "pointer",
               background: "#1e3a8a22", color: "#60a5fa", border: "1px solid #3b82f633" }}>
             <IcoPencil/> Egzèsis
@@ -311,19 +332,19 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             ? <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px",
                 borderRadius: 12, background: "#14532d22", border: "1px solid #22c55e22" }}>
                 <span style={{ color: "#86efac" }}><IcoDatabase/></span>
-                <span style={{ color: "#86efac", fontSize: 11 }}>• Image disponible hors-ligne</span>
+                <span style={{ color: "#86efac", fontSize: 13 }}>• Image disponible hors-ligne</span>
               </div>
             : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px",
                 borderRadius: 12, background: "#78350f22", border: "1px solid #f59e0b22" }}>
                 <span style={{ color: "#fcd34d" }}><IcoWarning/></span>
-                <span style={{ color: "#fcd34d", fontSize: 11 }}>Mode fallback — Image non disponible hors-ligne</span>
+                <span style={{ color: "#fcd34d", fontSize: 13 }}>Mode fallback — Image non disponible hors-ligne</span>
               </div>
           }
 
           {/* Image */}
           {selected.image
             ? <div>
-                <p style={{ color: "#60a5fa", fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+                <p style={{ color: "#60a5fa", fontSize: 13, fontWeight: 700, textTransform: "uppercase",
                   letterSpacing: "0.06em", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
                   <IcoCamera/> Imaj ki analize
                 </p>
@@ -334,7 +355,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             : <div style={{ borderRadius: 16, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10,
                 background: "#1e3a8a11", border: "1px solid #1e3a8a22" }}>
                 <IcoChat/>
-                <span style={{ color: "#3b82f6", fontSize: 12 }}>Kesyon tèks sèlman. Pa gen imaj.</span>
+                <span style={{ color: "#3b82f6", fontSize: 14 }}>Kesyon tèks sèlman. Pa gen imaj.</span>
               </div>
           }
 
@@ -347,9 +368,9 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 10, overflow: "hidden", background: "#fff" }}>
-                  <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
+                  <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}/>
                 </div>
-                <span style={{ color: "#fff", fontWeight: 700, fontSize: 13 }}>Repons Prof Lakay</span>
+                <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Repons Prof Lakay</span>
               </div>
               <button onClick={() => handleSpeak(selected.response, selected.id)}
                 style={{ padding: 8, borderRadius: 10, cursor: "pointer",
@@ -360,7 +381,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                 {speakingId === selected.id ? <IcoStop/> : <IcoVolumeUp/>}
               </button>
             </div>
-            <div style={{ fontSize: 13, lineHeight: 1.65, color: "#e0e8ff" }}>
+            <div style={{ fontSize: 15, lineHeight: 1.65, color: "#e0e8ff" }}>
               <LatexText content={selected.response}/>
             </div>
           </div>
@@ -369,8 +390,8 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
           <div style={{ borderRadius: 14, padding: "10px 14px", display: "flex",
             justifyContent: "space-between", alignItems: "center",
             background: "#0f1e4a", border: "1px solid #1e3a8a22", marginBottom: 16 }}>
-            <span style={{ fontSize: 11, color: "#60a5fa" }}>Rekèt itilize jou sa</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#fb923c" }}>
+            <span style={{ fontSize: 13, color: "#60a5fa" }}>Rekèt itilize jou sa</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: "#fb923c" }}>
               {selected.scansUsed}/{selected.dailyLimit || user.dailyScans}
             </span>
           </div>
@@ -397,11 +418,11 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             <span style={{ color: "#60a5fa" }}><IcoClipboard/></span> Istorik & Egzèsis
           </h2>
           <div style={{ display: "flex", gap: 6 }}>
-            <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 10, fontWeight: 700,
+            <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 12, fontWeight: 700,
               background: "#1e3a8a33", color: "#60a5fa", border: "1px solid #3b82f622" }}>
               {history.length} rekèt
             </span>
-            <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 10, fontWeight: 700,
+            <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 12, fontWeight: 700,
               background: "#14532d22", color: "#4ade80", border: "1px solid #22c55e22" }}>
               {exercices.length} egzèsis
             </span>
@@ -415,7 +436,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               style={{
-                padding: "7px 16px", borderRadius: 99, fontSize: 12, fontWeight: 700,
+                padding: "7px 16px", borderRadius: 99, fontSize: 14, fontWeight: 700,
                 cursor: "pointer", transition: "all 0.2s",
                 ...(tab === t.key
                   ? { background: "linear-gradient(135deg,#d4002a,#ff6b35)", color: "#fff",
@@ -441,7 +462,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                   animation: `bounce 1s ${i * 0.2}s infinite` }}/>
               ))}
             </div>
-            <p style={{ color: "#3b82f6", fontSize: 13 }}>Chajman...</p>
+            <p style={{ color: "#3b82f6", fontSize: 15 }}>Chajman...</p>
           </div>
         )}
 
@@ -453,14 +474,14 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
               <div style={{ borderRadius: 18, padding: 16,
                 background: "linear-gradient(145deg,#0f1e4a,#0a1535)",
                 border: "1px solid #1e3a8a33" }}>
-                <h3 style={{ color: "#fff", fontWeight: 700, fontSize: 13, margin: "0 0 12px",
+                <h3 style={{ color: "#fff", fontWeight: 700, fontSize: 15, margin: "0 0 12px",
                   display: "flex", alignItems: "center", gap: 6 }}>
                   <IcoChart/> Rekèt pa jou
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {Object.entries(dailyMap).slice(0, 7).map(([day, count]) => (
                     <div key={day} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ color: "#60a5fa", fontSize: 10, width: 90, flexShrink: 0 }}>{day}</span>
+                      <span style={{ color: "#60a5fa", fontSize: 12, width: 90, flexShrink: 0 }}>{day}</span>
                       <div style={{ flex: 1, height: 6, borderRadius: 99, background: "#1e3a8a44", overflow: "hidden" }}>
                         <div style={{
                           height: "100%", borderRadius: 99,
@@ -471,7 +492,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                           transition: "width 0.6s ease",
                         }}/>
                       </div>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: "#fb923c", width: 36, textAlign: "right" }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#fb923c", width: 36, textAlign: "right" }}>
                         {count}/{user.dailyScans}
                       </span>
                     </div>
@@ -488,11 +509,11 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                     border: "1px solid #1e3a8a22", marginBottom: 4 }}>
                     <IcoInbox/>
                   </div>
-                  <p style={{ color: "#60a5fa", textAlign: "center", fontSize: 13, lineHeight: 1.6 }}>
+                  <p style={{ color: "#60a5fa", textAlign: "center", fontSize: 15, lineHeight: 1.6 }}>
                     Istorik la poko kreye.<br/>Fè yon premye rekèt nan chat la!
                   </p>
                   <button onClick={() => onNavigate("chat")}
-                    style={{ padding: "12px 24px", borderRadius: 14, fontWeight: 800, fontSize: 13,
+                    style={{ padding: "12px 24px", borderRadius: 14, fontWeight: 800, fontSize: 15,
                       color: "#fff", cursor: "pointer",
                       background: "linear-gradient(135deg,#d4002a,#ff6b35)",
                       boxShadow: "0 6px 20px #d4002a44" }}>
@@ -501,7 +522,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                 </div>
 
               : <>
-                  <p style={{ color: "#475569", fontSize: 10, fontWeight: 700,
+                  <p style={{ color: "#475569", fontSize: 12, fontWeight: 700,
                     textTransform: "uppercase", letterSpacing: "0.08em" }}>
                     Tout rekèt yo
                   </p>
@@ -529,13 +550,13 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                     border: "1px solid #1e3a8a22", marginBottom: 4, color: "#3b82f6" }}>
                     <IcoPencil/>
                   </div>
-                  <p style={{ color: "#60a5fa", textAlign: "center", fontSize: 13, lineHeight: 1.6 }}>
+                  <p style={{ color: "#60a5fa", textAlign: "center", fontSize: 15, lineHeight: 1.6 }}>
                     Pa gen egzèsis ankò.<br/>Kòmanse yon egzèsis depi nan istorik la!
                   </p>
                 </div>
 
               : <>
-                  <p style={{ color: "#475569", fontSize: 10, fontWeight: 700,
+                  <p style={{ color: "#475569", fontSize: 12, fontWeight: 700,
                     textTransform: "uppercase", letterSpacing: "0.08em" }}>
                     Egzèsis sove yo
                   </p>
