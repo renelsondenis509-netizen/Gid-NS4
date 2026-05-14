@@ -931,6 +931,61 @@ async function freemiumLogin(
     subjects: ["Biologie","Géologie","Chimie","Physique","Histoire","Géographie","Économie","Philosophie","Analyse","Algèbre","Suite","Complexe","Probabilité","Géométrie","Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
   };
 }
+
+// ─── ACTION : create_school ───────────────────────────────────────────────────
+async function createSchool(
+  db: ReturnType<typeof createClient>,
+  body: {
+    adminSecret: string;
+    schoolName: string;
+    durationDays?: number;
+    maxStudents?: number;
+    dailyImageScans?: number;
+    dailyTextScans?: number;
+  }
+) {
+  const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+  if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) {
+    throw { status: 403, error: "Aksè refize." };
+  }
+
+  const { schoolName, durationDays = 365, maxStudents = 200, dailyImageScans = 5, dailyTextScans = 10 } = body;
+  if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." };
+
+  const rand = (len: number) => Array.from(crypto.getRandomValues(new Uint8Array(len)))
+    .map(b => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 32]).join("");
+
+  // Générer un code unique
+  let code = "";
+  for (let i = 0; i < 10; i++) {
+    const candidate = rand(4) + "-" + rand(4);
+    const { data } = await db.from("schools").select("code").eq("code", candidate).maybeSingle();
+    if (!data) { code = candidate; break; }
+  }
+  if (!code) throw { status: 500, error: "Echèk jenerasyon kòd. Eseye ankò." };
+
+  const directorCode = rand(5) + "-" + rand(5);
+  const now = new Date();
+  const startsAt = now.toISOString();
+  const expiresAt = new Date(now.getTime() + durationDays * 86400000).toISOString();
+
+  const { error } = await db.from("schools").insert({
+    code,
+    school_name: schoolName.trim(),
+    director_code: directorCode,
+    active: true,
+    starts_at: startsAt,
+    expires_at: expiresAt,
+    max_students: maxStudents,
+    daily_image_scans: dailyImageScans,
+    daily_text_scans: dailyTextScans,
+  });
+
+  if (error) throw { status: 500, error: "Echèk anrejistreman: " + error.message };
+
+  return { success: true, code, directorCode, schoolName: schoolName.trim(), expiresAt, maxStudents };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
 
@@ -949,6 +1004,7 @@ Deno.serve(async (req) => {
       case "get_payment_numbers": result = await getPaymentNumbers(supabase); break;
       case "get_announcements":   result = await getAnnouncements(supabase, body); break;
       case "create_announcement": result = await createAnnouncement(supabase, body); break;
+      case "create_school":       result = await createSchool(supabase, body); break;
       default:
         return new Response(JSON.stringify({ error: "Action inconnue" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
