@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { callAPI } from "../api";
+import { callEdge } from "../api";
 
 const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET ?? "";
 
@@ -68,7 +68,7 @@ export default function AdminScreen({ onBack }) {
     setRes({ result: null, error: "" });
     setLoading(l => ({ ...l, [key]: true }));
     try {
-      const data = await callAPI(action, { ...body, adminSecret: ADMIN_SECRET });
+      const data = await callEdge({ action, ...body, adminSecret: ADMIN_SECRET });
       setRes({ result: data, error: "" });
     } catch (e) {
       setRes({ result: null, error: e.message ?? "Erè enkoni." });
