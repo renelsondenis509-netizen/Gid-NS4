@@ -106,7 +106,11 @@ export function ChatScreen({ user, onNavigate }) {
   };
 
   const sendMessage = async (retryPayload = null) => {
-    if (offline) { setApiError({ type:"network", message:"Pa gen koneksyon entènèt !", detail:"Konekte epi eseye ankò.", icon:"📶", retry:false }); return; }
+    if (user.subjects?.length > 0 && !activeSubject) {
+    setApiError({ type:"warning", message:"Chwazi yon matyè anvan !", detail:"Klike sou yon matyè anwo a anvan ou voye kesyon an.", icon:"📚", retry:false });
+    return;
+  }
+  if (offline) { setApiError({ type:"network", message:"Pa gen koneksyon entènèt !", detail:"Konekte epi eseye ankò.", icon:"📶", retry:false }); return; }
     const freemiumExpired = user.freemiumExpiresAt && new Date(user.freemiumExpiresAt) < new Date() && !user.code;
     if (freemiumExpired) { onNavigate("payment"); return; }
     if (scansUsed >= DAILY_MAX) return;
@@ -381,7 +385,7 @@ export function ChatScreen({ user, onNavigate }) {
           />
           <button
             onClick={()=>sendMessage()}
-            disabled={loading||allDone||offline}
+            disabled={loading||allDone||offline||(user.subjects?.length>0&&!activeSubject)}
             style={{ width:46, height:46, borderRadius:14, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background:(loading||allDone||offline)?"rgba(37,99,235,0.2)":"linear-gradient(135deg,#1d4ed8,#2563eb)", border:"none", cursor:(loading||allDone||offline)?"not-allowed":"pointer", boxShadow:(loading||allDone||offline)?"none":"0 4px 14px rgba(37,99,235,0.35)" }}>
             <SendIcon/>
           </button>
