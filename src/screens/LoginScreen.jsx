@@ -9,9 +9,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasTriedFreemium] = useState(() => {
-    const exp = localStorage.getItem("gid_freemium_expires");
-    if (!exp) return false;
-    return new Date(exp) < new Date();
+    return !!localStorage.getItem("gid_freemium_expires");
   });
 
   const handleLogin = async () => {
