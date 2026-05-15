@@ -158,7 +158,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-4 space-y-2">
+      <div className="flex-1 px-4 py-4 space-y-2" style={{ overflowY: "auto", paddingBottom: 80 }}>
         {menuItems.map((item, i) => (
           <button key={item.screen} onClick={() => onNavigate(item.screen)}
             className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left active:scale-95 transition-transform"
