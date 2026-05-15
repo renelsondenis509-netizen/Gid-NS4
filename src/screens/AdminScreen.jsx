@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { callEdge } from "../api";
 
-
-
 const Field = ({ label, k, type = "text", form, setForm }) => (
   <div style={{ marginBottom: 12 }}>
     <label style={{ display: "block", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>{label}</label>
@@ -29,16 +27,12 @@ function ResultBox({ result, error }) {
   if (!result) return null;
   return (
     <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#0f2d1a", border: "1px solid #166534" }}>
-      {result.code && (
-        <>
-          {[["Kòd Lekòl", result.code], ["Kòd Direktè", result.directorCode], ["Lekòl", result.schoolName], ["Max Elèv", result.maxStudents], ["Ekspire", new Date(result.expiresAt).toLocaleDateString("fr-HT")]].map(([l, v]) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #166534", fontSize: 14 }}>
-              <span style={{ color: "#86efac" }}>{l}</span>
-              <span style={{ fontWeight: 700, color: "#f1f5f9" }}>{v}</span>
-            </div>
-          ))}
-        </>
-      )}
+      {result.code && [["Kòd Lekòl", result.code], ["Kòd Direktè", result.directorCode], ["Lekòl", result.schoolName], ["Max Elèv", result.maxStudents], ["Ekspire", new Date(result.expiresAt).toLocaleDateString("fr-HT")]].map(([l, v]) => (
+        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #166534", fontSize: 14 }}>
+          <span style={{ color: "#86efac" }}>{l}</span>
+          <span style={{ fontWeight: 700, color: "#f1f5f9" }}>{v}</span>
+        </div>
+      ))}
       {result.message && <p style={{ color: "#4ade80", fontSize: 14, margin: 0 }}>✅ {result.message}</p>}
     </div>
   );
@@ -58,12 +52,10 @@ export default function AdminScreen({ onBack }) {
   const [secretOk, setSecretOk] = useState(false);
   const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyImageScans: 5, dailyTextScans: 10 });
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
-  const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "", reactivate: false });
-
-  const [createRes, setCreateRes]           = useState({ result: null, error: "" });
-  const [revokeUserRes, setRevokeUserRes]   = useState({ result: null, error: "" });
+  const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
+  const [createRes, setCreateRes] = useState({ result: null, error: "" });
+  const [revokeUserRes, setRevokeUserRes] = useState({ result: null, error: "" });
   const [revokeSchoolRes, setRevokeSchoolRes] = useState({ result: null, error: "" });
-
   const [loading, setLoading] = useState({ create: false, revokeUser: false, revokeSchool: false });
 
   const run = async (action, body, key, setRes) => {
@@ -73,7 +65,7 @@ export default function AdminScreen({ onBack }) {
       const data = await callEdge({ action, ...body, adminSecret });
       setRes({ result: data, error: "" });
     } catch (e) {
-      setRes({ result: null, error: e.message ?? "Erè enkoni." });
+      setRes({ result: null, error: e.message ?? e.error ?? "Erè enkoni." });
     } finally {
       setLoading(l => ({ ...l, [key]: false }));
     }
@@ -81,21 +73,22 @@ export default function AdminScreen({ onBack }) {
 
   if (!secretOk) return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#f1f5f9", padding: 20, display: "flex", flexDirection: "column", maxWidth: 400, margin: "0 auto" }}>
-      <button onClick={onBack} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 15, cursor: "pointer", marginBottom: 0 }}>← Retou</button>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 15, cursor: "pointer", alignSelf: "flex-start", marginBottom: 0 }}>← Retou</button>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>🔐 Aksè Admin</h2>
-      <input
-        type="password"
-        placeholder="Antre mo de pase admin..."
-        value={adminSecret}
-        onChange={e => setAdminSecret(e.target.value)}
-        onKeyDown={e => e.key === "Enter" && adminSecret && setSecretOk(true)}
-        style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #334155", background: "#1e293b", color: "#f1f5f9", fontSize: 16, boxSizing: "border-box", marginBottom: 12 }}
-      />
-      <button onClick={() => adminSecret && setSecretOk(true)}
-        style={{ width: "100%", padding: 13, borderRadius: 10, background: "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
-        Kontinye
-      </button>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>🔐 Aksè Admin</h2>
+        <input
+          type="password"
+          placeholder="Antre mo de pase admin..."
+          value={adminSecret}
+          onChange={e => setAdminSecret(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && adminSecret && setSecretOk(true)}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #334155", background: "#1e293b", color: "#f1f5f9", fontSize: 16, boxSizing: "border-box", marginBottom: 12 }}
+        />
+        <button onClick={() => adminSecret && setSecretOk(true)}
+          style={{ width: "100%", padding: 13, borderRadius: 10, background: "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
+          Kontinye
+        </button>
+      </div>
     </div>
   );
 
