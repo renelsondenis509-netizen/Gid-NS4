@@ -80,12 +80,13 @@ export default function AdminScreen({ onBack }) {
   };
 
   if (!secretOk) return (
-    <div style={{ minHeight: "100vh", background: "#0f172a", color: "#f1f5f9", padding: 20, display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 400, margin: "0 auto" }}>
-      <button onClick={onBack} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 15, cursor: "pointer", marginBottom: 32 }}>← Retou</button>
+    <div style={{ minHeight: "100vh", background: "#0f172a", color: "#f1f5f9", padding: 20, display: "flex", flexDirection: "column", maxWidth: 400, margin: "0 auto" }}>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 15, cursor: "pointer", marginBottom: 0 }}>← Retou</button>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>🔐 Aksè Admin</h2>
       <input
         type="password"
-        placeholder="Antre mo de pास admin..."
+        placeholder="Antre mo de pase admin..."
         value={adminSecret}
         onChange={e => setAdminSecret(e.target.value)}
         onKeyDown={e => e.key === "Enter" && adminSecret && setSecretOk(true)}
