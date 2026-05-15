@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
+import { idbGetPendingScores, idbDeletePendingScore } from "./utils/idb";
+import { callEdge } from "./api";
 import { getFreemiumStatus } from "./utils/freemium";
 import { requestNotificationPermission, scheduleDailyReminder, scheduleExpiryReminder } from "./utils/notifications";
 import { SplashScreen }      from "./screens/SplashScreen";
@@ -27,6 +29,26 @@ export default function App() {
   const [user,       setUser]       = useState(null);
   const [activeScan, setActiveScan] = useState(null);
   const nav = (s) => setScreen(s);
+
+  // Sync scores offline dès que connexion disponible
+  useEffect(() => {
+    async function syncPendingScores() {
+      if (!navigator.onLine) return;
+      try {
+        const pending = await idbGetPendingScores();
+        for (const score of pending) {
+          try {
+            const { id, ts, ...payload } = score;
+            await callEdge(payload);
+            await idbDeletePendingScore(id);
+          } catch { break; }
+        }
+      } catch {}
+    }
+    syncPendingScores();
+    window.addEventListener("online", syncPendingScores);
+    return () => window.removeEventListener("online", syncPendingScores);
+  }, []);
 
   useEffect(() => {
     const saved = sessionLoad();

@@ -1,5 +1,5 @@
 const DB_NAME    = "gidns4";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -13,6 +13,9 @@ function openDB() {
       if (!db.objectStoreNames.contains("exercices")) {
         const s = db.createObjectStore("exercices", { keyPath: "id" });
         s.createIndex("phone", "phone", { unique: false });
+      }
+      if (!db.objectStoreNames.contains("pending_scores")) {
+        db.createObjectStore("pending_scores", { keyPath: "id", autoIncrement: true });
       }
     };
     req.onsuccess = (e) => resolve(e.target.result);
@@ -74,6 +77,30 @@ export async function idbGetExercice(phone) {
 export async function idbDeleteExercice(id) {
   const db = await openDB();
   return txPromise(db, "exercices", "readwrite", (store, resolve) => {
+    store.delete(id).onsuccess = () => resolve();
+  });
+}
+
+// ── PENDING SCORES (offline sync) ────────────────────────────
+export async function idbSavePendingScore(data) {
+  const db = await openDB();
+  return txPromise(db, "pending_scores", "readwrite", (store, resolve) => {
+    store.add(data).onsuccess = () => resolve();
+  });
+}
+
+export async function idbGetPendingScores() {
+  const db = await openDB();
+  return txPromise(db, "pending_scores", "readonly", (store, resolve, reject) => {
+    const req = store.getAll();
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror   = (e) => reject(e.target.error);
+  });
+}
+
+export async function idbDeletePendingScore(id) {
+  const db = await openDB();
+  return txPromise(db, "pending_scores", "readwrite", (store, resolve) => {
     store.delete(id).onsuccess = () => resolve();
   });
 }

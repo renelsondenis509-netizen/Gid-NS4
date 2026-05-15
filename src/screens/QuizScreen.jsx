@@ -5,6 +5,7 @@ import { QUIZ_DATA, QUIZ_BRANCHES as FILIERES } from "../data/quizData";
 import { shuffleArray, shuffleChoices } from "../utils/helpers";
 import { scoreToNote20, getMention, saveQuizGrade } from "../utils/quiz";
 import { BottomNav } from "../components/UI";
+import { idbSavePendingScore } from "../utils/idb";
 
 // ─── ICONS ───────────────────────────────────────────────────
 const HeartIcon = ({ filled = true, size = 20 }) => (
@@ -117,7 +118,13 @@ export function QuizScreen({ user, onNavigate }) {
     const note20 = scoreToNote20(finalScore, finalTotal);
     saveQuizGrade(user.phone, subject, note20, finalScore, finalTotal);
     try {
-      if (!user.isFreemium) await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak });
+      if (!user.isFreemium) {
+        try {
+          await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak });
+        } catch {
+          await idbSavePendingScore({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, ts:Date.now() });
+        }
+      }
     } catch {}
   };
 
