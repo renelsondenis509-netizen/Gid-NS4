@@ -933,6 +933,42 @@ async function freemiumLogin(
 }
 
 
+
+// ─── AUDIT LOG ────────────────────────────────────────────────────────────────
+async function logAudit(
+  db: ReturnType<typeof createClient>,
+  action: string,
+  performedBy: string,
+  target?: string,
+  details?: Record<string, unknown>
+) {
+  try {
+    await db.from("audit_logs").insert({
+      action,
+      performed_by: performedBy,
+      target: target ?? null,
+      details: details ?? null,
+    });
+  } catch (_) { /* ne pas bloquer si log échoue */ }
+}
+
+
+// ─── ACTION : get_audit_logs ─────────────────────────────────────────────────
+async function getAuditLogs(
+  db: ReturnType<typeof createClient>,
+  body: { adminSecret: string; limit?: number }
+) {
+  const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+  if (body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
+  const { data, error } = await db
+    .from("audit_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(body.limit ?? 50);
+  if (error) throw { status: 500, error: error.message };
+  return { success: true, logs: data };
+}
+
 // ─── ACTION : verify_admin ────────────────────────────────────────────────────
 async function verifyAdmin(body: { adminSecret: string }) {
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
@@ -993,6 +1029,8 @@ async function createSchool(
 
   if (error) throw { status: 500, error: "Echèk anrejistreman: " + error.message };
 
+  await logAudit(db, "create_school", body.adminSecret.slice(-4), code, { schoolName, durationDays, maxStudents });
+
   return { success: true, code, directorCode, schoolName: schoolName.trim(), expiresAt, maxStudents };
 }
 
@@ -1008,6 +1046,7 @@ async function revokeUser(
   if (!phone) throw { status: 400, error: "Nimewo telefòn obligatwa." };
   const { error } = await db.from("profiles").delete().eq("phone", phone);
   if (error) throw { status: 500, error: "Echèk revokasyon: " + error.message };
+  await logAudit(db, "revoke_user", body.adminSecret.slice(-4), phone);
   return { success: true, message: `Pwofil ${phone} efase.` };
 }
 
@@ -1022,6 +1061,7 @@ async function revokeSchool(
   if (!code) throw { status: 400, error: "Kòd lekòl obligatwa." };
   const { error } = await db.from("schools").update({ active: reactivate }).eq("code", code);
   if (error) throw { status: 500, error: "Echèk revokasyon: " + error.message };
+  await logAudit(db, reactivate ? "reactivate_school" : "revoke_school", body.adminSecret.slice(-4), code);
   return { success: true, message: `Lekòl ${code} ${reactivate ? "reaktive" : "revoké"}.` };
 }
 
@@ -1044,6 +1084,7 @@ Deno.serve(async (req) => {
       case "get_announcements":   result = await getAnnouncements(supabase, body); break;
       case "create_announcement": result = await createAnnouncement(supabase, body); break;
       case "verify_admin":        result = await verifyAdmin(body); break;
+      case "get_audit_logs":      result = await getAuditLogs(supabase, body); break;
       case "create_school":       result = await createSchool(supabase, body); break;
       case "revoke_user":         result = await revokeUser(supabase, body); break;
       case "revoke_school":       result = await revokeSchool(supabase, body); break;

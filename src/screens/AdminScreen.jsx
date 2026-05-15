@@ -55,6 +55,8 @@ export default function AdminScreen({ onBack }) {
   const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyImageScans: 5, dailyTextScans: 10 });
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
+  const [logs, setLogs] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(false);
   const [createRes, setCreateRes] = useState({ result: null, error: "" });
   const [revokeUserRes, setRevokeUserRes] = useState({ result: null, error: "" });
   const [revokeSchoolRes, setRevokeSchoolRes] = useState({ result: null, error: "" });
@@ -125,6 +127,30 @@ export default function AdminScreen({ onBack }) {
         <ActionButton label="Efase Pwofil" loading={loading.revokeUser} color="#dc2626"
           onClick={() => run("revoke_user", revokeUserForm, "revokeUser", setRevokeUserRes)} />
         <ResultBox {...revokeUserRes} />
+      </Section>
+
+      <Section title="📋 Jounal Odyit">
+        <button onClick={async () => {
+          setLogsLoading(true);
+          try {
+            const data = await callEdge({ action: "get_audit_logs", adminSecret });
+            setLogs(data.logs ?? []);
+          } catch (e) {
+            setLogs([]);
+          } finally { setLogsLoading(false); }
+        }} style={{ width: "100%", padding: 10, borderRadius: 8, background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", cursor: "pointer", marginBottom: 12 }}>
+          {logsLoading ? "Chajman..." : "🔄 Rafraîchi"}
+        </button>
+        {logs.length === 0 && !logsLoading && <p style={{ color: "#475569", fontSize: 13, textAlign: "center" }}>Pa gen jounal ankò.</p>}
+        {logs.map(log => (
+          <div key={log.id} style={{ padding: "8px 10px", borderRadius: 8, background: "#1e293b", marginBottom: 8, fontSize: 13 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+              <span style={{ color: "#60a5fa", fontWeight: 700 }}>{log.action}</span>
+              <span style={{ color: "#475569" }}>{new Date(log.created_at).toLocaleString("fr-HT")}</span>
+            </div>
+            {log.target && <div style={{ color: "#94a3b8" }}>Sib : <span style={{ color: "#f1f5f9" }}>{log.target}</span></div>}
+          </div>
+        ))}
       </Section>
 
       <Section title="🔒 Revoké / Reaktive Lekòl">
