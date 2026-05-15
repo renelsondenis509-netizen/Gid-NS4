@@ -110,7 +110,7 @@ export function LoginScreen({ onLogin, onNavigate }) {
           {/* Bouton principal */}
           <button onClick={handleLogin} disabled={loading}
             style={{ width:"100%", padding:"15px", borderRadius:16, background: loading ? "rgba(37,99,235,0.3)" : "linear-gradient(135deg,#E8002A,#c8001f)", color:"#fff", fontWeight:800, fontSize:15, border:"none", cursor: loading?"not-allowed":"pointer", boxShadow: loading?"none":"0 8px 28px rgba(232,0,42,0.3)", transition:"all .2s", letterSpacing:"0.02em" }}>
-            {loading ? "Verifikasyon..." : "Rantre →"}
+            {loading ? "Verifikasyon..." : "Rantre"}
           </button>
 
           {/* Bouton freemium */}
