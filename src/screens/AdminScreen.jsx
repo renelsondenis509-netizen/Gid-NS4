@@ -82,7 +82,7 @@ export default function AdminScreen({ onBack }) {
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>🔐 Aksè Admin</h2>
         <input
           type="password"
-          placeholder="Antre mo de pase admin..."
+          placeholder="Antre kòd admin lan..."
           value={adminSecret}
           onChange={e => setAdminSecret(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && adminSecret) document.getElementById("btn-admin-continue").click(); }}
@@ -96,7 +96,7 @@ export default function AdminScreen({ onBack }) {
             await callEdge({ action: "verify_admin", adminSecret });
             setSecretOk(true);
           } catch (e) {
-            setSecretError(e.error ?? "Mo de pase a pa kòrèk.");
+            setSecretError(e.error ?? "Kòd la pa kòrèk.");
           } finally { setVerifying(false); }
         }}
           id="btn-admin-continue" style={{ width: "100%", padding: 13, borderRadius: 10, background: verifying ? "#334155" : "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
