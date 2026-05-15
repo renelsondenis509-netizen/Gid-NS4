@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { callEdge } from "../api";
 
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET ?? "";
+
 
 const Field = ({ label, k, type = "text", form, setForm }) => (
   <div style={{ marginBottom: 12 }}>
@@ -54,6 +54,8 @@ function ActionButton({ label, loading, onClick, color = "#3b82f6" }) {
 }
 
 export default function AdminScreen({ onBack }) {
+  const [adminSecret, setAdminSecret] = useState("");
+  const [secretOk, setSecretOk] = useState(false);
   const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyImageScans: 5, dailyTextScans: 10 });
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "", reactivate: false });
@@ -68,7 +70,7 @@ export default function AdminScreen({ onBack }) {
     setRes({ result: null, error: "" });
     setLoading(l => ({ ...l, [key]: true }));
     try {
-      const data = await callEdge({ action, ...body, adminSecret: ADMIN_SECRET });
+      const data = await callEdge({ action, ...body, adminSecret });
       setRes({ result: data, error: "" });
     } catch (e) {
       setRes({ result: null, error: e.message ?? "Erè enkoni." });
@@ -76,6 +78,25 @@ export default function AdminScreen({ onBack }) {
       setLoading(l => ({ ...l, [key]: false }));
     }
   };
+
+  if (!secretOk) return (
+    <div style={{ minHeight: "100vh", background: "#0f172a", color: "#f1f5f9", padding: 20, display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 400, margin: "0 auto" }}>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 15, cursor: "pointer", marginBottom: 32 }}>← Retou</button>
+      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>🔐 Aksè Admin</h2>
+      <input
+        type="password"
+        placeholder="Antre mo de pास admin..."
+        value={adminSecret}
+        onChange={e => setAdminSecret(e.target.value)}
+        onKeyDown={e => e.key === "Enter" && adminSecret && setSecretOk(true)}
+        style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #334155", background: "#1e293b", color: "#f1f5f9", fontSize: 16, boxSizing: "border-box", marginBottom: 12 }}
+      />
+      <button onClick={() => adminSecret && setSecretOk(true)}
+        style={{ width: "100%", padding: 13, borderRadius: 10, background: "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
+        Kontinye
+      </button>
+    </div>
+  );
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#f1f5f9", padding: 20, paddingBottom: 80, maxWidth: 500, margin: "0 auto", overflowY: "auto", height: "100vh" }}>
