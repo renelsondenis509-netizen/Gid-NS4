@@ -8,11 +8,23 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body, #root {
+html, body {
   background: #070d1f;
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+#root {
+  background: #070d1f;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.scrollable-screen {
+  overflow-y: auto !important;
+  height: 100vh !important;
 }
 
 /* ── Scrollbars invisibles sur Android ── */

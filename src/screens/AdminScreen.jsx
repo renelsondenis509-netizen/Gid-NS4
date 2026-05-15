@@ -99,7 +99,7 @@ export default function AdminScreen({ onBack }) {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f172a", color: "#f1f5f9", padding: 20, paddingBottom: 80, maxWidth: 500, margin: "0 auto", overflowY: "auto", height: "100vh" }}>
+    <div className="scrollable-screen" style={{ background: "#0f172a", color: "#f1f5f9", padding: 20, paddingBottom: 80, maxWidth: 500, margin: "0 auto" }}>
       <button onClick={onBack} style={{ background: "none", border: "none", color: "#60a5fa", fontSize: 15, cursor: "pointer", marginBottom: 20 }}>← Retou</button>
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>⚙️ Panneau Admin</h2>
 
