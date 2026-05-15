@@ -50,6 +50,8 @@ function ActionButton({ label, loading, onClick, color = "#3b82f6" }) {
 export default function AdminScreen({ onBack }) {
   const [adminSecret, setAdminSecret] = useState("");
   const [secretOk, setSecretOk] = useState(false);
+  const [secretError, setSecretError] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyImageScans: 5, dailyTextScans: 10 });
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
@@ -81,12 +83,22 @@ export default function AdminScreen({ onBack }) {
           placeholder="Antre mo de pase admin..."
           value={adminSecret}
           onChange={e => setAdminSecret(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && adminSecret && setSecretOk(true)}
+          onKeyDown={e => { if (e.key === "Enter" && adminSecret) document.getElementById("btn-admin-continue").click(); }}
           style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #334155", background: "#1e293b", color: "#f1f5f9", fontSize: 16, boxSizing: "border-box", marginBottom: 12 }}
         />
-        <button onClick={() => adminSecret && setSecretOk(true)}
-          style={{ width: "100%", padding: 13, borderRadius: 10, background: "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
-          Kontinye
+        {secretError && <div style={{ color: "#fca5a5", fontSize: 13, marginBottom: 8 }}>{secretError}</div>}
+        <button onClick={async () => {
+          if (!adminSecret) return;
+          setVerifying(true); setSecretError("");
+          try {
+            await callEdge({ action: "verify_admin", adminSecret });
+            setSecretOk(true);
+          } catch (e) {
+            setSecretError(e.error ?? "Mo de pase a pa kòrèk.");
+          } finally { setVerifying(false); }
+        }}
+          id="btn-admin-continue" style={{ width: "100%", padding: 13, borderRadius: 10, background: verifying ? "#334155" : "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
+          {verifying ? "Verifikasyon..." : "Kontinye"}
         </button>
       </div>
     </div>

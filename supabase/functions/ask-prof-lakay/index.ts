@@ -932,6 +932,16 @@ async function freemiumLogin(
   };
 }
 
+
+// ─── ACTION : verify_admin ────────────────────────────────────────────────────
+async function verifyAdmin(body: { adminSecret: string }) {
+  const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+  if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) {
+    throw { status: 403, error: "Mo de pase a pa kòrèk." };
+  }
+  return { success: true };
+}
+
 // ─── ACTION : create_school ───────────────────────────────────────────────────
 async function createSchool(
   db: ReturnType<typeof createClient>,
@@ -1033,6 +1043,7 @@ Deno.serve(async (req) => {
       case "get_payment_numbers": result = await getPaymentNumbers(supabase); break;
       case "get_announcements":   result = await getAnnouncements(supabase, body); break;
       case "create_announcement": result = await createAnnouncement(supabase, body); break;
+      case "verify_admin":        result = await verifyAdmin(body); break;
       case "create_school":       result = await createSchool(supabase, body); break;
       case "revoke_user":         result = await revokeUser(supabase, body); break;
       case "revoke_school":       result = await revokeSchool(supabase, body); break;
