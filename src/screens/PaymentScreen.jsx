@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cacheGet, cacheSet } from "../utils/cache";
 import { callEdge } from "../api";
 
 export function PaymentScreen({ onBack }) {
@@ -7,16 +8,13 @@ export function PaymentScreen({ onBack }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const cached = cacheGet("payment_numbers");
+    if (cached) { setPayments(cached); setLoading(false); return; }
     callEdge({ action: "get_payment_numbers" })
-      .then(d => setPayments(d.numbers || d.payments || []))
+      .then(d => { const p = d.numbers || d.payments || []; cacheSet("payment_numbers", p, 60 * 60 * 1000); setPayments(p); })
       .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669105" }]))
       .finally(() => setLoading(false));
   }, []);
-
-  const copy = (num, key) => {
-    navigator.clipboard?.writeText(num).catch(() => {});
-    setCopied(key); setTimeout(() => setCopied(null), 2500);
-  };
 
   // ─── SVG ICONS ───────────────────────────────────────────────────────────
   const CopyIcon = () => (

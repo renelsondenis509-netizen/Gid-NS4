@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cacheGet, cacheSet } from "../utils/cache";
 import { callEdge, parseApiError } from "../api";
 import { BottomNav } from "../components/UI";
 
@@ -32,10 +33,15 @@ export function LeaderboardScreen({ user, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const load = () => {
+  const load = (force = false) => {
+    const key = `leaderboard_${user.code}`;
+    if (!force) {
+      const cached = cacheGet(key);
+      if (cached) { setData(cached); setLoading(false); return; }
+    }
     setLoading(true); setError(null);
     callEdge({ action:"get_leaderboard", phone:user.phone, schoolCode:user.code })
-      .then(d => setData(d))
+      .then(d => { cacheSet(key, d, 5 * 60 * 1000); setData(d); })
       .catch(e => setError(parseApiError(e).message))
       .finally(() => setLoading(false));
   };
@@ -86,7 +92,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
         {error && (
           <div className="rounded-2xl px-4 py-4 text-center" style={{ background:"#7f1d1d22", border:"1px solid #ef444433" }}>
             <p className="text-red-400 text-sm flex items-center justify-center gap-2"><IcoWarning/> {error}</p>
-            <button onClick={load} className="mt-3 px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1 mx-auto"
+            <button onClick={() => load(true)} className="mt-3 px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1 mx-auto"
               style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>
               <IcoRefresh/> Eseye Ankò
             </button>
