@@ -15,7 +15,7 @@ const supabase = createClient(
 );
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
-function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms = 5000): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error("Timeout")), ms)
   );
@@ -42,7 +42,7 @@ async function loadFallbackOrder(): Promise<string[]> {
       .single();
     if (data?.value && Array.isArray(data.value)) return data.value as string[];
   } catch (_) { /* utilise défaut */ }
-  return ["groq", "sambanova", "openrouter", "mistral", "llm7", "cloudflare"];
+  return ["groq", "sambanova", "openrouter"];
 }
 
 // ─── Providers texte-seulement ────────────────────────────────────────────────
