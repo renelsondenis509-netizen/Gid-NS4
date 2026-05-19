@@ -254,21 +254,23 @@ export function DashboardScreen({ onBack, userCode }) {
 const hasFetched = useRef(false);
 
 useEffect(() => {
-  if (hasFetched.current) return;   // ← bloque le 2e appel StrictMode
-  hasFetched.current = true;
-
   if (userCode === "FREEMIUM") {
     setStats(FREEMIUM_DEMO);
     setAuthorized(true);
     return;
   }
 
+  // Cache window — vérifié à chaque remount
   const _winKey = `_gns4_dash_${userCode}`;
   if (window[_winKey]) {
     setStats(window[_winKey]);
     setAuthorized(true);
     return;
   }
+
+  // Guard anti-double-appel (StrictMode)
+  if (hasFetched.current) return;
+  hasFetched.current = true;
 
   const saved = localStorage.getItem(_dirKey);
   if (!saved) return;
