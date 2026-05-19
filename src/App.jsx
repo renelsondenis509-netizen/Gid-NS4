@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
 import { idbGetPendingScores, idbDeletePendingScore } from "./utils/idb";
 import { callEdge } from "./api";
-import { getFreemiumStatus } from "./utils/freemium";
+import { getFreemiumStatus, hasAccess } from "./utils/freemium";
 import { requestNotificationPermission, scheduleDailyReminder, scheduleExpiryReminder } from "./utils/notifications";
 import { SplashScreen }      from "./screens/SplashScreen";
 import { LoginScreen }       from "./screens/LoginScreen";
@@ -82,6 +82,7 @@ export default function App() {
       else setScreen("login");
     }} />
   );
+  if (user && !hasAccess(user)) return <LoginScreen onLogin={handleLogin} onNavigate={nav} expired={true} />;
   if (screen === "login")       return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
   if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} />;
   if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
