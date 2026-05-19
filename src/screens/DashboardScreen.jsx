@@ -263,15 +263,11 @@ useEffect(() => {
     return;
   }
 
-  const _cacheKey = `dash_ttl_${userCode}`;
-  const _cached = localStorage.getItem(_cacheKey);
-  if (_cached) {
-    const { data, ts } = JSON.parse(_cached);
-    if (Date.now() - ts < 5 * 60 * 1000) {
-      setStats(data);
-      setAuthorized(true);
-      return;
-    }
+  const _winKey = `_gns4_dash_${userCode}`;
+  if (window[_winKey]) {
+    setStats(window[_winKey]);
+    setAuthorized(true);
+    return;
   }
 
   const saved = localStorage.getItem(_dirKey);
@@ -287,7 +283,7 @@ useEffect(() => {
       setStats(full);
       setAuthorized(true);
       localStorage.setItem(_dirKey, JSON.stringify(full));
-      localStorage.setItem(`dash_ttl_${userCode}`, JSON.stringify({ data: full, ts: Date.now() }));
+      window[`_gns4_dash_${userCode}`] = full;
     })
     .catch(() => {
       setStats(parsed);
@@ -314,7 +310,7 @@ useEffect(() => {
       setAuthorized(true);
       const fullData = JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } });
       localStorage.setItem(_dirKey, fullData);
-      localStorage.setItem(`dash_ttl_${userCode}`, JSON.stringify({ data: JSON.parse(fullData), ts: Date.now() }));
+      window[`_gns4_dash_${userCode}`] = JSON.parse(fullData);
     } catch (e) {
       setError(parseApiError(e).message);
     }
