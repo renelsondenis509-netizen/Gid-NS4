@@ -230,7 +230,6 @@ const generateAndSharePDF = async (school, stats) => {
 };
 
 
-const _dashCache = {};
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
   const [authorized, setAuthorized] = useState(false);
@@ -264,10 +263,15 @@ useEffect(() => {
     return;
   }
 
-  if (_dashCache[userCode]) {
-    setStats(_dashCache[userCode]);
-    setAuthorized(true);
-    return;
+  const _cacheKey = `dash_ttl_${userCode}`;
+  const _cached = localStorage.getItem(_cacheKey);
+  if (_cached) {
+    const { data, ts } = JSON.parse(_cached);
+    if (Date.now() - ts < 5 * 60 * 1000) {
+      setStats(data);
+      setAuthorized(true);
+      return;
+    }
   }
 
   const saved = localStorage.getItem(_dirKey);
@@ -283,7 +287,7 @@ useEffect(() => {
       setStats(full);
       setAuthorized(true);
       localStorage.setItem(_dirKey, JSON.stringify(full));
-      _dashCache[userCode] = full;
+      localStorage.setItem(`dash_ttl_${userCode}`, JSON.stringify({ data: full, ts: Date.now() }));
     })
     .catch(() => {
       setStats(parsed);
@@ -310,7 +314,7 @@ useEffect(() => {
       setAuthorized(true);
       const fullData = JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } });
       localStorage.setItem(_dirKey, fullData);
-      _dashCache[userCode] = JSON.parse(fullData);
+      localStorage.setItem(`dash_ttl_${userCode}`, JSON.stringify({ data: JSON.parse(fullData), ts: Date.now() }));
     } catch (e) {
       setError(parseApiError(e).message);
     }
