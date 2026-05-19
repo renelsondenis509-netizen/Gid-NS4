@@ -20,7 +20,12 @@ import AdminScreen            from "./screens/AdminScreen";
 
 /** Enrichit l'objet user avec le statut freemium calculé côté client. */
 function enrichUser(u) {
-  const { isFreemium, daysRemaining } = getFreemiumStatus(u);
+  const { isFreemium, daysRemaining: freemiumDays } = getFreemiumStatus(u);
+  const daysRemaining = isFreemium
+    ? freemiumDays
+    : u.expiresAt
+      ? Math.ceil((new Date(u.expiresAt) - Date.now()) / 86_400_000)
+      : (u.daysRemaining ?? 0);
   return { ...u, isFreemium, daysRemaining, freemiumExpiresAt: u.freemiumExpiresAt ?? null };
 }
 
