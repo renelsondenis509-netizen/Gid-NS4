@@ -9,7 +9,7 @@ export function getFreemiumStatus(user) {
 }
 
 export function hasAccess(user) {
-  if (user?.isFreemium) return true;
-  if (user?.code && user?.code !== "EXPIRED") return true;
+  if (user?.isFreemium && (user?.daysRemaining ?? 0) > 0) return true;
+  if (user?.code && user?.code !== "EXPIRED" && (user?.daysRemaining ?? 0) > 0) return true;
   return false;
 }
