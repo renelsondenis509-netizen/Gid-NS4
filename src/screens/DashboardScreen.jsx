@@ -1,5 +1,4 @@
 import { callEdge, parseApiError } from "../api";
-import { useState, useEffect } from "react";
 import { useState, useEffect, useRef } from "react";
 
 const generateAndSharePDF = async (school, stats) => {
@@ -311,7 +310,9 @@ useEffect(() => {
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim(), deviceId: getDeviceId() });
       setStats(result);
       setAuthorized(true);
-      localStorage.setItem(_dirKey, sessionStorage.setItem(`dash_sess_${userCode}`, JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } }));
+      const fullData = JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } });
+      localStorage.setItem(_dirKey, fullData);
+      sessionStorage.setItem(`dash_sess_${userCode}`, fullData);
     } catch (e) {
       setError(parseApiError(e).message);
     }
