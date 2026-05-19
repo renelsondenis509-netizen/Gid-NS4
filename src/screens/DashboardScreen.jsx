@@ -1,108 +1,235 @@
 import { callEdge, parseApiError } from "../api";
 import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const generateAndSharePDF = async (school, stats) => {
   const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
   const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
-
   const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-  const W = 210, margin = 15;
-  let y = 20;
+  const W = 210, M = 14;
+  let y = 0, page = 1;
 
-  const addLine = (text, fontSize = 10, bold = false, color = [30, 30, 60]) => {
+  // ── Utilitaires ──────────────────────────────────────────────────────
+  const newPage = () => {
+    doc.setFontSize(8); doc.setTextColor(120,120,160);
+    doc.text(`Page ${page}`, W - M, 290, { align: "right" });
+    doc.addPage(); page++; y = 20;
+  };
+  const check = (h = 8) => { if (y + h > 278) newPage(); };
+  const txt = (text, x, fontSize = 10, bold = false, color = [30,30,60], align = "left") => {
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", bold ? "bold" : "normal");
     doc.setTextColor(...color);
-    const lines = doc.splitTextToSize(text, W - margin * 2);
-    lines.forEach(line => {
-      if (y > 270) { doc.addPage(); y = 20; }
-      doc.text(line, margin, y);
-      y += fontSize * 0.45;
-    });
+    doc.text(String(text), x, y, { align });
+  };
+  const line = (text, fontSize = 10, bold = false, color = [30,30,60]) => {
+    check(fontSize * 0.5 + 3);
+    doc.setFontSize(fontSize); doc.setFont("helvetica", bold ? "bold" : "normal");
+    doc.setTextColor(...color);
+    const lines = doc.splitTextToSize(text, W - M * 2);
+    lines.forEach(l => { doc.text(l, M, y); y += fontSize * 0.45; });
     y += 2;
   };
-
-  const addSeparator = () => {
-    doc.setDrawColor(37, 99, 235);
-    doc.line(margin, y, W - margin, y);
-    y += 5;
+  const sep = (color = [37,99,235]) => {
+    check(6);
+    doc.setDrawColor(...color); doc.setLineWidth(0.4);
+    doc.line(M, y, W - M, y); y += 5;
+  };
+  const sectionTitle = (title, color = [37,99,235]) => {
+    check(14);
+    doc.setFillColor(...color);
+    doc.rect(M, y - 4, W - M * 2, 9, "F");
+    doc.setFontSize(11); doc.setFont("helvetica", "bold");
+    doc.setTextColor(255,255,255);
+    doc.text(title, M + 3, y + 2);
+    y += 9;
+  };
+  const kv = (label, value, labelColor = [80,100,160], valColor = [220,0,42]) => {
+    check(7);
+    txt(label + ":", M, 10, false, labelColor);
+    txt(value, W - M, 10, true, valColor, "right");
+    y += 6;
+  };
+  const bar = (pct, color = [37,99,235]) => {
+    const bW = W - M * 2;
+    doc.setFillColor(240,240,245); doc.rect(M, y, bW, 4, "F");
+    const r = Math.round(color[0]), g = Math.round(color[1]), b = Math.round(color[2]);
+    doc.setFillColor(r,g,b); doc.rect(M, y, bW * Math.min(pct,1), 4, "F");
+    y += 7;
   };
 
-  doc.setFillColor(10, 15, 46);
-  doc.rect(0, 0, W, 35, "F");
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(255, 255, 255);
-  doc.text("RAPÒ OFISYÈL GID NS4", W / 2, 15, { align: "center" });
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.text(school.name, W / 2, 23, { align: "center" });
-  doc.setFontSize(9);
-  doc.setTextColor(147, 197, 253);
-  doc.text(`${date} • ${time}`, W / 2, 30, { align: "center" });
-  y = 45;
+  // ── EN-TÊTE ──────────────────────────────────────────────────────────
+  doc.setFillColor(10,15,46);
+  doc.rect(0, 0, W, 38, "F");
+  doc.setFontSize(20); doc.setFont("helvetica","bold");
+  doc.setTextColor(255,255,255);
+  doc.text("RAPÒ OFISYÈL — GID NS4", W/2, 14, { align:"center" });
+  doc.setFontSize(12); doc.setFont("helvetica","normal");
+  doc.text(school.name || "", W/2, 23, { align:"center" });
+  doc.setFontSize(9); doc.setTextColor(147,197,253);
+  doc.text(`${date}  •  ${time}`, W/2, 30, { align:"center" });
+  doc.setFontSize(8); doc.setTextColor(100,140,220);
+  doc.text(`Kòd: ${school.code || "—"}`, W/2, 36, { align:"center" });
+  y = 48;
 
-  addLine("REZIME JENERAL", 13, true, [37, 99, 235]);
-  addSeparator();
-  addLine(`Elèv Aktif: ${stats.totalStudents} / ${school.maxStudents}`);
-  addLine(`Total Rekèt: ${stats.totalScans}`);
-  addLine(`Scan Jodi a: ${stats.scansToday}`);
-  addLine(`Scan Imaj: ${stats.imageScans ?? 0}`);
-  addLine(`Scan Tèks: ${stats.textScans ?? 0}`);
-  addLine(`Jou ki Rete: ${school.daysRemaining}`);
-  addLine(`Matyè Disponib: ${school.subjects.length}`);
-  y += 5;
-
-  addLine("TOP MATYÈ PI POPILÈ", 13, true, [37, 99, 235]);
-  addSeparator();
-  Object.entries(stats.subjectBreakdown || {})
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .forEach(([sub, count], i) => addLine(`${i + 1}. ${sub}: ${count} scan${count > 1 ? "s" : ""}`));
-  y += 5;
-
-  addLine("AKTIVITE 7 DÈNYE JOU", 13, true, [37, 99, 235]);
-  addSeparator();
-  Object.entries(stats.dailyActivity || {})
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .slice(-7)
-    .forEach(([day, count]) => addLine(`${day}: ${count} scan${count > 1 ? "s" : ""}`));
-  y += 5;
-
-  addLine("TOP ELÈV QUIZ", 13, true, [37, 99, 235]);
-  addSeparator();
-  if ((stats.quizStats?.topStudents || []).length > 0) {
-    stats.quizStats.topStudents.forEach((s, i) =>
-      addLine(`${i + 1}. ${s.name} — moy. ${s.avg}/20 (${s.count} quiz)`)
-    );
-  } else {
-    addLine("Pa gen done quiz ankò.");
-  }
-  addLine(`Mwayèn jeneral: ${stats.quizStats?.avgNote ?? 0}/20`);
-  addLine(`Total quiz: ${stats.quizStats?.totalQuizzes ?? 0}`);
-  y += 5;
-
-  doc.setFillColor(10, 15, 46);
-  doc.rect(0, 285, W, 12, "F");
-  doc.setFontSize(8);
-  doc.setTextColor(147, 197, 253);
-  doc.text("Pwodwi ak Gid NS4 • Prof Lakay", W / 2, 292, { align: "center" });
+  // ── 1. INFO ÉCOLE ────────────────────────────────────────────────────
+  sectionTitle("1. ENFÒMASYON LEKÒL LA", [10,15,46]);
+  y += 2;
+  kv("Non lekòl", school.name || "—");
+  kv("Kòd aksè", school.code || "—");
+  kv("Jou ki rete", `${school.daysRemaining ?? "—"} jou`);
+  kv("Rekèt pa jou", `${school.dailyScans ?? "—"} max`);
+  kv("Elèv maksimòm", `${school.maxStudents ?? "—"}`);
+  kv("Matyè disponib", `${school.subjects?.length ?? 0}`);
   y += 3;
 
-  addLine("REKÒMANDASYON", 13, true, [220, 0, 42]);
-  addSeparator();
-  if (stats.quizStats?.weakSubject) {
-    addLine(`Matyè ki bezwen plis atansyon:`);
-    addLine(`${stats.quizStats.weakSubject.subject} — moy. ${stats.quizStats.weakSubject.avg}/20`, 11, true, [220, 0, 42]);
-    addLine("Elèv yo dwe travay plis sou matyè sa a pou amelyore rezilta yo.");
+  // ── 2. REZIME JENERAL ────────────────────────────────────────────────
+  sectionTitle("2. REZIME JENERAL", [37,99,235]);
+  y += 2;
+  const totalScans = stats.totalScans ?? 0;
+  const imgScans   = stats.imageScans ?? 0;
+  const txtScans   = stats.textScans  ?? 0;
+  const imgPct     = totalScans > 0 ? Math.round((imgScans/totalScans)*100) : 0;
+  const txtPct     = totalScans > 0 ? Math.round((txtScans/totalScans)*100) : 0;
+  const utilPct    = (school.dailyScans && stats.scansToday)
+    ? Math.min(stats.scansToday / school.dailyScans, 1) : 0;
+
+  kv("Total Rekèt", String(totalScans));
+  kv("Elèv Aktif", `${stats.totalStudents ?? 0} / ${school.maxStudents ?? "?"}`);
+  kv("Rekèt Jodi a", String(stats.scansToday ?? 0));
+  kv("Scan Imaj", `${imgScans}  (${imgPct}%)`);
+  kv("Scan Tèks", `${txtScans}  (${txtPct}%)`);
+
+  check(10);
+  line("Taux itilizasyon jodi a:", 9, false, [80,100,160]);
+  bar(utilPct, [37,99,235]);
+  y += 2;
+
+  // ── 3. TOUT MATYÈ ────────────────────────────────────────────────────
+  sectionTitle("3. TOUT MATYÈ SCANNÉES", [67,56,202]);
+  y += 2;
+  const entries = Object.entries(stats.subjectBreakdown || {}).sort((a,b) => b[1]-a[1]);
+  const maxCount = Math.max(...entries.map(e=>e[1]), 1);
+  const barColors = [
+    [34,197,94],[59,130,246],[245,158,11],[168,85,247],[236,72,153],
+    [20,184,166],[249,115,22],[239,68,68],[99,102,241],[16,185,129],
+  ];
+  if (entries.length === 0) {
+    line("Pa gen done disponib.", 9, false, [120,120,160]);
   } else {
-    addLine("Pa gen done sifizan pou yon rekòmandasyon.");
+    entries.forEach(([sub, count], i) => {
+      check(14);
+      const pct = count / maxCount;
+      const col = barColors[i % barColors.length];
+      doc.setFontSize(9); doc.setFont("helvetica","normal");
+      doc.setTextColor(...col);
+      doc.text(`${i+1}. ${sub}`, M, y);
+      doc.setFont("helvetica","bold");
+      doc.text(`${count} rekèt`, W-M, y, { align:"right" });
+      y += 5;
+      bar(pct, col);
+    });
+  }
+  y += 2;
+
+  // ── 4. AKTIVITE 7 DÈNYE JOU ──────────────────────────────────────────
+  sectionTitle("4. AKTIVITE 7 DÈNYE JOU", [14,116,144]);
+  y += 2;
+  const days = Object.entries(stats.dailyActivity || {}).sort((a,b)=>a[0].localeCompare(b[0])).slice(-7);
+  const maxDay = Math.max(...days.map(d=>d[1]),1);
+  if (days.length === 0) {
+    line("Pa gen done aktivite.", 9, false, [120,120,160]);
+  } else {
+    days.forEach(([day, count]) => {
+      check(12);
+      doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(80,120,200);
+      doc.text(day, M, y);
+      doc.setFont("helvetica","bold"); doc.setTextColor(220,0,42);
+      doc.text(`${count}`, W-M, y, { align:"right" });
+      y += 4;
+      bar(count/maxDay, [37,99,235]);
+    });
+  }
+  y += 2;
+
+  // ── 5. QUIZ — PÈFÒMANS PA MATYÈ ─────────────────────────────────────
+  sectionTitle("5. PÈFÒMANS QUIZ PA MATYÈ", [168,85,247]);
+  y += 2;
+  const quizBySubject = stats.quizStats?.bySubject || [];
+  if (quizBySubject.length === 0) {
+    line("Pa gen done quiz pa matyè ankò.", 9, false, [120,120,160]);
+  } else {
+    quizBySubject.sort((a,b) => b.avg - a.avg).forEach((q, i) => {
+      check(12);
+      const col = barColors[i % barColors.length];
+      doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(80,100,160);
+      doc.text(`${q.subject}`, M, y);
+      doc.setFont("helvetica","bold"); doc.setTextColor(col[0],col[1],col[2]);
+      doc.text(`${q.avg}/20  (${q.count} quiz)`, W-M, y, { align:"right" });
+      y += 4;
+      bar(q.avg/20, col);
+    });
+  }
+  kv("Mwayèn jeneral", `${stats.quizStats?.avgNote ?? "—"}/20`);
+  kv("Total quiz", String(stats.quizStats?.totalQuizzes ?? 0));
+  y += 2;
+
+  // ── 6. TOP 10 ELÈV QUIZ ──────────────────────────────────────────────
+  sectionTitle("6. TOP 10 ELÈV QUIZ", [245,158,11]);
+  y += 2;
+  const top = (stats.quizStats?.topStudents || []).slice(0,10);
+  if (top.length === 0) {
+    line("Pa gen done elèv ankò.", 9, false, [120,120,160]);
+  } else {
+    top.forEach((s, i) => {
+      check(7);
+      const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
+      doc.setFontSize(9);
+      doc.setFont("helvetica", i < 3 ? "bold" : "normal");
+      doc.setTextColor(i<3?[245,158,11][0]:80, i<3?[245,158,11][1]:100, i<3?[245,158,11][2]:160);
+      doc.text(`${medal} ${s.name}`, M, y);
+      doc.setFont("helvetica","bold"); doc.setTextColor(34,197,94);
+      doc.text(`${s.avg}/20  (${s.count} quiz)`, W-M, y, { align:"right" });
+      y += 7;
+    });
+  }
+  y += 2;
+
+  // ── 7. REKÒMANDASYON ─────────────────────────────────────────────────
+  sectionTitle("7. REKÒMANDASYON", [220,0,42]);
+  y += 2;
+  const weak = stats.quizStats?.weakSubject;
+  const best = stats.quizStats?.topStudents?.[0];
+  if (weak) {
+    line(`⚠ Matyè ki bezwen plis atansyon: ${weak.subject} (moy. ${weak.avg}/20)`, 10, true, [220,0,42]);
+    line("Elèv yo dwe konsacre plis tan sou matyè sa a.", 9, false, [80,80,80]);
+    y += 2;
+  }
+  if (best) {
+    line(`★ Pi bon elèv: ${best.name} — ${best.avg}/20 (${best.count} quiz)`, 10, true, [34,197,94]);
+    y += 2;
+  }
+  if (utilPct >= 0.9) {
+    line("📈 Quota jounalye prèske atenn — konsidere ogmante limit la.", 9, false, [245,158,11]);
+    y += 2;
+  }
+  if (!weak && !best) {
+    line("Pa gen done sifizan pou yon rekòmandasyon.", 9, false, [120,120,160]);
   }
 
+  // ── PIED DE PAGE DERNIÈRE PAGE ────────────────────────────────────────
+  doc.setFontSize(8); doc.setTextColor(120,120,160);
+  doc.text(`Page ${page}`, W - M, 290, { align: "right" });
+  doc.setFillColor(10,15,46);
+  doc.rect(0, 284, W, 13, "F");
+  doc.setFontSize(8); doc.setTextColor(147,197,253);
+  doc.text("Pwodwi ak Gid NS4  •  Prof Lakay  •  Konfidansyèl", W/2, 292, { align:"center" });
+
   doc.save(`rapport-${school.name}-${date}.pdf`);
-};  // <-- ACCCOLADE FERMANTE MANQUANTE AJOUTÉE ICI
+};
+
 
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
@@ -125,26 +252,48 @@ export function DashboardScreen({ onBack, userCode }) {
   };
 
 
-  useEffect(() => {
-    if (userCode === "FREEMIUM") { setStats(FREEMIUM_DEMO); setAuthorized(true); return; }
-    const saved = localStorage.getItem(_dirKey);
-    if (!saved) return;
-    const parsed = JSON.parse(saved);
-    const { directorCode } = parsed._auth || {};
-    if (!directorCode) return;
-    setLoading(true);
-    callEdge({ action: "dashboard", schoolCode: userCode, directorCode })
-      .then(result => {
-        setStats({ ...result, _auth: { directorCode } });
-        setAuthorized(true);
-        localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode } }));
-      })
-      .catch(() => {
-        setStats(parsed);
-        setAuthorized(true);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+const hasFetched = useRef(false);
+
+useEffect(() => {
+  if (hasFetched.current) return;   // ← bloque le 2e appel StrictMode
+  hasFetched.current = true;
+
+  if (userCode === "FREEMIUM") {
+    setStats(FREEMIUM_DEMO);
+    setAuthorized(true);
+    return;
+  }
+
+  // Cache sessionStorage → 0 requête réseau si déjà chargé dans la session
+  const sessionKey = `dash_sess_${userCode}`;
+  const cached = sessionStorage.getItem(sessionKey);
+  if (cached) {
+    setStats(JSON.parse(cached));
+    setAuthorized(true);
+    return;
+  }
+
+  const saved = localStorage.getItem(_dirKey);
+  if (!saved) return;
+  const parsed = JSON.parse(saved);
+  const { directorCode } = parsed._auth || {};
+  if (!directorCode) return;
+
+  setLoading(true);
+  callEdge({ action: "dashboard", schoolCode: userCode, directorCode })
+    .then(result => {
+      const full = { ...result, _auth: { directorCode } };
+      setStats(full);
+      setAuthorized(true);
+      localStorage.setItem(_dirKey, JSON.stringify(full));
+      sessionStorage.setItem(sessionKey, JSON.stringify(full));  // ← mise en cache
+    })
+    .catch(() => {
+      setStats(parsed);
+      setAuthorized(true);
+    })
+    .finally(() => setLoading(false));
+}, []);
 
   const getDeviceId = () => {
     const key = "gid_device_id";
@@ -162,7 +311,7 @@ export function DashboardScreen({ onBack, userCode }) {
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim(), deviceId: getDeviceId() });
       setStats(result);
       setAuthorized(true);
-      localStorage.setItem(_dirKey, JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } }));
+      localStorage.setItem(_dirKey, sessionStorage.setItem(`dash_sess_${userCode}`, JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } }));
     } catch (e) {
       setError(parseApiError(e).message);
     }
