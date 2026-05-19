@@ -230,6 +230,7 @@ const generateAndSharePDF = async (school, stats) => {
 };
 
 
+const _dashCache = {};
 export function DashboardScreen({ onBack, userCode }) {
   const [dirCode, setDirCode] = useState("");
   const [authorized, setAuthorized] = useState(false);
@@ -263,11 +264,8 @@ useEffect(() => {
     return;
   }
 
-  // Cache sessionStorage → 0 requête réseau si déjà chargé dans la session
-  const sessionKey = `dash_sess_${userCode}`;
-  const cached = sessionStorage.getItem(sessionKey);
-  if (cached) {
-    setStats(JSON.parse(cached));
+  if (_dashCache[userCode]) {
+    setStats(_dashCache[userCode]);
     setAuthorized(true);
     return;
   }
@@ -285,7 +283,7 @@ useEffect(() => {
       setStats(full);
       setAuthorized(true);
       localStorage.setItem(_dirKey, JSON.stringify(full));
-      sessionStorage.setItem(sessionKey, JSON.stringify(full));  // ← mise en cache
+      _dashCache[userCode] = full;
     })
     .catch(() => {
       setStats(parsed);
@@ -312,7 +310,7 @@ useEffect(() => {
       setAuthorized(true);
       const fullData = JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } });
       localStorage.setItem(_dirKey, fullData);
-      sessionStorage.setItem(`dash_sess_${userCode}`, fullData);
+      _dashCache[userCode] = JSON.parse(fullData);
     } catch (e) {
       setError(parseApiError(e).message);
     }
