@@ -16,9 +16,9 @@ import { PaymentScreen }     from "./screens/PaymentScreen";
 import { DashboardScreen }   from "./screens/DashboardScreen";
 import { PartnerScreen }     from "./screens/PartnerScreen";
 import { FavoritesScreen }   from "./screens/FavoritesScreen";
-import AdminScreen            from "./screens/AdminScreen";
+import { AdminScreen }       from "./screens/AdminScreen";
+import { OfflineBanner }     from "./components/OfflineBanner";
 
-/** Enrichit l'objet user avec le statut freemium calculé côté client. */
 function enrichUser(u) {
   const { isFreemium, daysRemaining: freemiumDays } = getFreemiumStatus(u);
   const daysRemaining = isFreemium
@@ -33,9 +33,18 @@ export default function App() {
   const [screen,     setScreen]     = useState("splash");
   const [user,       setUser]       = useState(null);
   const [activeScan, setActiveScan] = useState(null);
+  const [isOffline,  setIsOffline]  = useState(!navigator.onLine);
+
   const nav = (s) => setScreen(s);
 
-  // Sync scores offline dès que connexion disponible
+  useEffect(() => {
+    const on  = () => setIsOffline(false);
+    const off = () => setIsOffline(true);
+    window.addEventListener("online",  on);
+    window.addEventListener("offline", off);
+    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
+  }, []);
+
   useEffect(() => {
     async function syncPendingScores() {
       if (!navigator.onLine) return;
@@ -75,34 +84,28 @@ export default function App() {
 
   const handleLogout = () => { sessionClear(); setUser(null); setScreen("login"); };
 
-  if (screen === "splash")      return (
-    <SplashScreen onDone={() => {
-      const s = sessionLoad();
-      if (s?.phone && s?.code) { setUser(enrichUser(s)); setScreen("chat"); }
-      else setScreen("login");
-    }} />
-  );
-  if (user && !hasAccess(user)) return <LoginScreen onLogin={handleLogin} onNavigate={nav} expired={true} />;
-  if (screen === "login")       return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
-  if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} />;
-  if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
-  if (screen === "leaderboard") return <LeaderboardScreen user={user} onNavigate={nav} />;
-  if (screen === "history")     return (
-    <HistoryScreen
-      user={user}
-      onNavigate={nav}
-      onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); setScreen("exercice"); }}
-    />
-  );
-  if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
-  if (screen === "payment")     return <PaymentScreen onBack={() => nav(user ? "menu" : "login")} />;
-  if (screen === "dashboard")   return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} />;
-  if (screen === "partner")     return <PartnerScreen onBack={() => nav(user ? "menu" : "login")} />;
-  if (screen === "exercice")    return (
-    <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />
-  );
-  if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
-  if (screen === "admin")       return <AdminScreen onBack={() => nav("menu")} />;
+  function renderContent() {
+    if (screen === "splash")      return <SplashScreen onDone={() => { const s = sessionLoad(); if (s?.phone && s?.code) { setUser(enrichUser(s)); setScreen("chat"); } else setScreen("login"); }} />;
+    if (user && !hasAccess(user)) return <LoginScreen onLogin={handleLogin} onNavigate={nav} expired={true} />;
+    if (screen === "login")       return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
+    if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} />;
+    if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
+    if (screen === "leaderboard") return <LeaderboardScreen user={user} onNavigate={nav} />;
+    if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); setScreen("exercice"); }} />;
+    if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
+    if (screen === "payment")     return <PaymentScreen onBack={() => nav(user ? "menu" : "login")} />;
+    if (screen === "dashboard")   return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} />;
+    if (screen === "partner")     return <PartnerScreen onBack={() => nav(user ? "menu" : "login")} />;
+    if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />;
+    if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
+    if (screen === "admin")       return <AdminScreen onBack={() => nav("menu")} />;
+    return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
+  }
 
-  return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
+  return (
+    <>
+      {isOffline && <OfflineBanner />}
+      {renderContent()}
+    </>
+  );
 }
