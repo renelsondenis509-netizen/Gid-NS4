@@ -6,6 +6,7 @@ import { shuffleArray, shuffleChoices } from "../utils/helpers";
 import { scoreToNote20, getMention, saveQuizGrade } from "../utils/quiz";
 import { BottomNav } from "../components/UI";
 import { idbSavePendingScore } from "../utils/idb";
+import { hasAccess } from "../utils/freemium";
 
 // ─── ICONS ───────────────────────────────────────────────────
 const HeartIcon = ({ filled = true, size = 20 }) => (
@@ -104,6 +105,7 @@ export function QuizScreen({ user, onNavigate }) {
   const [openBranch,    setOpenBranch]    = useState(null);
 
   const currentQ = shuffledQs[qIndex];
+  if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
   const startQCM = (sub) => {
     const all    = shuffleArray(QUIZ_DATA[sub]);
