@@ -5,6 +5,7 @@ import { callEdge } from "../api";
 import { hasAccess } from "../utils/freemium";
 
 import { cacheGet, cacheSet } from "../utils/cache";
+const IcoArrowLeft = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>);
 const IcoArrowRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>);
 const IcoCheck = ({ size = 13 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>);
 const IcoX = ({ size = 13 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
@@ -100,6 +101,16 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center px-6" style={{background:"linear-gradient(160deg,#0a0f2e,#0d1b4b)"}}>
         <div className="w-full max-w-sm space-y-4" style={{animation:"popIn .5s cubic-bezier(.34,1.56,.64,1) both"}}>
+  const handleShare = () => {
+    const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
+    const mention = score === questions.length ? "Pafè ! 🏆" : score >= questions.length / 2 ? "Byen ! 👍" : "Kontinye travay ! 🎯";
+    const text = `📚 Gid NS4 — Rezilta Egzèsis\nMatye: ${scan.subject || "Général"}\nNòt: ${score}/${questions.length} (${note20}/20)\n${mention}\n\nPwodwi pa Gid NS4 — pwofesè IA ou pou Bakaloreya a.`;
+    if (navigator.share) {
+      navigator.share({ title: "Rezilta Egzèsis — Gid NS4", text }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(text).then(() => alert("Rezilta a kopye !")).catch(() => {});
+    }
+  };
           <div className="text-center">
             <div style={{display:"flex",justifyContent:"center",marginBottom:8}}><IcoGraduation/></div>
             <h2 className="text-white font-black text-2xl">Egzèsis la fini !</h2>
@@ -127,6 +138,9 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
           </div>
           <button onClick={onBack} className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2" style={{background:"linear-gradient(135deg,#2563eb,#3b82f6)"}}>
             <IcoArrowLeft/> Retounen nan istorik
+          </button>
+          <button onClick={handleShare} className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2" style={{background:"linear-gradient(135deg,#059669,#10b981)",marginTop:8}}>
+            📤 Pataje Rezilta
           </button>
         </div>
       </div>
