@@ -80,7 +80,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     setCurrent(c=>c+1); setSelected(null);
   };
   const handleShare = async () => {
-    const { jsPDF } = await import("jspdf");
+    const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
     const mention = score === questions.length ? "Pafe !" : score >= questions.length / 2 ? "Byen !" : "Kontinye travay !";
