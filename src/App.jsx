@@ -16,7 +16,7 @@ import { PaymentScreen }     from "./screens/PaymentScreen";
 import { DashboardScreen }   from "./screens/DashboardScreen";
 import { PartnerScreen }     from "./screens/PartnerScreen";
 import { FavoritesScreen }   from "./screens/FavoritesScreen";
-import { AdminScreen }       from "./screens/AdminScreen";
+import AdminScreen       from "./screens/AdminScreen";
 import { OfflineBanner }     from "./components/OfflineBanner";
 
 function enrichUser(u) {
