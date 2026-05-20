@@ -4,17 +4,24 @@ export async function callEdge(payload) {
   if (!navigator.onLine) {
     throw { type: "offline", offline: true };
   }
-  const res = await fetch(API, {
-    method:  "POST",
-    headers: {
-      "Content-Type":  "application/json",
-      "Authorization": `Bearer ${SUPABASE_ANON}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();
-  if (!res.ok) throw { status: res.status, ...data };
-  return data;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(API, {
+      method:  "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${SUPABASE_ANON}`,
+      },
+      body:   JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    const data = await res.json();
+    if (!res.ok) throw { status: res.status, ...data };
+    return data;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export function parseApiError(err) {
