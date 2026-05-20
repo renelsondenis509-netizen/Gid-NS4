@@ -44,7 +44,7 @@ export async function idbGetScans(phone) {
   const db = await openDB();
   return txPromise(db, "scans", "readonly", (store, resolve, reject) => {
     const req = store.index("phone").getAll(phone);
-    req.onsuccess = (e) => resolve([...e.target.result].reverse());
+    req.onsuccess = (e) => resolve([...e.target.result].reverse().slice(0, 50));
     req.onerror   = (e) => reject(e.target.error);
   });
 }
@@ -69,7 +69,7 @@ export async function idbGetExercice(phone) {
   const db = await openDB();
   return txPromise(db, "exercices", "readonly", (store, resolve, reject) => {
     const req = store.index("phone").getAll(phone);
-    req.onsuccess = (e) => resolve([...e.target.result].reverse());
+    req.onsuccess = (e) => resolve([...e.target.result].reverse().slice(0, 50));
     req.onerror   = (e) => reject(e.target.error);
   });
 }
