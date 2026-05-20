@@ -122,9 +122,9 @@ export function QuizScreen({ user, onNavigate }) {
     try {
       if (!user.isFreemium) {
         try {
-          await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak });
+          await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz" });
         } catch {
-          await idbSavePendingScore({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, ts:Date.now() });
+          await idbSavePendingScore({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz", ts:Date.now() });
         }
       }
     } catch {}

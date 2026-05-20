@@ -4,7 +4,7 @@ import { idbSaveExercice } from "../utils/idb";
 import { callEdge } from "../api";
 import { hasAccess } from "../utils/freemium";
 
-const IcoArrowLeft = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>);
+import { cacheGet, cacheSet } from "../utils/cache";
 const IcoArrowRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>);
 const IcoCheck = ({ size = 13 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>);
 const IcoX = ({ size = 13 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
@@ -24,15 +24,20 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const [answers,   setAnswers]   = useState([]);
 
   useEffect(() => {
-      if (scan.questions?.length > 0) {
-    setQuestions(scan.questions);
-    setLoading(false);
-    return;
-  }
-  callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général" })
+    if (scan.questions?.length > 0) {
+      setQuestions(scan.questions);
+      setLoading(false);
+      return;
+    }
+    const cacheKey = `exercice_${scan.id}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) { setQuestions(cached); setLoading(false); return; }
+    callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général" })
       .then(r => {
-        if (r.questions?.length > 0) setQuestions(r.questions);
-        else setError("Pa gen ase kontni pou jenere egzèsis la.");
+        if (r.questions?.length > 0) {
+          cacheSet(cacheKey, r.questions, 30 * 60 * 1000);
+          setQuestions(r.questions);
+        } else setError("Pa gen ase kontni pou jenere egzèsis la.");
       })
       .catch(() => setError("Enposib pou jenere egzèsis la. Eseye ankò."))
       .finally(() => setLoading(false));
@@ -67,7 +72,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         subject: scan.subject || "Général",
         score, total: questions.length,
         note20, streak: score === questions.length ? 1 : 0,
-        name: user.name,
+        name: user.name, source: "exercice",
       }).catch(() => {});
       setDone(true); return;
     }

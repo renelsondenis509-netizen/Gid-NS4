@@ -591,13 +591,13 @@ async function saveQuizScore(
   db: ReturnType<typeof createClient>,
   body: {
     phone: string; schoolCode: string; subject: string;
-    score: number; total: number; note20: number; streak: number; name?: string;
+    score: number; total: number; note20: number; streak: number; name?: string; source?: string;
   }
 ) {
-  const { phone, schoolCode, subject, score, total, note20, streak, name } = body;
+  const { phone, schoolCode, subject, score, total, note20, streak, name, source } = body;
   await db.from("quiz_scores").insert({
     phone, school_code: schoolCode, subject, score, total, note20, streak,
-    name: name || phone, week: getWeekKey(), created_at: new Date().toISOString(),
+    name: name || phone, week: getWeekKey(), created_at: new Date().toISOString(), source: source || "quiz",
   });
   return { saved: true };
 }
