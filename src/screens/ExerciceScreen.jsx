@@ -79,6 +79,16 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     }
     setCurrent(c=>c+1); setSelected(null);
   };
+  const handleShare = () => {
+    const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
+    const mention = score === questions.length ? "Pafe ! 🏆" : score >= questions.length / 2 ? "Byen ! 👍" : "Kontinye travay ! 🎯";
+    const text = "📚 Gid NS4 — Rezilta Egzesis\nMatye: " + (scan.subject || "General") + "\nNot: " + score + "/" + questions.length + " (" + note20 + "/20)\n" + mention + "\n\nPwodwi pa Gid NS4.";
+    if (navigator.share) {
+      navigator.share({ title: "Rezilta Egzesis — Gid NS4", text }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(text).then(() => alert("Rezilta a kopye !")).catch(() => {});
+    }
+  };
 
   const q=questions[current];
 
@@ -101,16 +111,6 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center px-6" style={{background:"linear-gradient(160deg,#0a0f2e,#0d1b4b)"}}>
         <div className="w-full max-w-sm space-y-4" style={{animation:"popIn .5s cubic-bezier(.34,1.56,.64,1) both"}}>
-  const handleShare = () => {
-    const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
-    const mention = score === questions.length ? "Pafè ! 🏆" : score >= questions.length / 2 ? "Byen ! 👍" : "Kontinye travay ! 🎯";
-    const text = `📚 Gid NS4 — Rezilta Egzèsis\nMatye: ${scan.subject || "Général"}\nNòt: ${score}/${questions.length} (${note20}/20)\n${mention}\n\nPwodwi pa Gid NS4 — pwofesè IA ou pou Bakaloreya a.`;
-    if (navigator.share) {
-      navigator.share({ title: "Rezilta Egzèsis — Gid NS4", text }).catch(() => {});
-    } else {
-      navigator.clipboard?.writeText(text).then(() => alert("Rezilta a kopye !")).catch(() => {});
-    }
-  };
           <div className="text-center">
             <div style={{display:"flex",justifyContent:"center",marginBottom:8}}><IcoGraduation/></div>
             <h2 className="text-white font-black text-2xl">Egzèsis la fini !</h2>
