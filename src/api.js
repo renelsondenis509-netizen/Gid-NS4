@@ -1,7 +1,6 @@
 import { API, SUPABASE_ANON } from "./config";
 
 export async function callEdge(payload) {
-  console.log("API appelée, online:", navigator.onLine, "URL:", API);
   if (!navigator.onLine) {
     throw { type: "offline", offline: true };
   }
