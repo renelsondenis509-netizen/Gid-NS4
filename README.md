@@ -9,7 +9,7 @@ Tuteur IA "Prof Lakay" + Quiz QCM pour les élèves de Terminale (NS4), filière
 
 | Couche | Technologie |
 |---|---|
-| Frontend | React + Vite (port 5000) |
+| Frontend | React + Vite (port 5173) |
 | Backend | Supabase (DB + Edge Functions) |
 | IA | Cascade 6 providers via Edge Function |
 | Mobile | Capacitor (APK Android) |
