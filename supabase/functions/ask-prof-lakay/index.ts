@@ -639,7 +639,7 @@ async function getLeaderboard(
   // bestNoteMap = somme des meilleures notes par matière
   Object.entries(bestPerSubject).forEach(([p, subjects]) => {
     const vals = Object.values(subjects);
-    bestNoteMap[p] = Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10;
+    bestNoteMap[p] = Math.round(vals.reduce((a, b) => a + b, 0) * 10) / 10;
   });
 
   // 2. Remplir les autres maps (totalCorrect, name, school)

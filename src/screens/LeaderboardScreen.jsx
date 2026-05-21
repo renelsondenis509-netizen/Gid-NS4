@@ -49,7 +49,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
   useEffect(() => { load(); }, []);
 
   const tabs = [
-    { id:"bestNote",    Icon:IcoTrophy,   label:"Pi bon nòt",  valueLabel:"/20" },
+    { id:"bestNote",    Icon:IcoTrophy,   label:"Pi bon nòt",  valueLabel:" pts" },
     { id:"totalCorrect",Icon:IcoFlame,    label:"Total Kòrèk", valueLabel:" pts" },
     { id:"thisWeek",    Icon:IcoCalendar, label:"Semèn Sa",    valueLabel:" pts" },
   ];
