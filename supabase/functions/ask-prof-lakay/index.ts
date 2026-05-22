@@ -1024,6 +1024,7 @@ async function createSchool(
     max_students: maxStudents,
     daily_image_scans: dailyImageScans,
     daily_text_scans: dailyTextScans,
+    subjects: body.subjects ?? [],
   });
 
   if (error) throw { status: 500, error: "Echèk anrejistreman: " + error.message };

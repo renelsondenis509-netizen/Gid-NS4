@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FILIERES } from "../data/quizData";
 import { callEdge } from "../api";
 
 const Field = ({ label, k, type = "text", form, setForm }) => (
@@ -53,6 +54,7 @@ export default function AdminScreen({ onBack }) {
   const [secretError, setSecretError] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyImageScans: 5, dailyTextScans: 10 });
+  const [selectedFilieres, setSelectedFilieres] = useState([]);
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
   const [logs, setLogs] = useState([]);
@@ -117,8 +119,20 @@ export default function AdminScreen({ onBack }) {
         <Field label="Max Elèv" k="maxStudents" type="number" form={createForm} setForm={setCreateForm} />
         <Field label="Foto/jou" k="dailyImageScans" type="number" form={createForm} setForm={setCreateForm} />
         <Field label="Tèks/jou" k="dailyTextScans" type="number" form={createForm} setForm={setCreateForm} />
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display:"block", fontSize:13, color:"#94a3b8", marginBottom:8 }}>Filiè (matye)</label>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+            {Object.entries(FILIERES).map(([key, f]) => (
+              <button key={key} type="button"
+                onClick={() => setSelectedFilieres(prev => prev.includes(key) ? prev.filter(k=>k!==key) : [...prev, key])}
+                style={{ padding:"6px 14px", borderRadius:20, fontSize:13, fontWeight:700, border:"2px solid " + (selectedFilieres.includes(key) ? f.color : "#334155"), background: selectedFilieres.includes(key) ? f.color+"22" : "#1e293b", color: selectedFilieres.includes(key) ? f.color : "#94a3b8", cursor:"pointer" }}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <ActionButton label="✦ Jenere Kòd" loading={loading.create}
-          onClick={() => run("create_school", createForm, "create", setCreateRes)} />
+          onClick={() => { const subjects = Object.entries(FILIERES).filter(([k]) => selectedFilieres.includes(k)).flatMap(([,f]) => f.subjects); run("create_school", { ...createForm, subjects }, "create", setCreateRes); }} />
         <ResultBox {...createRes} />
       </Section>
 
