@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FILIERES } from "../data/quizData";
+import { QUIZ_BRANCHES as FILIERES } from "../data/quizData";
 import { callEdge } from "../api";
 
 const Field = ({ label, k, type = "text", form, setForm }) => (
@@ -57,6 +57,8 @@ export default function AdminScreen({ onBack }) {
   const [selectedFilieres, setSelectedFilieres] = useState([]);
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
+  const [updateForm, setUpdateForm] = useState({ code: "", dailyImageScans: "", dailyTextScans: "", maxStudents: "", durationDays: "" });
+  const [updateRes, setUpdateRes] = useState(null);
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [createRes, setCreateRes] = useState({ result: null, error: "" });
@@ -136,7 +138,25 @@ export default function AdminScreen({ onBack }) {
         <ResultBox {...createRes} />
       </Section>
 
-      <Section title="🚫 Revoké Elèv">
+      
+        <Section title="✏️ Modifye Lekol Egzistan">
+          <Field label="Kod Lekol"  k="code"            form={updateForm} setForm={setUpdateForm} />
+          <Field label="Foto/jou"   k="dailyImageScans" type="number" form={updateForm} setForm={setUpdateForm} />
+          <Field label="Teks/jou"   k="dailyTextScans"  type="number" form={updateForm} setForm={setUpdateForm} />
+          <Field label="Max Elev"   k="maxStudents"     type="number" form={updateForm} setForm={setUpdateForm} />
+          <Field label="Dire (jou)" k="durationDays"    type="number" form={updateForm} setForm={setUpdateForm} />
+          <ActionButton label="Mete Ajou" loading={loading.update}
+            onClick={() => run("update_school", {
+              ...updateForm,
+              dailyImageScans: updateForm.dailyImageScans ? Number(updateForm.dailyImageScans) : undefined,
+              dailyTextScans:  updateForm.dailyTextScans  ? Number(updateForm.dailyTextScans)  : undefined,
+              maxStudents:     updateForm.maxStudents     ? Number(updateForm.maxStudents)     : undefined,
+              durationDays:    updateForm.durationDays    ? Number(updateForm.durationDays)    : undefined,
+            }, "update", setUpdateRes)} />
+          {updateRes && <ResultCard result={updateRes} />}
+        </Section>
+
+        <Section title="🚫 Revoké Elèv">
         <Field label="Nimewo Telefòn" k="phone" form={revokeUserForm} setForm={setRevokeUserForm} />
         <ActionButton label="Efase Pwofil" loading={loading.revokeUser} color="#dc2626"
           onClick={() => run("revoke_user", revokeUserForm, "revokeUser", setRevokeUserRes)} />

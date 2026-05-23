@@ -1035,6 +1035,31 @@ async function createSchool(
 }
 
 
+
+// ─── ACTION : update_school ───────────────────────────────────────────────────
+async function updateSchool(
+  db: ReturnType<typeof createClient>,
+  body: { adminSecret: string; code: string; dailyImageScans?: number; dailyTextScans?: number; maxStudents?: number; durationDays?: number; }
+) {
+  const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+  if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
+  const { code, dailyImageScans, dailyTextScans, maxStudents, durationDays } = body;
+  if (!code?.trim()) throw { status: 400, error: "Kod lekol la obligatwa." };
+  const updates: Record<string, unknown> = {};
+  if (dailyImageScans !== undefined) updates.daily_image_scans = dailyImageScans;
+  if (dailyTextScans  !== undefined) updates.daily_text_scans  = dailyTextScans;
+  if (maxStudents     !== undefined) updates.max_students      = maxStudents;
+  if (durationDays    !== undefined) {
+    const { data: school } = await db.from("schools").select("starts_at").eq("code", code).maybeSingle();
+    if (school) updates.expires_at = new Date(new Date(school.starts_at).getTime() + durationDays * 86400000).toISOString();
+  }
+  if (Object.keys(updates).length === 0) throw { status: 400, error: "Pa gen chanjman." };
+  const { error } = await db.from("schools").update(updates).eq("code", code);
+  if (error) throw { status: 500, error: "Echek mizajou: " + error.message };
+  await logAudit(db, "update_school", body.adminSecret.slice(-4), code, updates);
+  return { success: true, updated: updates };
+}
+
 // ─── ACTION : revoke_user ─────────────────────────────────────────────────────
 async function revokeUser(
   db: ReturnType<typeof createClient>,
@@ -1086,6 +1111,7 @@ Deno.serve(async (req) => {
       case "verify_admin":        result = await verifyAdmin(body); break;
       case "get_audit_logs":      result = await getAuditLogs(supabase, body); break;
       case "create_school":       result = await createSchool(supabase, body); break;
+      case "update_school":       result = await updateSchool(supabase, body); break;
       case "revoke_user":         result = await revokeUser(supabase, body); break;
       case "revoke_school":       result = await revokeSchool(supabase, body); break;
       default:
