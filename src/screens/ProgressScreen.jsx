@@ -138,7 +138,7 @@ export function ProgressScreen({ user, onNavigate }) {
           {/* Barre couverture */}
           <div style={{ background:"rgba(15,28,60,0.8)", border:"1px solid #1e3a8a33", borderRadius:14, padding:"12px 14px", marginBottom:16 }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-              <span style={{ color:"#93c5fd", fontSize:12, fontWeight:700, display:"flex", alignItems:"center", gap:6 }}><IcoTarget/> Kouvèti matye</span>
+              <span style={{ color:"#93c5fd", fontSize:12, fontWeight:700, display:"flex", alignItems:"center", gap:6 }}><IcoTarget/> Matyè</span>
               <span style={{ color:"#60a5fa", fontSize:12, fontWeight:800 }}>{Math.round(stats.total / stats.max * 100)}%</span>
             </div>
             <Bar value={stats.total} max={stats.max} color="linear-gradient(90deg,#2563eb,#7c3aed)" />
@@ -163,7 +163,7 @@ export function ProgressScreen({ user, onNavigate }) {
 
           {/* Toutes les matières */}
           <div style={{ marginBottom:16 }}>
-            <h3 style={{ color:"#93c5fd", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoChart/> Tout matye eseye</h3>
+            <h3 style={{ color:"#93c5fd", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoChart/> Matyè eseye</h3>
             {stats.subjectStats.map(s => <SubjectCard key={s.sub} {...s} />)}
           </div>
 
