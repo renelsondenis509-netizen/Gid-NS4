@@ -108,7 +108,7 @@ export function ProgressScreen({ user, onNavigate }) {
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <button onClick={() => onNavigate("menu")} style={{ background:"rgba(37,99,235,0.12)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:10, width:36, height:36, color:"#60a5fa", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><IcoBack/></button>
           <div>
-            <h1 style={{ color:"#E8EEFF", fontWeight:800, fontSize:18, margin:0, display:"flex", alignItems:"center", gap:8 }}><IcoTrend/> Pwogresyon mwen</h1>
+            <h1 style={{ color:"#E8EEFF", fontWeight:800, fontSize:18, margin:0, display:"flex", alignItems:"center", gap:8 }}><IcoTrend/> Pwogresyon</h1>
             <p style={{ color:"#4B6ABA", fontSize:11, margin:0 }}>{user.name || user.phone}</p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export function ProgressScreen({ user, onNavigate }) {
           <div style={{ textAlign:"center", marginTop:80 }}>
             <div style={{ display:"flex", justifyContent:"center", marginBottom:16 }}><IcoBook/></div>
             <p style={{ color:"#4B6ABA", fontSize:14, fontWeight:600 }}>Pa gen done ankò.</p>
-            <p style={{ color:"#2d4080", fontSize:12 }}>Fè premye quiz ou a pou wè pwogresyon ou.</p>
+            <p style={{ color:"#2d4080", fontSize:12 }}>Fè premye quiz ou a pou wè pwogresyon ou yo.</p>
             <button onClick={() => onNavigate("quiz")} style={{ marginTop:20, padding:"12px 28px", borderRadius:14, background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"#fff", fontWeight:800, fontSize:14, border:"none", cursor:"pointer" }}>
               Kòmanse yon Quiz
             </button>
@@ -145,10 +145,10 @@ export function ProgressScreen({ user, onNavigate }) {
             <div style={{ color:"#2d4080", fontSize:10, marginTop:4 }}>{stats.total} / {stats.max} matye eseye</div>
           </div>
 
-          {/* Pi bon matye */}
+          {/* Matyè ki gen plis pwen */}
           {stats.top3.length > 0 && (
             <div style={{ marginBottom:16 }}>
-              <h3 style={{ color:"#22c55e", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoStar/> Pi bon matye</h3>
+              <h3 style={{ color:"#22c55e", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoStar/> Matyè ki gen plis pwen</h3>
               {stats.top3.map(s => <SubjectCard key={s.sub} {...s} highlight="good" />)}
             </div>
           )}
@@ -170,7 +170,7 @@ export function ProgressScreen({ user, onNavigate }) {
           {/* Matières non tentées */}
           {stats.untried.length > 0 && (
             <div style={{ marginBottom:16 }}>
-              <h3 style={{ color:"#4B6ABA", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoLock/> Pa eseye ankò ({stats.untried.length})</h3>
+              <h3 style={{ color:"#4B6ABA", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoLock/> Matyè ki poko eseye({stats.untried.length})</h3>
               <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                 {stats.untried.map(sub => (
                   <span key={sub} style={{ background:"rgba(15,28,60,0.7)", border:"1px solid #1e3a8a22", borderRadius:20, padding:"4px 10px", color:"#2d4080", fontSize:11, display:"flex", alignItems:"center", gap:4 }}><IcoLock/>{sub}</span>
