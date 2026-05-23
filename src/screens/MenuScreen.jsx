@@ -181,7 +181,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
         <button onClick={onLogout} className="w-full py-4 rounded-2xl text-red-400 font-semibold"
           style={{ background: "#d4002a15", border: "1px solid #d4002a30" }}>Dekonekte</button>
         <div style={{ textAlign:"center" }}>
-          <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>🔒 Politik Konfidansyalite</a>
+          <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/privacy-policy.html" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>🔒 Politik Konfidansyalite</a>
         </div>
       </div>
 
