@@ -3,6 +3,7 @@ import { BottomNav } from "../components/UI";
 import { getQuizGrades } from "../utils/quiz";
 import { QUIZ_BRANCHES } from "../data/quizData";
 import { idbGetExercice } from "../utils/idb";
+import { BADGES, computeBadges } from "../utils/badges";
 
 const ALL_SUBJECTS = Object.values(QUIZ_BRANCHES).flatMap(f => f.subjects);
 
@@ -95,8 +96,9 @@ export function ProgressScreen({ user, onNavigate }) {
     const weak3   = subjectStats.length > 3 ? [...subjectStats].sort((a, b) => a.best - b.best).slice(0, 3) : [];
     const bestStreak = Math.max(...subjectStats.map(s => s.streak));
     const untried = ALL_SUBJECTS.filter(s => !subjects.includes(s));
+    const badgeList = computeBadges({ grades, exoCount: totalExo, allSubjectsCount: ALL_SUBJECTS.length });
 
-    return { subjectStats: sorted, avg, top3, weak3, bestStreak, untried, totalExo, total: subjectStats.length, max: ALL_SUBJECTS.length };
+    return { subjectStats: sorted, avg, top3, weak3, bestStreak, untried, totalExo, total: subjectStats.length, max: ALL_SUBJECTS.length, badgeList };
   }, [grades, exoData]);
 
   return (
@@ -165,6 +167,24 @@ export function ProgressScreen({ user, onNavigate }) {
           <div style={{ marginBottom:16 }}>
             <h3 style={{ color:"#93c5fd", fontSize:13, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoChart/> Matyè eseye</h3>
             {stats.subjectStats.map(s => <SubjectCard key={s.sub} {...s} />)}
+          </div>
+
+
+          {/* Badges */}
+          <div style={{ marginBottom:16 }}>
+            <h3 style={{ color:"#fbbf24", fontSize:13, fontWeight:700, marginBottom:10, display:"flex", alignItems:"center", gap:6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Meday ({stats.badgeList.filter(b=>b.unlocked).length}/{stats.badgeList.length})
+            </h3>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
+              {stats.badgeList.map(b => (
+                <div key={b.id} style={{ background: b.unlocked ? `${b.color}18` : "rgba(15,28,60,0.5)", border:`1px solid ${b.unlocked ? b.color+"44" : "#1e3a8a22"}`, borderRadius:14, padding:"10px 8px", textAlign:"center", opacity: b.unlocked ? 1 : 0.4, transition:"opacity .3s" }}>
+                  <div style={{ width:28, height:28, margin:"0 auto 6px", filter: b.unlocked ? "none" : "grayscale(1)" }} dangerouslySetInnerHTML={{ __html: b.svg }} />
+                  <div style={{ color: b.unlocked ? b.color : "#2d4080", fontSize:10, fontWeight:700, lineHeight:1.2 }}>{b.label}</div>
+                  <div style={{ color:"#2d4080", fontSize:9, marginTop:2 }}>{b.desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Matières non tentées */}

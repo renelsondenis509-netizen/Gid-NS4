@@ -1,3 +1,5 @@
+import { computeBadges, BADGES } from "../utils/badges";
+import { QUIZ_BRANCHES } from "../data/quizData";
 import { APP_LOGO } from "../config";
 import { BottomNav } from "../components/UI";
 
@@ -69,24 +71,8 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
     ...(isAdmin ? [{ icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 14l2 2 4-4"/></svg>, label: "Admin", screen: "admin" }] : []),
   ];
 
-  const computeBadges = () => {
-    const badges = [];
-    try {
-      const grades = JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}");
-      const allGrades = Object.values(grades).flat();
-      const perfect = allGrades.filter(g => g.note20 >= 20).length;
-      const subjects20 = new Set(Object.keys(grades).filter(k => grades[k]?.note20 >= 20));
-      const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
-      const imgUsed = parseInt(localStorage.getItem(`gid_img_${user.phone}_${today}`) || "0");
-      const txtUsed = parseInt(localStorage.getItem(`gid_txt_${user.phone}_${today}`) || "0");
-      if (imgUsed + txtUsed >= 1) badges.push({ icon:"🎯", label:"Premye Kesyon", color:"#fbbf24" });
-      if (allGrades.length >= 1)  badges.push({ icon:"⭐", label:"Premye Quiz",   color:"#f59e0b" });
-      if (perfect >= 1)           badges.push({ icon:"🏆", label:"Pafè 20/20",    color:"#fbbf24" });
-      if (subjects20.size >= 3)   badges.push({ icon:"💎", label:"Maèt",          color:"#a855f7" });
-    } catch {}
-    return badges;
-  };
-  const badges = computeBadges();
+  const grades = (() => { try { return JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}"); } catch { return {}; } })();
+  const badges = computeBadges({ grades, exoCount: 0, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length }).filter(b => b.unlocked);
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
@@ -133,15 +119,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
 
         <div style={{ color:"#3B5BA8", fontSize:11, textAlign:"center", marginTop:10 }}>{user.school}</div>
 
-        {badges.length > 0 && (
-          <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:10, justifyContent:"center" }}>
-            {badges.map((b, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", borderRadius:20, background:`${b.color}18`, border:`1px solid ${b.color}44`, fontSize:10, fontWeight:700, color:b.color }}>
-                <span style={{ fontSize:12 }}>{b.icon}</span> {b.label}
-              </div>
-            ))}
-          </div>
-        )}
+
 
         <div className="mt-4 rounded-xl px-4 py-3 flex justify-between items-center"
           style={{ background: user.daysRemaining <= 7 ? "#d4002a22" : "#14532d22", border: `1px solid ${user.daysRemaining <= 7 ? "#d4002a44" : "#22c55e33"}` }}>
