@@ -17,6 +17,7 @@ import { DashboardScreen }   from "./screens/DashboardScreen";
 import { PartnerScreen }     from "./screens/PartnerScreen";
 import { FavoritesScreen }   from "./screens/FavoritesScreen";
 import AdminScreen       from "./screens/AdminScreen";
+import { ProgressScreen }   from "./screens/ProgressScreen";
 import { OfflineBanner }     from "./components/OfflineBanner";
 
 function enrichUser(u) {
@@ -99,6 +100,7 @@ export default function App() {
     if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />;
     if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
     if (screen === "admin")       return <AdminScreen onBack={() => nav("menu")} />;
+    if (screen === "progress")    return <ProgressScreen user={user} onNavigate={nav} />;
     return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
   }
 
