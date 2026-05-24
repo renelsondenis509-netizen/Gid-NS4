@@ -33,6 +33,7 @@ export function shuffleChoices(q) {
 
 // ─── IMAGE ───────────────────────────────────────────────────────────────────
 export function compressImage(base64, maxSize = 800, quality = 0.6) {
+  if (!base64 || !base64.startsWith("data:image/")) return Promise.resolve(base64);
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
