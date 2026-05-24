@@ -2,6 +2,7 @@ import { callEdge, parseApiError } from "../api";
 import { useState, useEffect, useRef } from "react";
 
 const generateAndSharePDF = async (school, stats) => {
+  try {
   const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
   const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
   const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
@@ -226,7 +227,10 @@ const generateAndSharePDF = async (school, stats) => {
   doc.setFontSize(8); doc.setTextColor(147,197,253);
   doc.text("Pwodwi ak Gid NS4  •  Prof Lakay  •  Konfidansyèl", W/2, 292, { align:"center" });
 
-  doc.save(`rapport-${school.name}-${date}.pdf`);
+    doc.save(`rapport-${school.name}-${date}.pdf`);
+  } catch (err) {
+    alert('Enposib jenere PDF la. Verifye koneksyon entènèt ou (jsPDF bezwen entènèt premye fwa).');
+  }
 };
 
 
@@ -280,7 +284,8 @@ if (window[_winKey]) {
   const saved = localStorage.getItem(_dirKey);
   if (!saved) return;
   const parsed = JSON.parse(saved);
-  const { directorCode } = parsed._auth || {};
+  const { directorCode: _enc } = parsed._auth || {};
+  const directorCode = _enc ? atob(_enc) : undefined;
   if (!directorCode) return;
 
   setLoading(true);
@@ -315,9 +320,9 @@ if (window[_winKey]) {
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim(), deviceId: getDeviceId() });
       setStats(result);
       setAuthorized(true);
-      const fullData = JSON.stringify({ ...result, _auth: { directorCode: dirCode.trim() } });
-      localStorage.setItem(_dirKey, fullData);
-      window[`_gns4_dash_${userCode}`] = JSON.parse(fullData);
+      const fullData = { ...result, _auth: { directorCode: btoa(dirCode.trim()) } };
+      localStorage.setItem(_dirKey, JSON.stringify(fullData));
+      window[`_gns4_dash_${userCode}`] = fullData;
     } catch (e) {
       setError(parseApiError(e).message);
     }
@@ -443,6 +448,7 @@ if (window[_winKey]) {
     );
   }
 
+  if (!stats?.school || !stats?.stats) return null;
   const { school, stats: s } = stats;
   const subjectEntries = Object.entries(s.subjectBreakdown || {}).sort((a, b) => b[1] - a[1]);
   const maxScans = Math.max(...subjectEntries.map(e => e[1]), 1);
@@ -591,7 +597,7 @@ if (window[_winKey]) {
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg,#25d366,#128c7e)", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}
         >
-          <WhatsAppIcon /> Pataje rapò PDF sou WhatsApp
+          <WhatsAppIcon /> Telechaje PDF
         </button>
       </div>
     </div>
