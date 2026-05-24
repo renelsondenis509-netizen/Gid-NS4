@@ -28,15 +28,15 @@ export function computeBadges({ grades, exoCount, allSubjectsCount }) {
     const allGrades  = Object.values(grades).flat();
     const subjects   = Object.keys(grades);
     const perfect    = allGrades.filter(g => g.note20 >= 20).length;
-    const subjects20 = subjects.filter(k => grades[k].some(e => e.note20 >= 20));
-    const avg        = subjects.length ? allGrades.reduce((a,b) => a + b.note20, 0) / allGrades.length : 0;
+    const subjects20 = subjects.filter(k => Array.isArray(grades[k]) && grades[k].some(e => e.note20 >= 20));
+    const bestNotes  = subjects.map(k => Math.max(...grades[k].map(e => e.note20)));
+    const avg        = bestNotes.length ? bestNotes.reduce((a,b) => a+b, 0) / bestNotes.length : 0;
     const maxStreak  = Math.max(0, ...subjects.map(k => grades[k].filter(e => e.note20 >= 16).length));
     const coverage   = subjects.length / allSubjectsCount;
     const today      = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
-    const imgUsed    = parseInt(localStorage.getItem(`gid_img_undefined_${today}`) || "0");
-    const txtUsed    = parseInt(localStorage.getItem(`gid_txt_undefined_${today}`) || "0");
+    const scanUsed   = parseInt(localStorage.getItem(`gid_scan_${grades._phone || ''}_${today}`) || "0");
 
-    if (imgUsed + txtUsed >= 1 || allGrades.length >= 1) unlocked.add("first_scan");
+    if (scanUsed >= 1 || allGrades.length >= 1) unlocked.add("first_scan");
     if (allGrades.length >= 1)   unlocked.add("first_quiz");
     if (perfect >= 1)            unlocked.add("perfect");
     if (subjects20.length >= 3)  unlocked.add("master");

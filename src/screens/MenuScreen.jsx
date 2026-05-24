@@ -1,4 +1,6 @@
 import { computeBadges, BADGES } from "../utils/badges";
+import { useState, useEffect } from "react";
+import { idbGetExercice } from "../utils/idb";
 import { QUIZ_BRANCHES } from "../data/quizData";
 import { APP_LOGO } from "../config";
 import { BottomNav } from "../components/UI";
@@ -72,7 +74,9 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
   ];
 
   const grades = (() => { try { return JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}"); } catch { return {}; } })();
-  const badges = computeBadges({ grades, exoCount: 0, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length }).filter(b => b.unlocked);
+  const [exoCount, setExoCount] = useState(0);
+  useEffect(() => { idbGetExercice(user.phone).then(e => setExoCount(e.length)).catch(()=>{}); }, [user.phone]);
+  const badges = computeBadges({ grades, exoCount, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length }).filter(b => b.unlocked);
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
