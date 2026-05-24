@@ -285,7 +285,7 @@ if (window[_winKey]) {
   if (!saved) return;
   const parsed = JSON.parse(saved);
   const { directorCode: _enc } = parsed._auth || {};
-  const directorCode = _enc ? atob(_enc) : undefined;
+  let directorCode; try { directorCode = _enc ? atob(_enc) : undefined; } catch { directorCode = _enc; }
   if (!directorCode) return;
 
   setLoading(true);

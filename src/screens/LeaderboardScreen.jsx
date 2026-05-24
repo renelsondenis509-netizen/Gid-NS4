@@ -75,7 +75,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
               style={{ background:tab===id?"linear-gradient(135deg,#d4002a,#ff6b35)":"#0f1e4a", color:tab===id?"white":"#4b5ea8", border:tab===id?"none":"1px solid #1e3a8a33" }}>
               <Icon size={13}/> {label}
             </button>
-          ); })}
+          ))}
         </div>
       </div>
 
@@ -129,14 +129,13 @@ export function LeaderboardScreen({ user, onNavigate }) {
                         {entry.isMe && <div style={{ color:colors[rank], fontSize:10, marginTop:3 }}>← Ou</div>}
                       </div>
                     </div>
-                  );
-                })}
+                  )})}
               </div>
             )}
 
             <div className="space-y-2">
-              {board.map((entry, i) => { const stableKey = entry.phone || `rank_${i}`; return (
-                <div key={stableKey} style={{
+              {board.map((entry, i) => (
+                <div key={entry.phone || i} style={{
                   display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:14,
                   background:entry.isMe?"rgba(37,99,235,0.15)":"rgba(15,28,60,0.80)",
                   border:entry.isMe?"1.5px solid rgba(37,99,235,0.5)":"1px solid rgba(255,255,255,0.10)",
