@@ -9,4 +9,4 @@ export const SUPABASE_URL     = url;
 export const SUPABASE_ANON    = anon;
 export const API               = `${url}/functions/v1/ask-prof-lakay`;
 export const APP_LOGO          = "/logo.png?v=2";
-export const PROF_LAKAY_PHOTO  = "https://i.postimg.cc/MH8V3LKv/Jpgpro-out-bfea41d353cc11eb57c8fc16e3b40ffa.jpg";
+export const PROF_LAKAY_PHOTO  = "/prof-lakay.jpg";

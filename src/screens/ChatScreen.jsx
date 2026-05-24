@@ -115,10 +115,6 @@ export function ChatScreen({ user, onNavigate }) {
     if (freemiumExpired) { onNavigate("payment"); return; }
     if (scansUsed >= DAILY_MAX) return;
     if (loading) return;
-    if (!activeSubject) {
-      setMessages(p => [...p, { role:"assistant", content:"⚠️ **Chwazi yon matyè anvan!**\n\nKlike sou youn nan matyè ki anba a (Biologie, Chimie, Physique...) pou mwen ka ede ou kòmsadwa." }]);
-      return;
-    }
     await new Promise(r => setTimeout(r, 300));
     const payload = retryPayload || {
       userMsg:      { role:"user", content:input.trim()||"Analyse cet exercice.", image },
@@ -141,7 +137,6 @@ export function ChatScreen({ user, onNavigate }) {
       setScansUsed(next);
       try { localStorage.setItem(_scanKey, String(next)); } catch {}
       setLastPayload(null);
-      setActiveSubject(null);
       await idbSaveScan(user.phone, {
         date:     new Date().toLocaleString("fr-HT", { timeZone:"America/Port-au-Prince" }),
         scanDate: new Date().toISOString().split("T")[0],
@@ -166,9 +161,10 @@ export function ChatScreen({ user, onNavigate }) {
   const allDone = scansUsed >= DAILY_MAX;
 
   const toggleFav = (msg, i) => {
+    const stableId = `${msg.subject||"gen"}_${(msg.content||"").slice(0,32).replace(/\s/g,"_")}`;
     setFavorites(prev => {
-      const exists = prev.findIndex(f => f.id === i);
-      const next   = exists >= 0 ? prev.filter(f => f.id !== i) : [...prev, { id:i, content:msg.content, subject:activeSubject, date:new Date().toLocaleDateString("fr-HT",{timeZone:"America/Port-au-Prince"}) }];
+      const exists = prev.findIndex(f => f.id === stableId);
+      const next   = exists >= 0 ? prev.filter(f => f.id !== stableId) : [...prev, { id:stableId, content:msg.content, subject:msg.subject||activeSubject, date:new Date().toLocaleDateString("fr-HT",{timeZone:"America/Port-au-Prince"}) }];
       try { localStorage.setItem(`fav_${user.phone}`, JSON.stringify(next)); } catch {}
       return next;
     });
@@ -286,7 +282,7 @@ export function ChatScreen({ user, onNavigate }) {
               {msg.role === "assistant" && (
                 <div style={{ display:"flex", gap:4, marginTop:6, paddingLeft:4 }}>
                   <button onClick={()=>toggleFav(msg,i)} style={{ width:28, height:28, borderRadius:8, background:"none", border:"none", cursor:"pointer", color:"#fbbf24", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
-                    {favorites.findIndex(f=>f.id===i)>=0 ? <StarFullIcon/> : <StarOutlineIcon/>}
+                    {favorites.findIndex(f=>f.id===`${msg.subject||"gen"}_${(msg.content||"").slice(0,32).replace(/\s/g,"_")}`)>=0 ? <StarFullIcon/> : <StarOutlineIcon/>}
                   </button>
                   <button onClick={()=>speak(msg.content)} style={{ width:28, height:28, borderRadius:8, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.2)", cursor:"pointer", color:"#60a5fa", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     <SpeakIcon/>

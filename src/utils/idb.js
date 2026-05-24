@@ -6,14 +6,24 @@ function openDB() {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
+      const tx = e.target.transaction;
+      // scans
       if (!db.objectStoreNames.contains("scans")) {
         const s = db.createObjectStore("scans", { keyPath: "id" });
         s.createIndex("phone", "phone", { unique: false });
+      } else {
+        const s = tx.objectStore("scans");
+        if (!s.indexNames.contains("phone")) s.createIndex("phone", "phone", { unique: false });
       }
+      // exercices
       if (!db.objectStoreNames.contains("exercices")) {
         const s = db.createObjectStore("exercices", { keyPath: "id" });
         s.createIndex("phone", "phone", { unique: false });
+      } else {
+        const s = tx.objectStore("exercices");
+        if (!s.indexNames.contains("phone")) s.createIndex("phone", "phone", { unique: false });
       }
+      // pending_scores
       if (!db.objectStoreNames.contains("pending_scores")) {
         db.createObjectStore("pending_scores", { keyPath: "id", autoIncrement: true });
       }
@@ -44,7 +54,7 @@ export async function idbGetScans(phone) {
   const db = await openDB();
   return txPromise(db, "scans", "readonly", (store, resolve, reject) => {
     const req = store.index("phone").getAll(phone);
-    req.onsuccess = (e) => resolve([...e.target.result].reverse().slice(0, 50));
+    req.onsuccess = (e) => resolve([...e.target.result].reverse().slice(0, 100));
     req.onerror   = (e) => reject(e.target.error);
   });
 }
@@ -69,7 +79,7 @@ export async function idbGetExercice(phone) {
   const db = await openDB();
   return txPromise(db, "exercices", "readonly", (store, resolve, reject) => {
     const req = store.index("phone").getAll(phone);
-    req.onsuccess = (e) => resolve([...e.target.result].reverse().slice(0, 50));
+    req.onsuccess = (e) => resolve([...e.target.result].reverse().slice(0, 100));
     req.onerror   = (e) => reject(e.target.error);
   });
 }

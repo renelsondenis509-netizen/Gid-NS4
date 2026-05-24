@@ -5,7 +5,7 @@ export async function callEdge(payload) {
     throw { type: "offline", offline: true };
   }
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 15000);
   try {
     const res = await fetch(API, {
       method:  "POST",
