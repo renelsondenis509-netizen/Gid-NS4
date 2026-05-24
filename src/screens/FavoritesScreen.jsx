@@ -32,7 +32,7 @@ export function FavoritesScreen({ user, onNavigate }) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(cleanForTTS(text));
       utterance.lang = 'fr-FR';
-      utterance.rate = 1.1;
+      utterance.rate = 0.9;
       utterance.onend = () => setSpeakingId(null);
       utterance.onerror = () => setSpeakingId(null);
       window.speechSynthesis.speak(utterance);
@@ -41,8 +41,12 @@ export function FavoritesScreen({ user, onNavigate }) {
   };
 
   useEffect(() => {
-    return () => window.speechSynthesis.cancel();
-  }, []);
+    const sync = () => {
+      try { setFavorites(JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]")); } catch {}
+    };
+    window.addEventListener("focus", sync);
+    return () => { window.speechSynthesis.cancel(); window.removeEventListener("focus", sync); };
+  }, [user.phone]);
 
   const removeFav = (id) => {
     const next = favorites.filter(f => f.id !== id);
@@ -111,7 +115,7 @@ export function FavoritesScreen({ user, onNavigate }) {
           </div>
         )}
         {favorites.map((f, i) => (
-          <div key={i} className="rounded-2xl overflow-hidden" style={{ background:"#0f1e4a", border:"1px solid #3b82f655" }}>
+          <div key={f.id || i} className="rounded-2xl overflow-hidden" style={{ background:"#0f1e4a", border:"1px solid #3b82f655" }}>
             <button onClick={() => setSelected(f)} className="w-full text-left active:scale-95 transition-transform">
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -119,7 +123,7 @@ export function FavoritesScreen({ user, onNavigate }) {
                   <span className="text-blue-400 text-xs ml-auto">{f.date}</span>
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color:"#c7d2fe", display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
-                  {f.content?.slice(0, 120)}...
+                  {f.content?.length > 120 ? f.content.slice(0, 120) + "..." : f.content}
                 </p>
               </div>
             </button>

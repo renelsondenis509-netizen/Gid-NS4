@@ -87,6 +87,7 @@ const getSubjectIcon = (subject, size = 20, color = "#fff") => {
 
 // ─── QUIZ SCREEN ─────────────────────────────────────────────
 export function QuizScreen({ user, onNavigate }) {
+  if (!hasAccess(user)) { onNavigate("payment"); return null; }
   const [phase,         setPhase]         = useState("select");
   const [subject,       setSubject]       = useState(null);
   const [shuffledQs,    setShuffledQs]    = useState([]);
@@ -105,7 +106,6 @@ export function QuizScreen({ user, onNavigate }) {
   const [openBranch,    setOpenBranch]    = useState(null);
 
   const currentQ = shuffledQs[qIndex];
-  if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
   const startQCM = (sub) => {
     const all    = shuffleArray(QUIZ_DATA[sub]);
@@ -137,7 +137,7 @@ export function QuizScreen({ user, onNavigate }) {
     setTotalAnswered(t => t + 1);
     if (correct) {
       setScore(s => s + 1); setRoundScore(r => r + 1);
-      setStreak(s => { const ns = s + 1; setMaxStreak(m => Math.max(m, ns)); return ns; });
+      setStreak(s => { const ns = s + 1; setMaxStreak(m => { const nm = Math.max(m, ns); return nm; }); return ns; });
     } else {
       setHearts(h => h - 1); setStreak(0);
       setShaking(true); setTimeout(() => setShaking(false), 500);
@@ -157,7 +157,7 @@ export function QuizScreen({ user, onNavigate }) {
     const unseen = all.filter(q => !usedQKeys.has(q.q));
     const pool   = unseen.length >= 10 ? unseen : shuffleArray(all);
     const next10 = shuffleArray(pool).slice(0, 10).map(shuffleChoices);
-    setShuffledQs(next10); setUsedQKeys(new Set([...usedQKeys, ...next10.map(q => q.q)]));
+    setShuffledQs(next10); setUsedQKeys(prev => new Set([...prev, ...next10.map(q => q.q)]));
     setQIndex(0); setSelected(null); setRoundScore(0); setRound(r => r + 1); setPhase("qcm");
   };
 
@@ -383,7 +383,7 @@ export function QuizScreen({ user, onNavigate }) {
 
   // ── BRAVO ─────────────────────────────────────────────────────
   if (phase === "bravo") {
-    const note20   = scoreToNote20(roundScore, 10);
+    const note20   = scoreToNote20(roundScore, shuffledQs.length || 10);
     const mention  = getMention(note20);
     const allCount = (QUIZ_DATA[subject]||[]).length;
     const seenCount = usedQKeys.size;
