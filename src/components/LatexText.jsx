@@ -13,8 +13,20 @@ function ensureKatex() {
   const script = document.createElement("script");
   script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
   script.onload = () => { katexReady = true; katexQueue.forEach(r => r()); katexQueue = []; };
+  script.onerror = () => { katexQueue = []; };
   document.head.appendChild(script);
   return new Promise(r => katexQueue.push(r));
+}
+
+
+function sanitizeHtml(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<iframe[\s\S]*?<\/iframe>/gi, "")
+    .replace(/on\w+\s*=/gi, "")
+    .replace(/<img[^>]+onerror[^>]*>/gi, "")
+    .replace(/<object[\s\S]*?<\/object>/gi, "")
+    .replace(/<embed[^>]*>/gi, "");
 }
 
 export function LatexText({ content }) {
@@ -35,7 +47,7 @@ export function LatexText({ content }) {
             try { return window.katex.renderToString(e.trim(), { displayMode:false, throwOnError:false }); }
             catch { return `<code class="katex-fallback">${e}</code>`; }
           });
-        setHtml(result);
+        setHtml(sanitizeHtml(result));
       } catch { setHtml(null); }
     });
     return () => { cancelled = true; };
@@ -52,8 +64,8 @@ export function LatexText({ content }) {
           <span dangerouslySetInnerHTML={{ __html:
             line
               .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-              .replace(/\$\$?([\s\S]+?)\$?\$/g, (_, e) =>
-                `<code style="background:#0d2244;color:#93c5fd;padding:1px 4px;border-radius:4px;font-family:monospace;font-size:.85em">${e}</code>`)
+              .replace(/\$\$([^$]+?)\$\$|\$([^$\n]+?)\$/g, (match, d, i) => { const e = d || i; return
+                `<code style="background:#0d2244;color:#93c5fd;padding:1px 4px;border-radius:4px;font-family:monospace;font-size:.85em">${e}</code>`; })
           }} />
           {i < arr.length - 1 && <br />}
         </span>
