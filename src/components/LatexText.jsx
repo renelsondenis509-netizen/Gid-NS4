@@ -64,8 +64,7 @@ export function LatexText({ content }) {
           <span dangerouslySetInnerHTML={{ __html:
             line
               .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-              .replace(/\$\$([^$]+?)\$\$|\$([^$\n]+?)\$/g, (match, d, i) => { const e = d || i; return
-                `<code style="background:#0d2244;color:#93c5fd;padding:1px 4px;border-radius:4px;font-family:monospace;font-size:.85em">${e}</code>`; })
+              .replace(/\$\$([^$]+?)\$\$|\$([^$\n]+?)\$/g, (match, d, i) => { const e = d || i; return `<code style="background:#0d2244;color:#93c5fd;padding:1px 4px;border-radius:4px;font-family:monospace;font-size:.85em">${e}</code>`; })
           }} />
           {i < arr.length - 1 && <br />}
         </span>
