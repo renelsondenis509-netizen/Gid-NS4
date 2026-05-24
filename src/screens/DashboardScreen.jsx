@@ -227,7 +227,17 @@ const generateAndSharePDF = async (school, stats) => {
   doc.setFontSize(8); doc.setTextColor(147,197,253);
   doc.text("Pwodwi ak Gid NS4  •  Prof Lakay  •  Konfidansyèl", W/2, 292, { align:"center" });
 
-    doc.save(`rapport-${school.name}-${date}.pdf`);
+    const pdfBlob = doc.output("blob");
+    const fileName = `rapport-${school.name}-${date}.pdf`;
+    const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "Rapò Gid NS4", text: `Rapò ofisyèl — ${school.name}` });
+    } else {
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement("a");
+      a.href = url; a.download = fileName; a.click();
+      URL.revokeObjectURL(url);
+    }
   } catch (err) {
     alert('Enposib jenere PDF la. Verifye koneksyon entènèt ou (jsPDF bezwen entènèt premye fwa).');
   }
