@@ -2,7 +2,7 @@ import { useState } from "react";
 import { APP_LOGO } from "../config";
 import { callEdge, parseApiError } from "../api";
 
-export function LoginScreen({ onLogin, onNavigate }) {
+export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   const [name,  setName]  = useState("");
   const [phone, setPhone] = useState("");
   const [code,  setCode]  = useState("");
@@ -21,19 +21,21 @@ export function LoginScreen({ onLogin, onNavigate }) {
     try {
       const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
       if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
-      onLogin({
-        name: name.trim(), phone: phone.trim(),
-        code: code.toUpperCase().trim(),
-        school:          result.school.name,
-        subjects:        result.school.subjects,
-        dailyScans:      result.school.dailyScans,
-        dailyImageScans: result.school.dailyImageScans ?? 1,
-        dailyTextScans:  result.school.dailyTextScans  ?? 4,
-        daysRemaining:   result.school.daysRemaining,
-        expiresAt:       result.school.expiresAt,
-        freemiumExpiresAt: null,
-        scansToday:      result.scansToday,
-      });
+      try {
+        onLogin({
+          name: name.trim(), phone: phone.trim(),
+          code: code.toUpperCase().trim(),
+          school:          result.school.name,
+          subjects:        result.school.subjects,
+          dailyScans:      result.school.dailyScans,
+          dailyImageScans: result.school.dailyImageScans ?? 1,
+          dailyTextScans:  result.school.dailyTextScans  ?? 4,
+          daysRemaining:   result.school.daysRemaining,
+          expiresAt:       result.school.expiresAt,
+          freemiumExpiresAt: null,
+          scansToday:      result.scansToday,
+        });
+      } catch {}
     } catch (e) { setError(parseApiError(e).message); }
     setLoading(false);
   };
@@ -69,6 +71,11 @@ export function LoginScreen({ onLogin, onNavigate }) {
   return (
     <div style={{ position:"fixed", inset:0, display:"flex", flexDirection:"column", overflow:"hidden", background:"linear-gradient(160deg,#03060F 0%,#06091A 50%,#0A0720 100%)" }}>
 
+      {expired && (
+        <div style={{ position:"relative", zIndex:10, background:"linear-gradient(90deg,#7f1d1d,#991b1b)", padding:"10px 16px", textAlign:"center", fontSize:13, color:"#fca5a5", fontWeight:600 }}>
+          ⚠️ Kòd ou a ekspire — Kontakte direksyon lekòl ou pou renouvle.
+        </div>
+      )}
       {/* Orbes décoratifs */}
       <div style={{ position:"absolute", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle,#2563EB0D,transparent 60%)", top:"-20%", right:"-25%", pointerEvents:"none" }} />
       <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle,#7C3AED08,transparent 60%)", bottom:"-10%", left:"-20%", pointerEvents:"none" }} />
