@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
-import { idbGetPendingScores, idbDeletePendingScore } from "./utils/idb";
-import { callEdge } from "./api";
 import { getFreemiumStatus, hasAccess } from "./utils/freemium";
 import { requestNotificationPermission, scheduleDailyReminder, scheduleExpiryReminder } from "./utils/notifications";
 import { SplashScreen }      from "./screens/SplashScreen";
@@ -74,6 +72,25 @@ export default function App() {
         if (granted && enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
       });
     }
+  }, []);
+
+  // Sync pending scores au retour en ligne
+  useEffect(() => {
+    const sync = async () => {
+      if (!navigator.onLine) return;
+      try {
+        const pending = await idbGetPendingScores();
+        for (const score of pending) {
+          try {
+            await callEdge({ action: "save_score", ...score });
+            await idbDeletePendingScore(score.id);
+          } catch {}
+        }
+      } catch {}
+    };
+    window.addEventListener("online", sync);
+    sync();
+    return () => window.removeEventListener("online", sync);
   }, []);
 
   const handleLogin = (u) => {
