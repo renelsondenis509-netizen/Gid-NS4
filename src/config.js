@@ -8,5 +8,5 @@ if (!url || !anon) {
 export const SUPABASE_URL     = url;
 export const SUPABASE_ANON    = anon;
 export const API               = `${url}/functions/v1/ask-prof-lakay`;
-export const APP_LOGO          = "/logo.png?v=2";
+export const APP_LOGO          = "/logo.png?v=3";
 export const PROF_LAKAY_PHOTO  = "/prof-lakay.jpg";
