@@ -4,6 +4,7 @@ import { idbGetExercice } from "../utils/idb";
 import { QUIZ_BRANCHES } from "../data/quizData";
 import { APP_LOGO } from "../config";
 import { BottomNav } from "../components/UI";
+import { scheduleDailyReminder, cancelAllNotifications, requestNotificationPermission } from "../utils/notifications";
 
 export function MenuScreen({ user, onNavigate, onLogout }) {
   // ─── SVG ICONS ───────────────────────────────────────────────────────────
@@ -77,6 +78,32 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
   const [exoCount, setExoCount] = useState(0);
   useEffect(() => { idbGetExercice(user.phone).then(e => setExoCount(e.length)).catch(()=>{}); }, [user.phone]);
   const badges = computeBadges({ grades, exoCount, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length }).filter(b => b.unlocked);
+
+  const NOTIF_KEY = "gns4_notif_settings";
+  const savedNotif = (() => { try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || "{}"); } catch { return {}; } })();
+  const [notifEnabled, setNotifEnabled] = useState(savedNotif.enabled ?? true);
+  const [notifHour, setNotifHour] = useState(savedNotif.hour ?? 18);
+
+  const handleNotifToggle = async () => {
+    const next = !notifEnabled;
+    setNotifEnabled(next);
+    localStorage.setItem(NOTIF_KEY, JSON.stringify({ enabled: next, hour: notifHour }));
+    if (next) {
+      const granted = await requestNotificationPermission();
+      if (granted) await scheduleDailyReminder(notifHour);
+    } else {
+      await cancelAllNotifications();
+    }
+  };
+
+  const handleNotifHour = async (h) => {
+    setNotifHour(h);
+    localStorage.setItem(NOTIF_KEY, JSON.stringify({ enabled: notifEnabled, hour: h }));
+    if (notifEnabled) {
+      const granted = await requestNotificationPermission();
+      if (granted) await scheduleDailyReminder(h);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
@@ -161,6 +188,34 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
       </div>
 
       <div className="px-4 pb-4 space-y-3">
+        <div className="rounded-2xl px-4 py-3" style={{ background:"#0f1e4a", border:"1px solid #1e3a8a44" }}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white text-sm font-semibold">🔔 Rapèl Chak Jou</span>
+            <button onClick={handleNotifToggle} style={{
+              width:44, height:24, borderRadius:12, border:"none", cursor:"pointer",
+              background: notifEnabled ? "linear-gradient(135deg,#d4002a,#ff6b35)" : "#1e3a8a",
+              position:"relative", transition:"background .3s"
+            }}>
+              <span style={{
+                position:"absolute", top:3, left: notifEnabled ? 22 : 3,
+                width:18, height:18, borderRadius:"50%", background:"white",
+                transition:"left .3s", display:"block"
+              }}/>
+            </button>
+          </div>
+          {notifEnabled && (
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-blue-400 text-xs">Lè :</span>
+              <select value={notifHour} onChange={e => handleNotifHour(Number(e.target.value))}
+                style={{ background:"#0a1530", color:"#93c5fd", border:"1px solid #1e3a8a", borderRadius:8, padding:"2px 8px", fontSize:12 }}>
+                {Array.from({length:24},(_,i)=>i).map(h => (
+                  <option key={h} value={h}>{String(h).padStart(2,"0")}:00</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
         <button onClick={onLogout} className="w-full py-4 rounded-2xl text-red-400 font-semibold"
           style={{ background: "#d4002a15", border: "1px solid #d4002a30" }}>Dekonekte</button>
         <div style={{ textAlign:"center" }}>

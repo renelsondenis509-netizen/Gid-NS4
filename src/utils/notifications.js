@@ -9,7 +9,7 @@ export async function requestNotificationPermission() {
   }
 }
 
-export async function scheduleDailyReminder() {
+export async function scheduleDailyReminder(hour = 18) {
   try {
     await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
     await LocalNotifications.schedule({
@@ -17,7 +17,7 @@ export async function scheduleDailyReminder() {
         id: 1,
         title: "📚 Gid NS4 — Prof Lakay",
         body: "Ou pa etidye jodi a ankò ! Ouvri app la epi poze yon kesyon.",
-        schedule: { on: { hour: 18, minute: 0 }, repeats: true, allowWhileIdle: true },
+        schedule: { on: { hour, minute: 0 }, repeats: true, allowWhileIdle: true },
         sound: null,
         smallIcon: "ic_launcher",
       }]
