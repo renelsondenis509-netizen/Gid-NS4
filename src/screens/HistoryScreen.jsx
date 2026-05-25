@@ -146,10 +146,13 @@ const HistoryCard = ({ h, onSelect, onSpeak, onDelete, speakingId, deleting }) =
               </div>
           }
           {/* Content */}
-          <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-            <div style={{ marginBottom: 4 }}>
-              <span style={{ fontSize: 12, color: "#475569" }}>{h.date}</span>
-            </div>
+         <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+  {subject && (
+    <div style={{ marginBottom: 4 }}><SubjectPill subject={subject}/></div>
+  )}
+  <div style={{ marginBottom: 4 }}>
+    <span style={{ fontSize: 12, color: "#475569" }}>{h.date}</span>
+  </div>
             <p style={{
               fontSize: 14, color: "#93c5fd", lineHeight: 1.5,
               overflow: "hidden", maxHeight: "3em",
