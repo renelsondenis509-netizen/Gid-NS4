@@ -67,7 +67,13 @@ export default function App() {
 
   useEffect(() => {
     const saved = sessionLoad();
-    if (saved?.phone && saved?.code) setUser(enrichUser(saved));
+    if (saved?.phone && saved?.code) {
+      const enriched = enrichUser(saved);
+      setUser(enriched);
+      requestNotificationPermission().then(granted => {
+        if (granted && enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
+      });
+    }
   }, []);
 
   const handleLogin = (u) => {
