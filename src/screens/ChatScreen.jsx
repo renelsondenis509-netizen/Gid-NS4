@@ -50,6 +50,7 @@ const SendIcon      = () => (<svg width="20" height="20" viewBox="0 0 24 24" fil
 const CloseIcon     = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>);
 const SpeakIcon     = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>);
 const ScrollDownIcon= () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>);
+const CopyIcon      = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>);
 
 export function ChatScreen({ user, onNavigate }) {
   const offline = useOffline();
@@ -63,6 +64,16 @@ export function ChatScreen({ user, onNavigate }) {
   const [activeSubject, setActiveSubject] = useState(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites,     setFavorites]     = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
+
+  const [copiedId, setCopiedId] = useState(null);
+  const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
+  const [msgTimes]  = useState(() => ({}));
+  const getTime = (i) => { if (!msgTimes[i]) msgTimes[i] = formatTime(); return msgTimes[i]; };
+
+  const copyText = (text, i) => {
+    const clean = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").trim();
+    navigator.clipboard?.writeText(clean).then(() => { setCopiedId(i); setTimeout(()=>setCopiedId(null), 2000); });
+  };
 
   const bottomRef = useRef(null);
   const fileRef   = useRef(null);
@@ -287,6 +298,10 @@ export function ChatScreen({ user, onNavigate }) {
                   <button onClick={()=>speak(msg.content)} style={{ width:28, height:28, borderRadius:8, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.2)", cursor:"pointer", color:"#60a5fa", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     <SpeakIcon/>
                   </button>
+                  <button onClick={()=>copyText(msg.content, i)} style={{ width:28, height:28, borderRadius:8, background:copiedId===i?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.05)", border:copiedId===i?"1px solid rgba(34,197,94,0.4)":"1px solid rgba(255,255,255,0.1)", cursor:"pointer", color:copiedId===i?"#4ade80":"#6b7280", display:"inline-flex", alignItems:"center", justifyContent:"center", transition:"all .2s" }}>
+                    <CopyIcon/>
+                  </button>
+                  <span style={{ fontSize:10, color:"#2d3f6e", marginLeft:2, alignSelf:"center" }}>{getTime(i)}</span>
                 </div>
               )}
             </div>
@@ -332,12 +347,13 @@ export function ChatScreen({ user, onNavigate }) {
 
         {/* SÉLECTEUR MATIÈRE */}
         {user.subjects && user.subjects.length > 0 && (
-          <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:8, scrollbarWidth:"none" }}>
+          <div style={{ position:"relative" }}>
+            <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:8, scrollbarWidth:"none", WebkitMaskImage:"linear-gradient(to right, black 85%, transparent 100%)", maskImage:"linear-gradient(to right, black 85%, transparent 100%)" }}>
             {user.subjects.map(s => {
               const c = getSubjectColor(s);
               const isActive = activeSubject === s;
               return (
-                <button key={s} onClick={()=>setActiveSubject(s)}
+                <button key={s} onClick={()=>setActiveSubject(s===activeSubject?null:s)}
                   style={{ flexShrink:0, padding:"5px 12px", borderRadius:20, fontSize:11, fontWeight:700, border:"1px solid", cursor:"pointer", whiteSpace:"nowrap", transition:"all .2s",
                     background: isActive ? c.active : "rgba(255,255,255,0.03)",
                     color: isActive ? "#fff" : "#4b6cb7",
@@ -349,6 +365,7 @@ export function ChatScreen({ user, onNavigate }) {
                 </button>
               );
             })}
+            </div>
           </div>
         )}
 
