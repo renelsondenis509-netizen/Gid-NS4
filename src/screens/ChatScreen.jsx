@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { APP_LOGO, PROF_LAKAY_PHOTO } from "../config";
+import { APP_LOGO, APP_LOGO_ICON, PROF_LAKAY_PHOTO } from "../config";
 import { callEdge, parseApiError } from "../api";
 import { idbSaveScan } from "../utils/idb";
 import { compressImage } from "../utils/helpers";
@@ -208,8 +208,8 @@ export function ChatScreen({ user, onNavigate }) {
       {/* HEADER */}
       <div style={{ position:"relative", zIndex:10, display:"flex", alignItems:"center", gap:12, padding:"10px 16px", background:"rgba(6,11,32,0.95)", backdropFilter:"blur(24px)", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
         {/* Avatar avec ring coloré si matière active */}
-        <div style={{ width:42, height:42, borderRadius:12, overflow:"hidden", flexShrink:0, boxShadow: activeColor ? `0 0 0 2px ${activeColor.active}` : "0 0 0 2px rgba(37,99,235,0.4)", transition:"box-shadow .3s" }}>
-          <img src={APP_LOGO} alt="Gid NS4" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+        <div style={{ width:48, height:48, borderRadius:14, overflow:"hidden", flexShrink:0, background:"#fff", boxShadow: activeColor ? `0 0 0 2px ${activeColor.active}` : "0 0 0 2px rgba(37,99,235,0.4)", transition:"box-shadow .3s" }}>
+        <img src={APP_LOGO_ICON} alt="Gid NS4" style={{ width:"100%", height:"100%", objectFit:"contain" }} />
         </div>
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>

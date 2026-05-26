@@ -9,4 +9,5 @@ export const SUPABASE_URL     = url;
 export const SUPABASE_ANON    = anon;
 export const API               = `${url}/functions/v1/ask-prof-lakay`;
 export const APP_LOGO          = "/logo.png?v=3";
+export const APP_LOGO_ICON     = "/logo_icon.png?v=1";
 export const PROF_LAKAY_PHOTO  = "/prof-lakay.jpg";
