@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { APP_LOGO, APP_LOGO_ICON, APP_LOGO_FULL, PROF_LAKAY_PHOTO } from "../config";
+import { APP_LOGO, PROF_LAKAY_PHOTO } from "../config";
 import { callEdge, parseApiError } from "../api";
 import { idbSaveScan } from "../utils/idb";
 import { compressImage } from "../utils/helpers";
@@ -209,7 +209,6 @@ export function ChatScreen({ user, onNavigate }) {
       <div style={{ position:"relative", zIndex:10, display:"flex", alignItems:"center", gap:12, padding:"10px 16px", background:"rgba(6,11,32,0.95)", backdropFilter:"blur(24px)", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
         {/* Avatar avec ring coloré si matière active */}
         <div style={{ flex:1, minWidth:0 }}>
-        <img src={APP_LOGO_FULL} alt="Gid NS4" style={{ height:48, maxWidth:180, objectFit:"contain", objectPosition:"left center" }} />
         <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
           <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Prof Lakay</span>
             {(user.isFreemium||user.code==="FREEMIUM") && user.daysRemaining > 0 && (

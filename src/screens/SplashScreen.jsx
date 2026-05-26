@@ -13,7 +13,7 @@ export function SplashScreen({ onDone }) {
         <div style={{ position:"relative", marginBottom:24 }}>
           <div style={{ position:"absolute", inset:-8, borderRadius:34, border:"2px solid #2563EB44", animation:"ringPulse 2s 1s ease-out infinite" }} />
           <div style={{ width:120, height:120, borderRadius:26, background:"#fff", boxShadow:"0 0 0 1px #2563EB33, 0 8px 40px #000c, 0 0 60px #2563EB22", overflow:"hidden" }}>
-            <img src={APP_LOGO} alt="Gid NS4" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+            <img src={APP_LOGO} alt="Gid NS4" style={{ width:"100%", height:"100%", objectFit:"contain" }} />
           </div>
         </div>
         <p style={{ color:"#5B7ADB", fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", animation:"fadeUp .5s .5s both" }}>
