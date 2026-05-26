@@ -26,6 +26,16 @@ function Section({ title, children }) {
 function ResultBox({ result, error }) {
   if (error) return <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#450a0a", color: "#fca5a5", fontSize: 14 }}>{error}</div>;
   if (!result) return null;
+if (result.success && result.code) return (
+    <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#0f2d1a", border: "1px solid #166534" }}>
+      {[["Kòd Lekòl", result.code], ["Kòd Direktè", result.directorCode], ["Lekòl", result.schoolName], ["Max Elèv", result.maxStudents], ["Ekspire", new Date(result.expiresAt).toLocaleDateString("fr-HT")]].map(([l, v]) => (
+        <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #166534", fontSize: 14 }}>
+          <span style={{ color: "#86efac" }}>{l}</span>
+          <span style={{ fontWeight: 700, color: "#f1f5f9" }}>{v}</span>
+        </div>
+      ))}
+    </div>
+  );
   if (result.success) return (
     <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#0f2d1a", border: "1px solid #166534" }}>
       <p style={{ color: "#4ade80", fontSize: 14, margin: "0 0 8px" }}>✅ Mizajou reyisi !</p>
