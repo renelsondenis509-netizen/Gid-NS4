@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
+import { callEdge } from "./api";
 import { getFreemiumStatus, hasAccess } from "./utils/freemium";
 import { requestNotificationPermission, scheduleDailyReminder, scheduleExpiryReminder } from "./utils/notifications";
 import { SplashScreen }      from "./screens/SplashScreen";
@@ -63,7 +64,7 @@ export default function App() {
     return () => window.removeEventListener("online", syncPendingScores);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     const saved = sessionLoad();
     if (saved?.phone && saved?.code) {
       const enriched = enrichUser(saved);
@@ -71,6 +72,17 @@ export default function App() {
       requestNotificationPermission().then(granted => {
         if (granted && enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
       });
+      // Refresh données école en arrière-plan
+      if (navigator.onLine && saved.code !== "FREEMIUM") {
+        callEdge({ action: "validate_code", phone: saved.phone, schoolCode: saved.code })
+          .then(result => {
+            if (result?.valid && result?.school) {
+              const fresh = enrichUser({ ...saved, ...result.school, code: saved.code, phone: saved.phone, name: saved.name, dailyScans: result.school.dailyScans, dailyImageScans: result.school.dailyImageScans, dailyTextScans: result.school.dailyTextScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects });
+              sessionSave(fresh);
+              setUser(fresh);
+            }
+          }).catch(() => {});
+      }
     }
   }, []);
 

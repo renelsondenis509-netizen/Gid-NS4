@@ -79,7 +79,7 @@ export function ChatScreen({ user, onNavigate }) {
   const fileRef   = useRef(null);
   const chatRef   = useRef(null);
 
-  const DAILY_MAX = user.dailyScans ?? 10;
+  const DAILY_MAX = user.dailyTextScans ?? user.dailyScans ?? 10;
   const today     = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
   const _scanKey  = `gid_scan_${user.phone}_${today}`;
   const [scansUsed, setScansUsed] = useState(() => { try { return parseInt(localStorage.getItem(_scanKey)||"0"); } catch { return 0; } });

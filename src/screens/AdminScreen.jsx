@@ -8,7 +8,7 @@ const Field = ({ label, k, type = "text", form, setForm }) => (
     <input
       type={type}
       value={form[k]}
-      onChange={e => setForm(f => ({ ...f, [k]: type === "number" ? Number(e.target.value) : e.target.value }))}
+      onChange={e => setForm(f => ({ ...f, [k]: type === "number" && e.target.value !== "" ? Number(e.target.value) : e.target.value }))}
       style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #334155", background: "#1e293b", color: "#f1f5f9", fontSize: 15, boxSizing: "border-box" }}
     />
   </div>
@@ -26,6 +26,17 @@ function Section({ title, children }) {
 function ResultBox({ result, error }) {
   if (error) return <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#450a0a", color: "#fca5a5", fontSize: 14 }}>{error}</div>;
   if (!result) return null;
+  if (result.success) return (
+    <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#0f2d1a", border: "1px solid #166534" }}>
+      <p style={{ color: "#4ade80", fontSize: 14, margin: "0 0 8px" }}>✅ Mizajou reyisi !</p>
+      {Object.entries(result.updated || {}).map(([k, v]) => (
+        <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid #166634", fontSize: 13 }}>
+          <span style={{ color: "#86efac" }}>{k}</span>
+          <span style={{ color: "#f1f5f9", fontWeight: 700 }}>{String(v)}</span>
+        </div>
+      ))}
+    </div>
+  );
   return (
     <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: "#0f2d1a", border: "1px solid #166534" }}>
       {result.code && [["Kòd Lekòl", result.code], ["Kòd Direktè", result.directorCode], ["Lekòl", result.schoolName], ["Max Elèv", result.maxStudents], ["Ekspire", new Date(result.expiresAt).toLocaleDateString("fr-HT")]].map(([l, v]) => (
@@ -58,13 +69,13 @@ export default function AdminScreen({ onBack }) {
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
   const [updateForm, setUpdateForm] = useState({ code: "", dailyImageScans: "", dailyTextScans: "", maxStudents: "", durationDays: "" });
-  const [updateRes, setUpdateRes] = useState(null);
+  const [updateRes, setUpdateRes] = useState({ result: null, error: "" });
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [createRes, setCreateRes] = useState({ result: null, error: "" });
   const [revokeUserRes, setRevokeUserRes] = useState({ result: null, error: "" });
   const [revokeSchoolRes, setRevokeSchoolRes] = useState({ result: null, error: "" });
-  const [loading, setLoading] = useState({ create: false, revokeUser: false, revokeSchool: false });
+  const [loading, setLoading] = useState({ create: false, revokeUser: false, revokeSchool: false, update: false });
 
   const run = async (action, body, key, setRes) => {
     setRes({ result: null, error: "" });
@@ -153,7 +164,7 @@ export default function AdminScreen({ onBack }) {
               maxStudents:     updateForm.maxStudents     ? Number(updateForm.maxStudents)     : undefined,
               durationDays:    updateForm.durationDays    ? Number(updateForm.durationDays)    : undefined,
             }, "update", setUpdateRes)} />
-          {updateRes && <ResultCard result={updateRes} />}
+          <ResultBox result={updateRes.result} error={updateRes.error} />
         </Section>
 
         <Section title="🚫 Revoké Elèv">
