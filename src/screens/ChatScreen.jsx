@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { APP_LOGO, APP_LOGO_ICON, PROF_LAKAY_PHOTO } from "../config";
+import { APP_LOGO, APP_LOGO_ICON, APP_LOGO_FULL, PROF_LAKAY_PHOTO } from "../config";
 import { callEdge, parseApiError } from "../api";
 import { idbSaveScan } from "../utils/idb";
 import { compressImage } from "../utils/helpers";
@@ -208,12 +208,10 @@ export function ChatScreen({ user, onNavigate }) {
       {/* HEADER */}
       <div style={{ position:"relative", zIndex:10, display:"flex", alignItems:"center", gap:12, padding:"10px 16px", background:"rgba(6,11,32,0.95)", backdropFilter:"blur(24px)", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
         {/* Avatar avec ring coloré si matière active */}
-        <div style={{ width:48, height:48, borderRadius:14, overflow:"hidden", flexShrink:0, background:"#fff", boxShadow: activeColor ? `0 0 0 2px ${activeColor.active}` : "0 0 0 2px rgba(37,99,235,0.4)", transition:"box-shadow .3s" }}>
-        <img src={APP_LOGO_ICON} alt="Gid NS4" style={{ width:"100%", height:"100%", objectFit:"contain" }} />
-        </div>
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Prof Lakay</span>
+        <img src={APP_LOGO_FULL} alt="Gid NS4" style={{ height:48, maxWidth:180, objectFit:"contain", objectPosition:"left center" }} />
+        <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
+          <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Prof Lakay</span>
             {(user.isFreemium||user.code==="FREEMIUM") && user.daysRemaining > 0 && (
               <span style={{ fontSize:10, padding:"2px 8px", borderRadius:20, background:"rgba(220,38,38,0.15)", color:"#fca5a5", border:"1px solid rgba(220,38,38,0.25)", fontWeight:600 }}>
                 Freemium {user.daysRemaining}j
