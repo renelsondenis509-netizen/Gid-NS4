@@ -1050,6 +1050,7 @@ async function deleteSchool(db: ReturnType<typeof createClient>, body: { adminSe
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
   if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
   if (!body.code?.trim()) throw { status: 400, error: "Kòd la obligatwa." };
+await db.from("profiles").delete().eq("school_code", body.code);
   const { error } = await db.from("schools").delete().eq("code", body.code);
   if (error) throw { status: 500, error: error.message };
   await logAudit(db, "delete_school", body.adminSecret.slice(-4), body.code, {});
