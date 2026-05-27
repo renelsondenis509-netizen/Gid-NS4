@@ -636,6 +636,31 @@ if (window[_winKey]) {
     )}
   </div>
 )}
+{s.quizStats?.topStudents?.length > 0 && (
+  <div className="rounded-2xl p-5" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
+    <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+      <UsersIcon color="#f59e0b" /> Top 10 Elèv
+    </h3>
+    <p className="text-blue-400 text-xs mb-4">Klase pa mwayèn quiz</p>
+    <div className="space-y-2">
+      {s.quizStats.topStudents.slice(0,10).map((st,i)=>{
+        const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
+        const pct = Math.round((st.avg/20)*100);
+        const col = pct>=70?"#22c55e":pct>=50?"#f59e0b":"#ef4444";
+        return (
+          <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-xl" style={{background:"#ffffff06",border:"1px solid #ffffff08"}}>
+            <span className="text-base w-6 text-center">{medal}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-semibold truncate">{st.name}</p>
+              <p className="text-blue-400 text-xs">{st.count} quiz</p>
+            </div>
+            <span className="font-bold text-sm" style={{color:col}}>{st.avg}/20</span>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
         <button
           onClick={() => generateAndSharePDF(school, s)}
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
