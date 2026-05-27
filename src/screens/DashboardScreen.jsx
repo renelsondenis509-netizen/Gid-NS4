@@ -602,6 +602,40 @@ if (window[_winKey]) {
           </div>
         )}
 
+{s.quizStats?.bySubject?.length > 0 && (
+  <div className="rounded-2xl p-5" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
+    <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+      <ChartIcon /> Pèfòmans Quiz pa Matyè
+    </h3>
+    <p className="text-blue-400 text-xs mb-4">Mwayèn sou 20 • Nòmb quiz</p>
+    <div className="space-y-3">
+      {[...s.quizStats.bySubject].sort((a,b)=>b.avg-a.avg).map((q,i)=>{
+        const pct = Math.round((q.avg/20)*100);
+        const col = pct>=70?"#22c55e":pct>=50?"#f59e0b":"#ef4444";
+        return (
+          <div key={q.subject}>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-blue-200">{q.subject}</span>
+              <span className="font-bold" style={{color:col}}>{q.avg}/20 <span className="text-blue-400 font-normal">({q.count} quiz)</span></span>
+            </div>
+            <div className="h-2.5 rounded-full overflow-hidden" style={{background:"#ffffff10"}}>
+              <div className="h-full rounded-full transition-all" style={{width:`${pct}%`,background:col}}/>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+    <div className="mt-4 pt-3 flex justify-between text-xs" style={{borderTop:"1px solid #ffffff10"}}>
+      <span className="text-blue-400">Mwayèn jeneral</span>
+      <span className="font-bold text-white">{s.quizStats.avgNote ?? "—"}/20</span>
+    </div>
+    {s.quizStats.weakSubject && (
+      <div className="mt-3 px-3 py-2 rounded-xl text-xs" style={{background:"#d4002a15",border:"1px solid #d4002a33",color:"#fca5a5"}}>
+        ⚠ Matyè ki pi fèb : <span className="font-bold">{s.quizStats.weakSubject.subject}</span> — {s.quizStats.weakSubject.avg}/20
+      </div>
+    )}
+  </div>
+)}
         <button
           onClick={() => generateAndSharePDF(school, s)}
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
