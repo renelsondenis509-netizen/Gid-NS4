@@ -426,7 +426,32 @@ if (window[_winKey]) {
       <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
         <div className="flex items-center gap-3 px-4 py-4 border-b" style={{ borderColor: "#ffffff10" }}>
           <button onClick={onBack} className="text-blue-400 text-xl">←</button>
-          <h2 className="text-white font-bold">Dashboard Direction</h2>
+          <button
+  onClick={async () => {
+    setLoading(true);
+    try {
+      const saved = localStorage.getItem(_dirKey);
+      const { _auth } = JSON.parse(saved);
+      let directorCode; try { directorCode = atob(_auth.directorCode); } catch { directorCode = _auth.directorCode; }
+      const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode });
+      const full = { ...result, _auth };
+      setStats(full);
+      localStorage.setItem(_dirKey, JSON.stringify(full));
+      window[`_gns4_dash_${userCode}`] = full;
+    } catch {}
+    setLoading(false);
+  }}
+  disabled={loading}
+  style={{ padding:"6px 12px", borderRadius:12, fontSize:13, fontWeight:700,
+    display:"flex", alignItems:"center", gap:5, cursor:"pointer",
+    background:"#1e3a8a22", color:"#60a5fa", border:"1px solid #3b82f633" }}>
+  {loading
+    ? <LoaderIcon/>
+    : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+  }
+  Refresh
+       </button>  
+        <h2 className="text-white font-bold">Dashboard Direction</h2>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6">
           <LockIcon />
