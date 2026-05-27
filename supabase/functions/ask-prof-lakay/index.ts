@@ -1053,7 +1053,9 @@ async function updateSchool(
     const { data: school } = await db.from("schools").select("starts_at").eq("code", code).maybeSingle();
     if (school) updates.expires_at = new Date(new Date(school.starts_at).getTime() + durationDays * 86400000).toISOString();
   }
-  if (Object.keys(updates).length === 0) throw { status: 400, error: "Pa gen chanjman." };
+if (Object.keys(updates).length === 0) throw { status: 400, error: "Pa gen chanjman." };
+  const { data: exists } = await db.from("schools").select("code").eq("code", code).maybeSingle();
+  if (!exists) throw { status: 404, error: `Kòd lekòl "${code}" pa egziste.` };
   const { error } = await db.from("schools").update(updates).eq("code", code);
   if (error) throw { status: 500, error: "Echek mizajou: " + error.message };
   await logAudit(db, "update_school", body.adminSecret.slice(-4), code, updates);
