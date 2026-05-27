@@ -995,7 +995,9 @@ async function createSchool(
   }
 
   const { schoolName, durationDays = 365, maxStudents = 200, dailyImageScans = 5, dailyTextScans = 10 } = body;
-  if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." };
+if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." };
+  const { data: existing } = await db.from("schools").select("code").eq("school_name", schoolName.trim()).maybeSingle();
+  if (existing) throw { status: 409, error: `Lekòl "${schoolName.trim()}" deja egziste ak kòd ${existing.code}.` };
 
   const rand = (len: number) => Array.from(crypto.getRandomValues(new Uint8Array(len)))
     .map(b => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 32]).join("");
