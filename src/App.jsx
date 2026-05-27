@@ -124,7 +124,7 @@ useEffect(() => {
     if (screen === "splash")      return <SplashScreen onDone={() => { const s = sessionLoad(); if (s?.phone && s?.code) { setUser(enrichUser(s)); setScreen("chat"); } else setScreen("login"); }} />;
     if (user && !hasAccess(user)) return <LoginScreen onLogin={handleLogin} onNavigate={nav} expired={true} />;
     if (screen === "login")       return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
-    if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} />;
+    if (screen === "chat")        return <ChatScreen key={user?.dailyTextScans} user={user} onNavigate={nav} />;
     if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
     if (screen === "leaderboard") return <LeaderboardScreen user={user} onNavigate={nav} />;
     if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); setScreen("exercice"); }} />;
