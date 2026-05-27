@@ -636,6 +636,31 @@ if (window[_winKey]) {
     )}
   </div>
 )}
+{Object.keys(s.dailyActivity||{}).length > 0 && (
+  <div className="rounded-2xl p-5" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
+    <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+      <CalendarIcon color="#14b8a6" /> Aktivite 7 Dènye Jou
+    </h3>
+    <p className="text-blue-400 text-xs mb-4">Nòmb rekèt pa jou</p>
+    <div className="space-y-2">
+      {Object.entries(s.dailyActivity).sort((a,b)=>a[0].localeCompare(b[0])).slice(-7).map(([day,count])=>{
+        const max = Math.max(...Object.values(s.dailyActivity),1);
+        const pct = Math.round((count/max)*100);
+        return (
+          <div key={day}>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-blue-200">{day}</span>
+              <span className="font-bold text-blue-400">{count} rekèt</span>
+            </div>
+            <div className="h-2.5 rounded-full overflow-hidden" style={{background:"#ffffff10"}}>
+              <div className="h-full rounded-full transition-all" style={{width:`${pct}%`,background:"linear-gradient(90deg,#14b8a6,#3b82f6)"}}/>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
 {s.quizStats?.topStudents?.length > 0 && (
   <div className="rounded-2xl p-5" style={{ background: "#ffffff08", border: "1px solid #ffffff10" }}>
     <h3 className="text-white font-bold mb-1 flex items-center gap-2">
