@@ -748,7 +748,7 @@ if (window[_winKey]) {
             <span className="text-base w-6 text-center">{medal}</span>
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-semibold truncate">{st.name}</p>
-              <p className="text-blue-400 text-xs">{st.count} quiz</p>
+              <p className="text-blue-400 text-xs">{st.count} egzèsis/quiz</p>
             </div>
             <span className="font-bold text-sm" style={{color:col}}>{st.avg}/20</span>
           </div>
