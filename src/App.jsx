@@ -17,6 +17,7 @@ import { PartnerScreen }     from "./screens/PartnerScreen";
 import { FavoritesScreen }   from "./screens/FavoritesScreen";
 import AdminScreen       from "./screens/AdminScreen";
 import { ProgressScreen }   from "./screens/ProgressScreen";
+import { AboutScreen }      from "./screens/AboutScreen";
 import { OfflineBanner }     from "./components/OfflineBanner";
 
 function enrichUser(u) {
@@ -45,7 +46,7 @@ export default function App() {
     return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     async function syncPendingScores() {
       if (!navigator.onLine) return;
       try {
@@ -136,6 +137,7 @@ useEffect(() => {
     if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
     if (screen === "admin")       return <AdminScreen onBack={() => nav("menu")} />;
     if (screen === "progress")    return <ProgressScreen user={user} onNavigate={nav} />;
+    if (screen === "about")       return <AboutScreen onNavigate={nav} />;
     return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
   }
 
