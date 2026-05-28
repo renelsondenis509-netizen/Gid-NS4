@@ -567,6 +567,27 @@ if (window[_winKey]) {
           </div>
         </div>
 
+{(() => {
+  const used = s.scansToday ?? 0;
+  const max = school.dailyScans ?? 1;
+  const pct = Math.min(Math.round((used/max)*100), 100);
+  const col = pct>=90?"#ef4444":pct>=70?"#f59e0b":"#22c55e";
+  return (
+    <div className="rounded-2xl p-4" style={{background:"#ffffff08",border:`1px solid ${col}33`}}>
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-white font-bold text-sm">Quota Jodi a</span>
+        <span className="font-bold text-sm" style={{color:col}}>{used}/{max} rekèt</span>
+      </div>
+      <div className="h-3 rounded-full overflow-hidden" style={{background:"#ffffff10"}}>
+        <div className="h-full rounded-full transition-all" style={{width:`${pct}%`,background:col}}/>
+      </div>
+      <p className="text-xs mt-2" style={{color:col}}>
+        {pct>=90?"⚠ Limit prèske atenn !":pct>=70?"📈 Itilizasyon wo":"✅ Nòmal"}
+        {" • "}{100-pct}% disponib
+      </p>
+    </div>
+  );
+})()}
         <div className="grid grid-cols-2 gap-3">
           {[
             { label: "Requêtes Totales", val: s.totalScans, Icon: SearchIcon, color: "#3b82f6" },
