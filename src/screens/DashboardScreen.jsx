@@ -134,6 +134,26 @@ const generateAndSharePDF = async (school, stats) => {
   }
   y += 2;
 
+// ── 4. AKTIVITE PA SEMÈN ─────────────────────────────────────────────
+  sectionTitle("4. AKTIVITE PA SEMÈN", [168,85,247]);
+  y += 2;
+  const weeks = Object.entries(stats.weeklyActivity || {}).sort((a,b)=>a[0].localeCompare(b[0])).slice(-8);
+  const maxWeek = Math.max(...weeks.map(w=>w[1]),1);
+  if (weeks.length === 0) {
+    line("Pa gen done semèn.", 9, false, [120,120,160]);
+  } else {
+    weeks.forEach(([week, count]) => {
+      check(12);
+      doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(168,85,247);
+      doc.text(week, M, y);
+      doc.setFont("helvetica","bold"); doc.setTextColor(220,0,42);
+      doc.text(`${count}`, W-M, y, { align:"right" });
+      y += 4;
+      bar(count/maxWeek, [168,85,247]);
+    });
+  }
+  y += 2;
+
   // ── 4. AKTIVITE 7 DÈNYE JOU ──────────────────────────────────────────
   sectionTitle("4. AKTIVITE 7 DÈNYE JOU", [14,116,144]);
   y += 2;
