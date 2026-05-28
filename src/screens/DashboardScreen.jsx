@@ -154,8 +154,8 @@ const generateAndSharePDF = async (school, stats) => {
   }
   y += 2;
 
-  // ── 4. AKTIVITE 7 DÈNYE JOU ──────────────────────────────────────────
-  sectionTitle("4. AKTIVITE 7 DÈNYE JOU", [14,116,144]);
+  // ── 5. AKTIVITE 7 DÈNYE JOU ──────────────────────────────────────────
+  sectionTitle("5. AKTIVITE 7 DÈNYE JOU", [14,116,144]);
   y += 2;
   const days = Object.entries(stats.dailyActivity || {}).sort((a,b)=>a[0].localeCompare(b[0])).slice(-7);
   const maxDay = Math.max(...days.map(d=>d[1]),1);
@@ -174,8 +174,8 @@ const generateAndSharePDF = async (school, stats) => {
   }
   y += 2;
 
-  // ── 5. QUIZ — PÈFÒMANS PA MATYÈ ─────────────────────────────────────
-  sectionTitle("5. PÈFÒMANS QUIZ PA MATYÈ", [168,85,247]);
+  // ── 6. QUIZ — PÈFÒMANS PA MATYÈ ─────────────────────────────────────
+  sectionTitle("6. PÈFÒMANS QUIZ PA MATYÈ", [168,85,247]);
   y += 2;
   const quizBySubject = stats.quizStats?.bySubject || [];
   if (quizBySubject.length === 0) {
@@ -196,8 +196,8 @@ const generateAndSharePDF = async (school, stats) => {
   kv("Total quiz", String(stats.quizStats?.totalQuizzes ?? 0));
   y += 2;
 
-  // ── 6. TOP 10 ELÈV QUIZ ──────────────────────────────────────────────
-  sectionTitle("6. TOP 10 ELÈV QUIZ", [245,158,11]);
+  // ── 7. TOP 10 ELÈV QUIZ ──────────────────────────────────────────────
+  sectionTitle("7. TOP 10 ELÈV QUIZ", [245,158,11]);
   y += 2;
   const top = (stats.quizStats?.topStudents || []).slice(0,10);
   if (top.length === 0) {
@@ -217,8 +217,8 @@ const generateAndSharePDF = async (school, stats) => {
   }
   y += 2;
 
-  // ── 7. REKÒMANDASYON ─────────────────────────────────────────────────
-  sectionTitle("7. REKÒMANDASYON", [220,0,42]);
+  // ── 8. REKÒMANDASYON ─────────────────────────────────────────────────
+  sectionTitle("8. REKÒMANDASYON", [220,0,42]);
   y += 2;
   const weak = stats.quizStats?.weakSubject;
   const best = stats.quizStats?.topStudents?.[0];
