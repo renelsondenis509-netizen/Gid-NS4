@@ -782,6 +782,17 @@ async function processDashboard(
     ).map((s: any) => ({ ...s, avg: Math.round(s.totalScore / s.count * 10) / 10 }))
      .sort((a: any, b: any) => b.avg - a.avg)
      .slice(0, 5),
+bySubject: (() => {
+      const subjectMap: Record<string, { total: number; count: number }> = {};
+      (quizData ?? []).forEach((q: any) => {
+        if (!subjectMap[q.subject]) subjectMap[q.subject] = { total: 0, count: 0 };
+        subjectMap[q.subject].total += q.note20;
+        subjectMap[q.subject].count += 1;
+      });
+      return Object.entries(subjectMap)
+        .map(([subject, d]) => ({ subject, avg: Math.round(d.total / d.count * 10) / 10, count: d.count }))
+        .sort((a, b) => b.avg - a.avg);
+    })(),
     weakSubject: (() => {
       const subjectAvg: Record<string, { total: number; count: number }> = {};
       (quizData ?? []).forEach((q: any) => {
