@@ -12,7 +12,7 @@ export function AboutScreen({ onNavigate }) {
           <img src={APP_LOGO} alt="Gid NS4" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
         <div style={{ color: "#E8EEFF", fontSize: 22, fontWeight: 900, letterSpacing: 0.5 }}>Gid NS4</div>
-        <div style={{ color: "#4B6ABA", fontSize: 13, marginTop: 4 }}>Asistan Etid pou Bak / NS4</div>
+        <div style={{ color: "#4B6ABA", fontSize: 13, marginTop: 4 }}>Asistan Etid pou Klas NS4</div>
         <div style={{ display: "inline-block", marginTop: 10, background: "rgba(37,99,235,0.15)", border: "1px solid rgba(37,99,235,0.30)", borderRadius: 20, padding: "3px 14px", color: "#6B8ADB", fontSize: 12, fontWeight: 700 }}>
           v{APP_VERSION}
         </div>
@@ -28,12 +28,12 @@ export function AboutScreen({ onNavigate }) {
         </Card>
 
         <Card>
-          <Row label="Devlòpè" value="Renelson Denis" />
+          <Row label="Devlòpè" value="Milokan App" />
           <Row label="Peyi" value="🇭🇹 Ayiti" last />
         </Card>
 
         <Card>
-          <Row label="Sijè kouvè" value="14+ matières NS4" />
+          <Row label="Sijè kouvri" value="20+ matyè NS4" />
           <Row label="Modèl IA" value="Prof Lakay (Multi-AI)" last />
         </Card>
 
