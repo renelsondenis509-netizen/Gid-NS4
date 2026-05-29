@@ -50,6 +50,7 @@ const SendIcon      = () => (<svg width="20" height="20" viewBox="0 0 24 24" fil
 const CloseIcon     = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>);
 const SpeakIcon     = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>);
 const ScrollDownIcon= () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>);
+const EnvelopeIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>);
 const CopyIcon      = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>);
 
 export function ChatScreen({ user, onNavigate }) {
@@ -65,8 +66,30 @@ export function ChatScreen({ user, onNavigate }) {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites,     setFavorites]     = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
 
-  const [copiedId, setCopiedId] = useState(null);
-  const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
+const [copiedId, setCopiedId] = useState(null);
+const [announcements,     setAnnouncements]     = useState([]);
+const [showAnnouncements, setShowAnnouncements] = useState(false);
+const [hasUnread,         setHasUnread]         = useState(false);
+
+useEffect(() => {
+  if (!user.code || user.code === "FREEMIUM") return;
+  callEdge({ action: "get_announcements", schoolCode: user.code })
+    .then(res => {
+      const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());
+      if (list.length === 0) return;
+      setAnnouncements(list);
+      const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
+      if (list[0]?.id && String(list[0].id) !== lastSeen) setHasUnread(true);
+    })
+    .catch(() => {});
+}, []);
+
+const openAnnouncements = () => {
+  setShowAnnouncements(true);
+  setHasUnread(false);
+  if (announcements[0]?.id) localStorage.setItem(`annonce_seen_${user.phone}`, String(announcements[0].id));
+};  
+const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
   const [msgTimes]  = useState(() => ({}));
   const getTime = (i) => { if (!msgTimes[i]) msgTimes[i] = formatTime(); return msgTimes[i]; };
 
@@ -231,6 +254,12 @@ export function ChatScreen({ user, onNavigate }) {
         </div>
 
         {/* Compteur circulaire */}
+{announcements.length > 0 && (
+  <button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#60a5fa", flexShrink:0 }}>
+    <EnvelopeIcon />
+    {hasUnread && <span style={{ position:"absolute", top:6, right:6, width:8, height:8, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444" }} />}
+  </button>
+)}
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
           <div style={{ position:"relative", width:44, height:44 }}>
             <svg width="44" height="44" style={{ transform:"rotate(-90deg)" }}>
@@ -337,6 +366,25 @@ export function ChatScreen({ user, onNavigate }) {
         </button>
       )}
 
+      {showAnnouncements && (
+  <div onClick={() => setShowAnnouncements(false)} style={{ position:"fixed", inset:0, zIndex:50, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"flex-end" }}>
+    <div onClick={e => e.stopPropagation()} style={{ width:"100%", maxHeight:"70vh", overflowY:"auto", background:"#080e24", borderRadius:"20px 20px 0 0", border:"1px solid rgba(37,99,235,0.2)", padding:"20px 16px 32px" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+        <span style={{ color:"#e2e8ff", fontWeight:800, fontSize:15 }}>📢 Mesaj Lekòl</span>
+        <button onClick={() => setShowAnnouncements(false)} style={{ background:"none", border:"none", color:"#4b6cb7", cursor:"pointer" }}><CloseIcon /></button>
+      </div>
+      {announcements.map((a, i) => (
+        <div key={a.id ?? i} style={{ marginBottom:12, padding:"14px 16px", borderRadius:14, background:"rgba(15,28,60,0.80)", border:"1px solid rgba(37,99,235,0.15)", borderLeft:"3px solid #2563eb" }}>
+          <div style={{ color:"#93c5fd", fontWeight:700, fontSize:13, marginBottom:6 }}>{a.title}</div>
+          <div style={{ color:"#c8d8ff", fontSize:13, lineHeight:1.6 }}>{a.message}</div>
+          <div style={{ color:"#2d3f6e", fontSize:11, marginTop:8 }}>
+            {new Date(a.created_at).toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince", day:"2-digit", month:"short", year:"numeric" })}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
       <ErrorToast error={apiError} onRetry={lastPayload?()=>sendMessage(lastPayload):null} onDismiss={()=>{setApiError(null);setLastPayload(null);}} />
 
       {/* ZONE INPUT */}
