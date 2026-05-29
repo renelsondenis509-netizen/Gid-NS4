@@ -257,7 +257,7 @@ const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit"
 {announcements.length > 0 && (
   <button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#60a5fa", flexShrink:0 }}>
     <EnvelopeIcon />
-    {hasUnread && <span style={{ position:"absolute", top:6, right:6, width:8, height:8, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444" }} />}
+    {hasUnread && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{announcements.length}</span>}
   </button>
 )}
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
