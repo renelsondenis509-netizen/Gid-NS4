@@ -84,7 +84,7 @@ useEffect(() => {
     .catch(() => {});
 }, []);
 
-const openAnnouncements = () => {
+  const openAnnouncements = () => {
   setShowAnnouncements(true);
   setHasUnread(false);
   if (announcements[0]?.id) localStorage.setItem(`annonce_seen_${user.phone}`, String(announcements[0].id));
@@ -115,7 +115,30 @@ const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit"
     return () => el?.removeEventListener("scroll", onScroll);
   }, []);
 
-  const detectSubject = (text) => {
+const [announcements,     setAnnouncements]     = useState([]);
+const [showAnnouncements, setShowAnnouncements] = useState(false);
+const [unreadCount,       setUnreadCount]       = useState(0);
+
+useEffect(() => {
+  if (!user.code || user.code === "FREEMIUM") return;
+  callEdge({ action: "get_announcements", schoolCode: user.code })
+    .then(res => {
+      const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());
+      if (list.length === 0) return;
+      setAnnouncements(list);
+      const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
+      const idx = lastSeen ? list.findIndex(a => String(a.id) === lastSeen) : list.length;
+      const count = idx === -1 ? 0 : idx;
+      if (count > 0) setUnreadCount(count);
+    })
+    .catch(() => {});
+}, []);
+
+const openAnnouncements = () => {
+  setShowAnnouncements(true);
+  setUnreadCount(0);
+  if (announcements[0]?.id) localStorage.setItem(`annonce_seen_${user.phone}`, String(announcements[0].id));
+};  const detectSubject = (text) => {
     const t = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
     if (t.includes("bio")||t.includes("cellule")||t.includes("adn")||t.includes("genetique")) return "Biologie";
     if (t.includes("geol")||t.includes("roche")||t.includes("mineral")) return "Géologie";
@@ -257,7 +280,7 @@ const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit"
 {announcements.length > 0 && (
   <button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#60a5fa", flexShrink:0 }}>
     <EnvelopeIcon />
-    {hasUnread && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{announcements.length}</span>}
+    {unreadCount > 0 && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{unreadCount}</span>}
   </button>
 )}
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
