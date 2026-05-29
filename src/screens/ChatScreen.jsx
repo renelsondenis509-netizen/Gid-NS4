@@ -259,13 +259,11 @@ const openAnnouncements = () => {
         </div>
 
         {/* Compteur circulaire */}
-{announcements.length > 0 && (
-  <button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#60a5fa", flexShrink:0 }}>
-    <EnvelopeIcon />
-    {unreadCount > 0 && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{unreadCount}</span>}
-  </button>
-)}
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+<button onClick={announcements.length > 0 ? openAnnouncements : undefined} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:announcements.length > 0 ? "pointer" : "default", color:announcements.length > 0 ? "#60a5fa" : "#2d3f6e", flexShrink:0, opacity:announcements.length > 0 ? 1 : 0.4 }}>
+  <EnvelopeIcon />
+  {unreadCount > 0 && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{unreadCount}</span>}
+</button>
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
           <div style={{ position:"relative", width:44, height:44 }}>
             <svg width="44" height="44" style={{ transform:"rotate(-90deg)" }}>
               <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="3"/>
