@@ -96,14 +96,18 @@ const [announcements,     setAnnouncements]     = useState([]);
 const [showAnnouncements, setShowAnnouncements] = useState(false);
 const [copiedId, setCopiedId] = useState(null);
 const [unreadCount,       setUnreadCount]       = useState(0);
+const [dismissedIds, setDismissedIds] = useState(() => {
+  try { return JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]"); } catch { return []; }
+});
 
 useEffect(() => {
   if (!user.code || user.code === "FREEMIUM") return;
   callEdge({ action: "get_announcements", schoolCode: user.code })
     .then(res => {
       const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());
+      const dismissed = JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]");
+      setAnnouncements(list.filter(a => !dismissed.includes(String(a.id))));
       if (list.length === 0) return;
-      setAnnouncements(list);
       const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
       const idx = lastSeen ? list.findIndex(a => String(a.id) === lastSeen) : list.length;
       const count = idx === -1 ? 0 : idx;
@@ -378,7 +382,15 @@ const openAnnouncements = () => {
 <div key={a.id ?? i} style={{ marginBottom:12, padding:"14px 16px", borderRadius:14, background:"rgba(15,28,60,0.80)", border:"1px solid rgba(37,99,235,0.15)", borderLeft:"3px solid #2563eb" }}>
   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
     <div style={{ color:"#93c5fd", fontWeight:700, fontSize:13, marginBottom:6 }}>{a.title}</div>
-    <button onClick={() => setAnnouncements(prev => prev.filter((_, j) => j !== i))}
+onClick={() => {
+  const id = String(a.id ?? i);
+  setAnnouncements(prev => prev.filter((_, j) => j !== i));
+  setDismissedIds(prev => {
+    const next = [...prev, id];
+    localStorage.setItem(`annonce_dismissed_${user.phone}`, JSON.stringify(next));
+    return next;
+  });
+}}
       style={{ background:"none", border:"none", color:"#4b6cb7", cursor:"pointer", fontSize:16, lineHeight:1, padding:"0 0 0 8px" }}>✕</button>
   </div>
   <div style={{ color:"#c8d8ff", fontSize:13, lineHeight:1.6 }}>{a.message}</div>
