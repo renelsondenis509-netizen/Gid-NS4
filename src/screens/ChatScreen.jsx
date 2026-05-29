@@ -237,7 +237,8 @@ if (announcements[0]?.created_at) localStorage.setItem(`annonce_seen_${user.phon
 
       {/* HEADER */}
       <div style={{ position:"relative", zIndex:10, display:"flex", alignItems:"center", gap:12, padding:"10px 16px", background:"rgba(6,11,32,0.95)", backdropFilter:"blur(24px)", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
-        {/* Avatar avec ring coloré si matière active */}
+      <span style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", color:"#ff3b3b", fontWeight:900, fontSize:15, letterSpacing:1, textShadow:"0 0 12px rgba(255,59,59,0.6)" }}>Gid NS4</span> 
+       {/* Avatar avec ring coloré si matière active */}
         <div style={{ flex:1, minWidth:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
           <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Prof Lakay</span>
