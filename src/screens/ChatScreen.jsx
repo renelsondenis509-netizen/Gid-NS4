@@ -66,12 +66,7 @@ export function ChatScreen({ user, onNavigate }) {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites,     setFavorites]     = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
 
-  const openAnnouncements = () => {
-  setShowAnnouncements(true);
-  setHasUnread(false);
-  if (announcements[0]?.id) localStorage.setItem(`annonce_seen_${user.phone}`, String(announcements[0].id));
-};  
-const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
+ const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
   const [msgTimes]  = useState(() => ({}));
   const getTime = (i) => { if (!msgTimes[i]) msgTimes[i] = formatTime(); return msgTimes[i]; };
 
