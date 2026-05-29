@@ -110,7 +110,9 @@ const visible = list.filter(a => !dismissed.includes(String(a.id)));
 setAnnouncements(visible);
 if (visible.length === 0) return;
 const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
-const unread = lastSeen ? visible.filter(a => String(a.id) !== lastSeen && !dismissed.includes(String(a.id))).length : visible.length;
+const unread = lastSeen
+  ? visible.filter(a => new Date(a.created_at) > new Date(lastSeen)).length
+  : visible.length;
 if (unread > 0) setUnreadCount(unread);
     })
     .catch(() => {});
@@ -119,7 +121,7 @@ if (unread > 0) setUnreadCount(unread);
 const openAnnouncements = () => {
   setShowAnnouncements(true);
   setUnreadCount(0);
-  if (announcements[0]?.id) localStorage.setItem(`annonce_seen_${user.phone}`, String(announcements[0].id));
+  localStorage.setItem(`annonce_seen_${user.phone}`, new Date().toISOString());
 };  const detectSubject = (text) => {
     const t = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
     if (t.includes("bio")||t.includes("cellule")||t.includes("adn")||t.includes("genetique")) return "Biologie";
