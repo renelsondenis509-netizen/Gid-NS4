@@ -270,6 +270,33 @@ export function DashboardScreen({ onBack, userCode }) {
   const _dirKey = `gid_dir_v3_${userCode}`;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [annonce, setAnnonce]         = useState({ title: "", message: "", expiresAt: "" });
+  const [annonceStatus, setAnnonceStatus] = useState(null); // "ok" | "err" | null
+  const [annonceSending, setAnnonceSending] = useState(false);
+
+const sendAnnonce = async () => {
+  if (!annonce.title.trim() || !annonce.message.trim()) return;
+  setAnnonceSending(true);
+  setAnnonceStatus(null);
+  try {
+    const saved = localStorage.getItem(_dirKey);
+    const { _auth } = JSON.parse(saved);
+    let directorCode; try { directorCode = atob(_auth.directorCode); } catch { directorCode = _auth.directorCode; }
+    await callEdge({
+      action: "create_announcement",
+      schoolCode: userCode,
+      directorCode,
+      title: annonce.title.trim(),
+      message: annonce.message.trim(),
+      expiresAt: annonce.expiresAt || null,
+    });
+    setAnnonceStatus("ok");
+    setAnnonce({ title: "", message: "", expiresAt: "" });
+  } catch {
+    setAnnonceStatus("err");
+  }
+  setAnnonceSending(false);
+};
   const [stats, setStats] = useState(null); // init done in useEffect
 
   const FREEMIUM_DEMO = {
@@ -777,7 +804,41 @@ if (window[_winKey]) {
     </div>
   </div>
 )}
-        <button
+<div className="rounded-2xl p-4" style={{ background: "#ffffff08", border: "1px solid rgba(37,99,235,0.2)" }}>
+  <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    Voye Yon Annons
+  </h3>
+  <input
+    value={annonce.title}
+    onChange={e => setAnnonce(p => ({ ...p, title: e.target.value }))}
+    placeholder="Tit annons lan..."
+    style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:12, padding:"10px 14px", color:"#e2e8ff", fontSize:13, outline:"none", marginBottom:8, boxSizing:"border-box" }}
+  />
+  <textarea
+    value={annonce.message}
+    onChange={e => setAnnonce(p => ({ ...p, message: e.target.value }))}
+    placeholder="Mesaj pou elèv yo..."
+    rows={3}
+    style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:12, padding:"10px 14px", color:"#e2e8ff", fontSize:13, outline:"none", resize:"none", marginBottom:8, boxSizing:"border-box", fontFamily:"inherit" }}
+  />
+  <input
+    type="date"
+    value={annonce.expiresAt}
+    onChange={e => setAnnonce(p => ({ ...p, expiresAt: e.target.value }))}
+    style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:12, padding:"10px 14px", color:"#e2e8ff", fontSize:13, outline:"none", marginBottom:10, boxSizing:"border-box" }}
+  />
+  {annonceStatus === "ok" && <p style={{ color:"#4ade80", fontSize:12, marginBottom:8 }}>✅ Annons voye ak siksè !</p>}
+  {annonceStatus === "err" && <p style={{ color:"#f87171", fontSize:12, marginBottom:8 }}>❌ Echèk — eseye ankò.</p>}
+  <button
+    onClick={sendAnnonce}
+    disabled={annonceSending || !annonce.title.trim() || !annonce.message.trim()}
+    style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontWeight:700, fontSize:13, cursor: annonceSending ? "not-allowed" : "pointer", background: annonceSending ? "#1e3a8a" : "linear-gradient(135deg,#1d4ed8,#2563eb)", color:"#fff" }}
+  >
+    {annonceSending ? "Ap voye..." : "📢 Voye Annons"}
+  </button>
+</div>  
+      <button
           onClick={() => generateAndSharePDF(school, s)}
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg,#25d366,#128c7e)", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}
