@@ -240,7 +240,7 @@ if (announcements[0]?.created_at) localStorage.setItem(`annonce_seen_${user.phon
        {/* Avatar avec ring coloré si matière active */}
         <div style={{ flex:1, minWidth:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
-          <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Prof Lakay</span>
+          <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Gid NS4</span>
             {(user.isFreemium||user.code==="FREEMIUM") && user.daysRemaining > 0 && (
               <span style={{ fontSize:10, padding:"2px 8px", borderRadius:20, background:"rgba(220,38,38,0.15)", color:"#fca5a5", border:"1px solid rgba(220,38,38,0.25)", fontWeight:600 }}>
                 Freemium {user.daysRemaining}j
