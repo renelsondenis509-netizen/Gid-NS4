@@ -66,24 +66,6 @@ export function ChatScreen({ user, onNavigate }) {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites,     setFavorites]     = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
 
-const [copiedId, setCopiedId] = useState(null);
-const [announcements,     setAnnouncements]     = useState([]);
-const [showAnnouncements, setShowAnnouncements] = useState(false);
-const [hasUnread,         setHasUnread]         = useState(false);
-
-useEffect(() => {
-  if (!user.code || user.code === "FREEMIUM") return;
-  callEdge({ action: "get_announcements", schoolCode: user.code })
-    .then(res => {
-      const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());
-      if (list.length === 0) return;
-      setAnnouncements(list);
-      const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
-      if (list[0]?.id && String(list[0].id) !== lastSeen) setHasUnread(true);
-    })
-    .catch(() => {});
-}, []);
-
   const openAnnouncements = () => {
   setShowAnnouncements(true);
   setHasUnread(false);
