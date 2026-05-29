@@ -24,7 +24,7 @@ export function AboutScreen({ onNavigate }) {
         <Card>
           <Row label="Vèsyon" value={`v${APP_VERSION}`} />
           <Row label="Platfòm" value="Android (Capacitor)" />
-          <Row label="Backend" value="Supabase" last />
+          <Row label="Backend" value="SB" last />
         </Card>
 
         <Card>
