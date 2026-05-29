@@ -94,6 +94,7 @@ export function ChatScreen({ user, onNavigate }) {
 
 const [announcements,     setAnnouncements]     = useState([]);
 const [showAnnouncements, setShowAnnouncements] = useState(false);
+const [copiedId, setCopiedId] = useState(null);
 const [unreadCount,       setUnreadCount]       = useState(0);
 
 useEffect(() => {
@@ -374,13 +375,17 @@ const openAnnouncements = () => {
         <button onClick={() => setShowAnnouncements(false)} style={{ background:"none", border:"none", color:"#4b6cb7", cursor:"pointer" }}><CloseIcon /></button>
       </div>
       {announcements.map((a, i) => (
-        <div key={a.id ?? i} style={{ marginBottom:12, padding:"14px 16px", borderRadius:14, background:"rgba(15,28,60,0.80)", border:"1px solid rgba(37,99,235,0.15)", borderLeft:"3px solid #2563eb" }}>
-          <div style={{ color:"#93c5fd", fontWeight:700, fontSize:13, marginBottom:6 }}>{a.title}</div>
-          <div style={{ color:"#c8d8ff", fontSize:13, lineHeight:1.6 }}>{a.message}</div>
-          <div style={{ color:"#2d3f6e", fontSize:11, marginTop:8 }}>
-            {new Date(a.created_at).toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince", day:"2-digit", month:"short", year:"numeric" })}
-          </div>
-        </div>
+<div key={a.id ?? i} style={{ marginBottom:12, padding:"14px 16px", borderRadius:14, background:"rgba(15,28,60,0.80)", border:"1px solid rgba(37,99,235,0.15)", borderLeft:"3px solid #2563eb" }}>
+  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+    <div style={{ color:"#93c5fd", fontWeight:700, fontSize:13, marginBottom:6 }}>{a.title}</div>
+    <button onClick={() => setAnnouncements(prev => prev.filter((_, j) => j !== i))}
+      style={{ background:"none", border:"none", color:"#4b6cb7", cursor:"pointer", fontSize:16, lineHeight:1, padding:"0 0 0 8px" }}>✕</button>
+  </div>
+  <div style={{ color:"#c8d8ff", fontSize:13, lineHeight:1.6 }}>{a.message}</div>
+  <div style={{ color:"#2d3f6e", fontSize:11, marginTop:8 }}>
+    {new Date(a.created_at).toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince", day:"2-digit", month:"short", year:"numeric" })}
+  </div>
+</div>
       ))}
     </div>
   </div>
