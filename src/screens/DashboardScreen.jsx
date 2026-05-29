@@ -205,7 +205,7 @@ const generateAndSharePDF = async (school, stats) => {
   } else {
     top.forEach((s, i) => {
       check(7);
-      const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
+      const medal = i===0?"#1":i===1?"#2":i===2?"#3":`${i+1}.`;
       doc.setFontSize(9);
       doc.setFont("helvetica", i < 3 ? "bold" : "normal");
       doc.setTextColor(i<3?[245,158,11][0]:80, i<3?[245,158,11][1]:100, i<3?[245,158,11][2]:160);
@@ -228,7 +228,7 @@ const generateAndSharePDF = async (school, stats) => {
     y += 2;
   }
   if (best) {
-    line(`★ Pi bon elèv: ${best.name} — ${best.avg}/20 (${best.count} quiz)`, 10, true, [34,197,94]);
+    line(`* Pi bon elèv: ${best.name} — ${best.avg}/20 (${best.count} quiz)`, 10, true, [34,197,94]);
     y += 2;
   }
   if (utilPct >= 0.9) {
