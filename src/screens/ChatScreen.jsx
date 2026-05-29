@@ -105,13 +105,13 @@ useEffect(() => {
   callEdge({ action: "get_announcements", schoolCode: user.code })
     .then(res => {
       const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());
-      const dismissed = JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]");
-      setAnnouncements(list.filter(a => !dismissed.includes(String(a.id))));
-      if (list.length === 0) return;
-      const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
-      const idx = lastSeen ? list.findIndex(a => String(a.id) === lastSeen) : list.length;
-      const count = idx === -1 ? 0 : idx;
-      if (count > 0) setUnreadCount(count);
+const dismissed = JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]");
+const visible = list.filter(a => !dismissed.includes(String(a.id)));
+setAnnouncements(visible);
+if (visible.length === 0) return;
+const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
+const unread = lastSeen ? visible.filter(a => String(a.id) !== lastSeen && !dismissed.includes(String(a.id))).length : visible.length;
+if (unread > 0) setUnreadCount(unread);
     })
     .catch(() => {});
 }, []);
