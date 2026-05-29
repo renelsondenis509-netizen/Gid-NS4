@@ -828,7 +828,7 @@ if (window[_winKey]) {
     onChange={e => setAnnonce(p => ({ ...p, expiresAt: e.target.value }))}
     style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:12, padding:"10px 14px", color:"#e2e8ff", fontSize:13, outline:"none", marginBottom:10, boxSizing:"border-box" }}
   />
-  {annonceStatus === "ok" && <p style={{ color:"#4ade80", fontSize:12, marginBottom:8 }}>✅ Annons voye ak siksè !</p>}
+  {annonceStatus === "ok" && <p style={{ color:"#4ade80", fontSize:12, marginBottom:8 }}>✅ Anons pibliye ak siksè !</p>}
   {annonceStatus === "err" && <p style={{ color:"#f87171", fontSize:12, marginBottom:8 }}>❌ Echèk — eseye ankò.</p>}
   <button
     onClick={sendAnnonce}
