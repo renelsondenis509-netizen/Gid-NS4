@@ -121,7 +121,7 @@ if (unread > 0) setUnreadCount(unread);
 const openAnnouncements = () => {
   setShowAnnouncements(true);
   setUnreadCount(0);
-  localStorage.setItem(`annonce_seen_${user.phone}`, new Date().toISOString());
+if (announcements[0]?.created_at) localStorage.setItem(`annonce_seen_${user.phone}`, announcements[0].created_at);
 };  const detectSubject = (text) => {
     const t = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
     if (t.includes("bio")||t.includes("cellule")||t.includes("adn")||t.includes("genetique")) return "Biologie";
