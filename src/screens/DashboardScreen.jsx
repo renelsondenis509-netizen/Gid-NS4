@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 
 const generateAndSharePDF = async (school, stats) => {
   try {
+  const cleanText = (str) => (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x00-\x7F]/g, "?");
   const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
   const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
   const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
@@ -67,7 +68,7 @@ const generateAndSharePDF = async (school, stats) => {
   doc.setTextColor(255,255,255);
   doc.text("RAPÒ OFISYÈL — GID NS4", W/2, 14, { align:"center" });
   doc.setFontSize(12); doc.setFont("helvetica","normal");
-  doc.text(school.name || "", W/2, 23, { align:"center" });
+  doc.text(cleanText(school.name) || "", W/2, 23, { align:"center" });
   doc.setFontSize(9); doc.setTextColor(147,197,253);
   doc.text(`${date}  •  ${time}`, W/2, 30, { align:"center" });
   doc.setFontSize(8); doc.setTextColor(100,140,220);
@@ -77,7 +78,7 @@ const generateAndSharePDF = async (school, stats) => {
   // ── 1. INFO ÉCOLE ────────────────────────────────────────────────────
   sectionTitle("1. ENFÒMASYON LEKÒL LA", [10,15,46]);
   y += 2;
-  kv("Non lekòl", school.name || "—");
+  kv("Non lekòl", cleanText(school.name) || "—");
   kv("Kòd aksè", school.code || "—");
   kv("Jou ki rete", `${school.daysRemaining ?? "—"} jou`);
   kv("Rekèt pa jou", `${school.dailyScans ?? "—"} max`);
@@ -125,7 +126,7 @@ const generateAndSharePDF = async (school, stats) => {
       const col = barColors[i % barColors.length];
       doc.setFontSize(9); doc.setFont("helvetica","normal");
       doc.setTextColor(...col);
-      doc.text(`${i+1}. ${sub}`, M, y);
+      doc.text(`${i+1}. ${cleanText(sub)}`, M, y);
       doc.setFont("helvetica","bold");
       doc.text(`${count} rekèt`, W-M, y, { align:"right" });
       y += 5;
@@ -145,7 +146,7 @@ const generateAndSharePDF = async (school, stats) => {
     weeks.forEach(([week, count]) => {
       check(12);
       doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(168,85,247);
-      doc.text(week, M, y);
+      doc.text(cleanText(week), M, y);
       doc.setFont("helvetica","bold"); doc.setTextColor(220,0,42);
       doc.text(`${count}`, W-M, y, { align:"right" });
       y += 4;
@@ -185,7 +186,7 @@ const generateAndSharePDF = async (school, stats) => {
       check(12);
       const col = barColors[i % barColors.length];
       doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(80,100,160);
-      doc.text(`${q.subject}`, M, y);
+      doc.text(cleanText(q.subject), M, y);
       doc.setFont("helvetica","bold"); doc.setTextColor(col[0],col[1],col[2]);
       doc.text(`${q.avg}/20  (${q.count} quiz)`, W-M, y, { align:"right" });
       y += 4;
@@ -209,7 +210,7 @@ const generateAndSharePDF = async (school, stats) => {
       doc.setFontSize(9);
       doc.setFont("helvetica", i < 3 ? "bold" : "normal");
       doc.setTextColor(i<3?[245,158,11][0]:80, i<3?[245,158,11][1]:100, i<3?[245,158,11][2]:160);
-      doc.text(`${medal} ${s.name}`, M, y);
+      doc.text(`${medal} ${cleanText(s.name)}`, M, y);
       doc.setFont("helvetica","bold"); doc.setTextColor(34,197,94);
       doc.text(`${s.avg}/20  (${s.count} quiz)`, W-M, y, { align:"right" });
       y += 7;
@@ -228,7 +229,7 @@ const generateAndSharePDF = async (school, stats) => {
     y += 2;
   }
   if (best) {
-    line(`* Pi bon elèv: ${best.name} — ${best.avg}/20 (${best.count} quiz)`, 10, true, [34,197,94]);
+    line(`* Pi bon elèv: ${cleanText(best.name)} — ${best.avg}/20 (${best.count} quiz)`, 10, true, [34,197,94]);
     y += 2;
   }
   if (utilPct >= 0.9) {
@@ -248,7 +249,7 @@ const generateAndSharePDF = async (school, stats) => {
   doc.text("Pwodwi ak Gid NS4  •  Prof Lakay  •  Konfidansyèl", W/2, 292, { align:"center" });
 
     const pdfBlob = doc.output("blob");
-    const fileName = `rapport-${school.name}-${date}.pdf`;
+    const fileName = `rapport-${cleanText(school.name)}-${date}.pdf`;
     const file = new File([pdfBlob], fileName, { type: "application/pdf" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: "Rapò Gid NS4", text: `Rapò ofisyèl — ${school.name}` });
