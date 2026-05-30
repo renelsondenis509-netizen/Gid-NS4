@@ -102,9 +102,9 @@ export function LeaderboardScreen({ user, onNavigate }) {
         {!loading && !error && board?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <IcoChart/>
-            <p className="text-blue-400 text-center text-sm">Pa gen done ankò.<br/>Fè kèk quiz pou parèt nan klasman an !</p>
+            <p className="text-blue-400 text-center text-sm">Poko gen done.<br/>Fè kèk quiz pou parèt nan klasman an !</p>
             <button onClick={() => onNavigate("quiz")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>→ Ale nan Quiz</button>
+              style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan Quiz</button>
           </div>
         )}
 
