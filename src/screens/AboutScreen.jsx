@@ -28,7 +28,7 @@ export function AboutScreen({ onNavigate }) {
         </Card>
 
         <Card>
-          <Row label="Devlòpè" value="Milokan App" />
+          <Row label="Devlopè" value="Milokan App" />
           <Row label="Peyi" value="🇭🇹 Ayiti" last />
         </Card>
 
