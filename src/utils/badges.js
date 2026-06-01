@@ -22,7 +22,7 @@ export const BADGES = [
   { id:"streak_5",      svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',                                                                                label:"Ekspè",       color:"#f59e0b", desc:"5 fwa 16+ nan yon matye" },
 ];
 
-export function computeBadges({ grades, exoCount, allSubjectsCount }) {
+export function computeBadges({ grades, exoCount, allSubjectsCount, phone = "" }) {
   const unlocked = new Set();
   try {
     const allGrades  = Object.values(grades).flat();
@@ -32,9 +32,9 @@ export function computeBadges({ grades, exoCount, allSubjectsCount }) {
     const bestNotes  = subjects.map(k => Math.max(...grades[k].map(e => e.note20)));
     const avg        = bestNotes.length ? bestNotes.reduce((a,b) => a+b, 0) / bestNotes.length : 0;
     const maxStreak  = Math.max(0, ...subjects.map(k => grades[k].filter(e => e.note20 >= 16).length));
-    const coverage   = subjects.length / allSubjectsCount;
+    const coverage   = allSubjectsCount > 0 ? subjects.length / allSubjectsCount : 0;
     const today      = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
-    const scanUsed   = parseInt(localStorage.getItem(`gid_scan_${grades._phone || ''}_${today}`) || "0");
+    const scanUsed   = parseInt(localStorage.getItem(`gid_scan_${phone}_${today}`) || "0");
 
     if (scanUsed >= 1 || allGrades.length >= 1) unlocked.add("first_scan");
     if (allGrades.length >= 1)   unlocked.add("first_quiz");

@@ -78,7 +78,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
   const grades = (() => { try { return JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}"); } catch { return {}; } })();
   const [exoCount, setExoCount] = useState(0);
   useEffect(() => { idbGetExercice(user.phone).then(e => setExoCount(e.length)).catch(()=>{}); }, [user.phone]);
-  const badges = computeBadges({ grades, exoCount, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length }).filter(b => b.unlocked);
+  const badges = computeBadges({ grades, exoCount, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length, phone: user?.phone ?? "" }).filter(b => b.unlocked);
 
   const NOTIF_KEY = "gns4_notif_settings";
   const savedNotif = (() => { try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || "{}"); } catch { return {}; } })();

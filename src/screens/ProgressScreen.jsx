@@ -96,7 +96,7 @@ export function ProgressScreen({ user, onNavigate }) {
     const weak3   = subjectStats.length > 3 ? [...subjectStats].sort((a, b) => a.best - b.best).slice(0, 3) : [];
     const bestStreak = Math.max(...subjectStats.map(s => s.streak));
     const untried = ALL_SUBJECTS.filter(s => !subjects.includes(s));
-    const badgeList = computeBadges({ grades, exoCount: totalExo, allSubjectsCount: ALL_SUBJECTS.length });
+    const badgeList = computeBadges({ grades, exoCount: totalExo, allSubjectsCount: ALL_SUBJECTS.length, phone: user.phone });
 
     return { subjectStats: sorted, avg, top3, weak3, bestStreak, untried, totalExo, total: subjectStats.length, max: ALL_SUBJECTS.length, badgeList };
   }, [grades, exoData]);
