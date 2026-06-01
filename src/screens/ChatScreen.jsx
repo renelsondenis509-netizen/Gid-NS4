@@ -82,7 +82,7 @@ export function ChatScreen({ user, onNavigate }) {
   const DAILY_MAX = user.dailyTextScans ?? user.dailyScans ?? 10;
   const today     = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
   const _scanKey  = `gid_scan_${user.phone}_${today}`;
-  const [scansUsed, setScansUsed] = useState(() => { try { return parseInt(localStorage.getItem(_scanKey)||"0"); } catch { return 0; } });
+  const [scansUsed, setScansUsed] = useState(() => { try { return user.scansToday ?? parseInt(localStorage.getItem(_scanKey)||"0"); } catch { return 0; } });
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages, loading]);
   useEffect(() => {
@@ -116,7 +116,7 @@ const unread = lastSeen
 if (unread > 0) setUnreadCount(unread);
     })
     .catch(() => {});
-}, []);
+}, [user.code]);
 
 const openAnnouncements = () => {
   setShowAnnouncements(true);
@@ -237,7 +237,9 @@ if (announcements[0]?.created_at) localStorage.setItem(`annonce_seen_${user.phon
 
       {/* HEADER */}
       <div style={{ position:"relative", zIndex:10, display:"flex", alignItems:"center", gap:12, padding:"10px 16px", background:"rgba(6,11,32,0.95)", backdropFilter:"blur(24px)", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
-       {/* Avatar avec ring coloré si matière active */}
+       <div style={{ width:36, height:36, borderRadius:10, flexShrink:0, overflow:"hidden", background:"#fff", boxShadow:"0 2px 12px rgba(0,0,0,0.4)", border: activeSubject ? `2px solid ${activeColor?.active}` : "2px solid transparent", transition:"border-color .3s" }}>
+          <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }} />
+        </div>
         <div style={{ flex:1, minWidth:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
           <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Gid NS4</span>
