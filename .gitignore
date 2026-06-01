@@ -1,14 +1,12 @@
-node_modules/
-# Fichiers secrets (IMPORTANT !)
-   .env
-   .env.local
+
    
    # Fichiers de build et cache
-   dist/
+   .env
+   .env.local
    .vite/
-
-
-.env
-dist/
+   dist/
+# Fichiers secrets (IMPORTANT !)
 *.save
 .env
+dist/
+node_modules/
