@@ -15,16 +15,13 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   const handleLogin = async () => {
     setError("");
     if (!name.trim() || name.trim().length < 2) { setError("Antre non ou ki valid (omwen 2 lèt)."); return; }
-    if (!phone.trim() || phone.length < 8)       { setError("Antre yon nimewo telefòn valid."); return; }
+    if (!phone.trim() || phone.trim().length < 8)       { setError("Antre yon nimewo telefòn valid."); return; }
     if (!code.trim())                             { setError("Antre kòd lekòl ou a."); return; }
     setLoading(true);
     try {
       const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
       if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
-      try {
-        onLogin({
-          name: name.trim(), phone: phone.trim(),
-          code: code.toUpperCase().trim(),
+      onLogin({
           school:          result.school.name,
           subjects:        result.school.subjects,
           dailyScans:      result.school.dailyScans,
@@ -33,9 +30,8 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
           daysRemaining:   result.school.daysRemaining,
           expiresAt:       result.school.expiresAt,
           freemiumExpiresAt: null,
-          scansToday:      result.scansToday,
-        });
-      } catch {}
+        scansToday:      result.scansToday,
+      });
     } catch (e) { setError(parseApiError(e).message); }
     setLoading(false);
   };
@@ -43,7 +39,7 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   const handleFreemium = async () => {
     setError("");
     if (!name.trim() || name.trim().length < 2) { setError("Antre non ou ki valid (omwen 2 lèt)."); return; }
-    if (!phone.trim() || phone.length < 8)       { setError("Antre yon nimewo telefòn valid."); return; }
+    if (!phone.trim() || phone.trim().length < 8)       { setError("Antre yon nimewo telefòn valid."); return; }
     setLoading(true);
     try {
       const result = await callEdge({ action:"freemium_login", phone:phone.trim(), name:name.trim() });
