@@ -19,6 +19,7 @@ import AdminScreen       from "./screens/AdminScreen";
 import { ProgressScreen }   from "./screens/ProgressScreen";
 import { AboutScreen }      from "./screens/AboutScreen";
 import { OfflineBanner }     from "./components/OfflineBanner";
+import { idbGetPendingScores, idbDeletePendingScore } from "./utils/idb";
 
 function enrichUser(u) {
   const { isFreemium, daysRemaining: freemiumDays } = getFreemiumStatus(u);
@@ -44,25 +45,6 @@ export default function App() {
     window.addEventListener("online",  on);
     window.addEventListener("offline", off);
     return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
-  }, []);
-
- useEffect(() => {
-    async function syncPendingScores() {
-      if (!navigator.onLine) return;
-      try {
-        const pending = await idbGetPendingScores();
-        for (const score of pending) {
-          try {
-            const { id, ts, ...payload } = score;
-            await callEdge(payload);
-            await idbDeletePendingScore(id);
-          } catch { break; }
-        }
-      } catch {}
-    }
-    syncPendingScores();
-    window.addEventListener("online", syncPendingScores);
-    return () => window.removeEventListener("online", syncPendingScores);
   }, []);
 
 useEffect(() => {
