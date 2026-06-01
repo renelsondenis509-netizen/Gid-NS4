@@ -345,19 +345,6 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 0", display: "flex", flexDirection: "column", gap: 14 }}>
-          {/* Cache status */}
-          {!selected._fallback
-            ? <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px",
-                borderRadius: 12, background: "#14532d22", border: "1px solid #22c55e22" }}>
-                <span style={{ color: "#86efac" }}><IcoDatabase/></span>
-                <span style={{ color: "#86efac", fontSize: 13 }}>• Image disponible hors-ligne</span>
-              </div>
-            : <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px",
-                borderRadius: 12, background: "#78350f22", border: "1px solid #f59e0b22" }}>
-                <span style={{ color: "#fcd34d" }}><IcoWarning/></span>
-                <span style={{ color: "#fcd34d", fontSize: 13 }}>Mode fallback — Image non disponible hors-ligne</span>
-              </div>
-          }
 
           {/* Image */}
           {selected.image
@@ -503,7 +490,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                       <div style={{ flex: 1, height: 6, borderRadius: 99, background: "#1e3a8a44", overflow: "hidden" }}>
                         <div style={{
                           height: "100%", borderRadius: 99,
-                          width: `${Math.min((count / user.dailyScans) * 100, 100)}%`,
+                          width: `${Math.min((count / (user.dailyTextScans ?? user.dailyScans)) * 100, 100)}%`,
                           background: count >= user.dailyScans
                             ? "#ef4444"
                             : "linear-gradient(90deg,#d4002a,#ff6b35)",
@@ -511,7 +498,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                         }}/>
                       </div>
                       <span style={{ fontSize: 12, fontWeight: 700, color: "#fb923c", width: 36, textAlign: "right" }}>
-                        {count}/{user.dailyScans}
+                        {count}/{user.dailyTextScans ?? user.dailyScans}
                       </span>
                     </div>
                   ))}
