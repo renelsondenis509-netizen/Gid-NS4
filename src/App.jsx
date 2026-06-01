@@ -77,7 +77,7 @@ useEffect(() => {
         const pending = await idbGetPendingScores();
         for (const score of pending) {
           try {
-            await callEdge({ action: "save_score", ...score });
+            await callEdge({ action: "save_quiz_score", ...score });
             await idbDeletePendingScore(score.id);
           } catch {}
         }
