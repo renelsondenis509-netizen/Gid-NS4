@@ -87,7 +87,6 @@ const getSubjectIcon = (subject, size = 20, color = "#fff") => {
 
 // ─── QUIZ SCREEN ─────────────────────────────────────────────
 export function QuizScreen({ user, onNavigate }) {
-  if (!hasAccess(user)) { onNavigate("payment"); return null; }
   const [phase,         setPhase]         = useState("select");
   const [subject,       setSubject]       = useState(null);
   const [shuffledQs,    setShuffledQs]    = useState([]);
@@ -104,6 +103,8 @@ export function QuizScreen({ user, onNavigate }) {
   const [roundScore,    setRoundScore]    = useState(0);
   const [usedQKeys,     setUsedQKeys]     = useState(new Set());
   const [openBranch,    setOpenBranch]    = useState(null);
+
+  if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
   const currentQ = shuffledQs[qIndex];
 
