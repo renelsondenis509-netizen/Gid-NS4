@@ -22,6 +22,9 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
       const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
       if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
       onLogin({
+          name:            name.trim(),
+          phone:           phone.trim(),
+          code:            code.toUpperCase().trim(),
           school:          result.school.name,
           subjects:        result.school.subjects,
           dailyScans:      result.school.dailyScans,
@@ -30,7 +33,7 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
           daysRemaining:   result.school.daysRemaining,
           expiresAt:       result.school.expiresAt,
           freemiumExpiresAt: null,
-        scansToday:      result.scansToday,
+          scansToday:      result.scansToday,
       });
     } catch (e) { setError(parseApiError(e).message); }
     setLoading(false);
