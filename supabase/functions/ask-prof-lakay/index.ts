@@ -10,12 +10,22 @@ const corsHeaders = {
 };
 
 const supabase = createClient(
+
+// Fonction utilitaire pour obtenir la date en Haïti (UTC-5)
+function getHaitiDate(): string {
+  const now = new Date();
+  const haitiTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Port-au-Prince" }));
+  const year = haitiTime.getFullYear();
+  const month = String(haitiTime.getMonth() + 1).padStart(2, "0");
+  const day = String(haitiTime.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;}
+
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
-function withTimeout<T>(promise: Promise<T>, ms = 5000): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms = 20000): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error("Timeout")), ms)
   );
@@ -207,7 +217,7 @@ async function callCloudflare(systemPrompt: string, userContent: unknown[]): Pro
 }
 
 // ─── Appel principal avec fallback automatique ────────────────────────────────
-async function callGemini(prompt: string, imageBase64?: string | null): Promise<string> {
+async function callAIProvider(prompt: string, imageBase64?: string | null): Promise<string> {
   const [systemPart, ...userParts] = prompt.split("\n\nÉlève:");
   const userText = userParts.join("\n\nÉlève:").trim() || prompt;
   const systemPrompt = systemPart.trim();
@@ -441,7 +451,7 @@ const { data: profile, error: profileError } = await db
   .eq("school_code", schoolCode)
   .maybeSingle();
 
-const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+const today = getHaitiDate();
 const { count: scansToday } = await db
   .from("scans")
   .select("*", { count: "exact", head: true })
@@ -475,7 +485,7 @@ const ADMIN_PHONE = Deno.env.get("ADMIN_PHONE") ?? "";
 // ─── ACTION : ask (avec cache amélioré) ───────────────────────────────────────
 async function processAsk(
   db: ReturnType<typeof createClient>,
-  gemini: typeof callGemini,
+  gemini: typeof callAIProvider,
   body: {
     phone: string;
     schoolCode: string;
@@ -506,14 +516,18 @@ async function processAsk(
 
     if (!school || !school.active) throw { status: 403, error: "Kòd la pa valid oswa dezaktive." };
     if (new Date() > new Date(school.expires_at)) throw { status: 403, error: "Kòd ou a ekspire. Kontakte direksyon lekòl ou." };
-    allowedSubjects = school.subjects ?? [];
+    let rawSubjects = school.subjects ?? [];
+  if (!rawSubjects.includes("Statistique") && rawSubjects.some((s: string) => ["Analyse","Algèbre","Suite","Complexe","Probabilité","Géométrie","Physique"].includes(s))) {
+    rawSubjects = [...rawSubjects, "Statistique"];
+  }
+  allowedSubjects = rawSubjects;
     dailyLimitOverride = school.daily_scans ?? 5;
     if (subject !== "Général" && !allowedSubjects.includes(subject)) {
       throw { status: 403, error: `Matière ${subject} pa otorize ak kòd sa a.` };
     }
   }
 
-  const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+  const today = getHaitiDate();
   const { count: scansToday } = await db
     .from("scans")
     .select("*", { count: "exact", head: true })
@@ -527,9 +541,9 @@ async function processAsk(
   }
 
   const creoleWords = message.toLowerCase().split(/\s+/);
-  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","se","te","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini"];
-  const detectedLang = creoleMarkers.some(w => creoleWords.includes(w)) ? "ht" : "fr";
-  const langRule = detectedLang === "ht"
+  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini","mwenmenm","noumenm"];
+  const creoleCount = creoleMarkers.filter(w => creoleWords.includes(w)).length;
+  const detectedLang = creoleCount >= 2 ? "ht" : "fr";
     ? "RÈGLE LANGUE: Réponds UNIQUEMENT en créole haïtien standard (IPN/CSLC). INTERDIT: mots anglais, mots français, répéter la question, traduire en anglais. Écris directement ta réponse sans préambule."
     : "RÈGLE LANGUE: L'élève écrit en français. Réponds UNIQUEMENT en français. Zéro mot créole dans ta réponse.";
   const systemPrompt = `${langRule}
@@ -703,7 +717,7 @@ async function processDashboard(
     }
   }
 
-  const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+  const today = getHaitiDate();
   const currentWeek = getWeekKey();
 
   const [
@@ -911,7 +925,7 @@ async function freemiumLogin(
     throw { status: 403, error: "Peryòd gratis ou a fini. Kontakte direksyon lekòl ou pou yon kòd." };
   }
 
-  const today = new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }).split(" ")[0];
+  const today = getHaitiDate();
   const { count: scansToday } = await db.from("scans").select("*", { count: "exact", head: true }).eq("phone", phone).gte("created_at", `${today}T05:00:00Z`);
 
   return {
@@ -1045,11 +1059,14 @@ async function deleteSchool(db: ReturnType<typeof createClient>, body: { adminSe
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
   if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
   if (!body.code?.trim()) throw { status: 400, error: "Kòd la obligatwa." };
-await db.from("profiles").delete().eq("school_code", body.code);
-  const { error } = await db.from("schools").delete().eq("code", body.code);
-  if (error) throw { status: 500, error: error.message };
-  await logAudit(db, "delete_school", body.adminSecret.slice(-4), body.code, {});
-  return { success: true, message: `Lekòl ${body.code} efase.` };
+  await db.from("scans").delete().eq("school_code", body.code);
+  await db.from("quiz_scores").delete().eq("school_code", body.code);
+  await db.from("announcements").delete().eq("school_code", body.code);
+  // Suppression en cascade des données liées
+  await db.from("scans").delete().eq("school_code", body.code);
+  await db.from("quiz_scores").delete().eq("school_code", body.code);
+  await db.from("announcements").delete().eq("school_code", body.code);
+  await db.from("profiles").delete().eq("school_code", body.code);
 }
 
 // ─── ACTION : update_school ───────────────────────────────────────────────────
@@ -1119,7 +1136,7 @@ Deno.serve(async (req) => {
       case "generate_quiz":        result = await generateQuiz(supabase, body); break;
       case "freemium_login":      result = await freemiumLogin(supabase, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
-      case "ask":                 result = await processAsk(supabase, callGemini, body); break;
+      case "ask":                 result = await processAsk(supabase, callAIProvider, body); break;
       case "save_quiz_score":     result = await saveQuizScore(supabase, body); break;
       case "get_leaderboard":     result = await getLeaderboard(supabase, body); break;
       case "dashboard":           result = await processDashboard(supabase, body); break;
