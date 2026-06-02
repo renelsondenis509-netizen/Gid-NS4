@@ -68,11 +68,17 @@ useEffect(() => {
                 const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0 });
                 sessionSave(fresh);
                 setUser(fresh);
+                // Sync compteur local avec serveur
+                const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
+                try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
               }
             } else if (result?.valid && result?.school) {
               const fresh = enrichUser({ ...saved, ...result.school, code: saved.code, phone: saved.phone, name: saved.name, dailyScans: result.school.dailyScans, dailyImageScans: result.school.dailyImageScans, dailyTextScans: result.school.dailyTextScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects, isAdmin: result.isAdmin ?? saved.isAdmin ?? false });
               sessionSave(fresh);
               setUser(fresh);
+              // Sync compteur local avec serveur
+              const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
+              try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
             }
           }).catch(() => {});
       }
