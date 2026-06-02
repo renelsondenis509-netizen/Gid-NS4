@@ -56,10 +56,20 @@ useEffect(() => {
         if (granted && enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
       });
       // Refresh données école en arrière-plan
-      if (navigator.onLine && saved.code !== "FREEMIUM") {
-        callEdge({ action: "validate_code", phone: saved.phone, schoolCode: saved.code })
+      if (navigator.onLine) {
+        const refreshAction = saved.code === "FREEMIUM" ? "freemium_login" : "validate_code";
+        const refreshPayload = saved.code === "FREEMIUM"
+          ? { action: "freemium_login", phone: saved.phone, name: saved.name || saved.phone }
+          : { action: "validate_code", phone: saved.phone, schoolCode: saved.code };
+        callEdge(refreshPayload)
           .then(result => {
-            if (result?.valid && result?.school) {
+            if (saved.code === "FREEMIUM") {
+              if (result?.freemiumExpiresAt) {
+                const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0 });
+                sessionSave(fresh);
+                setUser(fresh);
+              }
+            } else if (result?.valid && result?.school) {
               const fresh = enrichUser({ ...saved, ...result.school, code: saved.code, phone: saved.phone, name: saved.name, dailyScans: result.school.dailyScans, dailyImageScans: result.school.dailyImageScans, dailyTextScans: result.school.dailyTextScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects, isAdmin: result.isAdmin ?? saved.isAdmin ?? false });
               sessionSave(fresh);
               setUser(fresh);
