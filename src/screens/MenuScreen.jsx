@@ -62,8 +62,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
   );
 
   // ─── MENU ITEMS DATA ─────────────────────────────────────────────────────
-  const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE ?? "";
-  const isAdmin = user?.phone === ADMIN_PHONE;
+  const isAdmin = user?.isAdmin === true;
 
   const menuItems = [
     { icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>, label:"Pwogresyon", screen:"progress" },

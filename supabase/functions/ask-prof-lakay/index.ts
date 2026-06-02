@@ -451,8 +451,10 @@ const { count: scansToday } = await db
 
 const daysRemaining = Math.ceil((expires.getTime() - now.getTime()) / 86400000);
 
-return {
+const ADMIN_PHONE = Deno.env.get("ADMIN_PHONE") ?? "";
+  return {
   valid: true,
+  isAdmin: ADMIN_PHONE !== "" && phone === ADMIN_PHONE,
   school: {
     name:            school.school_name,
     subjects:        school.subjects ?? [],

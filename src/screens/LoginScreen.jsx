@@ -33,6 +33,7 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
           daysRemaining:   result.school.daysRemaining,
           expiresAt:       result.school.expiresAt,
           freemiumExpiresAt: null,
+          isAdmin:         result.isAdmin ?? false,
           scansToday:      result.scansToday,
       });
     } catch (e) { setError(parseApiError(e).message); }
