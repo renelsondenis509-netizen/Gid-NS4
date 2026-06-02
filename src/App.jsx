@@ -69,7 +69,7 @@ useEffect(() => {
                 sessionSave(fresh);
                 setUser(fresh);
                 // Sync compteur local avec serveur
-                const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
+                const today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
                 try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
               }
             } else if (result?.valid && result?.school) {
@@ -77,7 +77,7 @@ useEffect(() => {
               sessionSave(fresh);
               setUser(fresh);
               // Sync compteur local avec serveur
-              const today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
+              const today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
               try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
             }
           }).catch(() => {});
