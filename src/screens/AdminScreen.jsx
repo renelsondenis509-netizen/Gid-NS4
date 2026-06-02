@@ -69,6 +69,42 @@ function ActionButton({ label, loading, onClick, color = "#3b82f6" }) {
   );
 }
 
+function ListSchools({ adminSecret }) {
+  const [schools, setSchools] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const load = async () => {
+    setLoading(true); setError("");
+    try {
+      const data = await callEdge({ action: "list_schools", adminSecret });
+      setSchools(data.schools ?? []);
+    } catch (e) {
+      setError(e.error ?? "Erè.");
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div>
+      <button onClick={load} disabled={loading}
+        style={{ width:"100%", padding:10, borderRadius:8, background:"#1e293b", color:"#94a3b8", border:"1px solid #334155", cursor:"pointer", marginBottom:12 }}>
+        {loading ? "Chajman..." : "🔄 Chaje Lis Lekòl"}
+      </button>
+      {error && <p style={{ color:"#fca5a5", fontSize:13 }}>{error}</p>}
+      {schools.map(s => (
+        <div key={s.code} style={{ padding:"10px 12px", borderRadius:8, background:"#1e293b", marginBottom:8, fontSize:13 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+            <span style={{ color:"#60a5fa", fontWeight:700 }}>{s.school_name}</span>
+            <span style={{ color: s.active ? "#4ade80" : "#ef4444", fontWeight:700 }}>{s.active ? "Aktif" : "Revoké"}</span>
+          </div>
+          <div style={{ color:"#94a3b8" }}>Kòd : <span style={{ color:"#f1f5f9", fontFamily:"monospace" }}>{s.code}</span></div>
+          <div style={{ color:"#94a3b8" }}>Max : {s.max_students} elèv • Ekspire : {new Date(s.expires_at).toLocaleDateString("fr-HT")}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function AdminScreen({ onBack }) {
   const [adminSecret, setAdminSecret] = useState("");
   const [secretOk, setSecretOk] = useState(false);
@@ -206,6 +242,10 @@ export default function AdminScreen({ onBack }) {
             {log.target && <div style={{ color: "#94a3b8" }}>Sib : <span style={{ color: "#f1f5f9" }}>{log.target}</span></div>}
           </div>
         ))}
+      </Section>
+
+      <Section title="📋 Lis Lekòl Yo">
+        <ListSchools adminSecret={adminSecret} />
       </Section>
 
       <Section title="🔒 Revoké / Reaktive Lekòl">
