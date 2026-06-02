@@ -82,7 +82,7 @@ export function ChatScreen({ user, onNavigate }) {
   const DAILY_MAX = user.dailyTextScans ?? user.dailyScans ?? 10;
   const today     = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
   const _scanKey  = `gid_scan_${user.phone}_${today}`;
-  const [scansUsed, setScansUsed] = useState(() => { try { return user.scansToday ?? parseInt(localStorage.getItem(_scanKey)||"0"); } catch { return 0; } });
+  const [scansUsed, setScansUsed] = useState(() => { try { return parseInt(localStorage.getItem(_scanKey)||"0") || (user.scansToday ?? 0); } catch { return 0; } });
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages, loading]);
   useEffect(() => {

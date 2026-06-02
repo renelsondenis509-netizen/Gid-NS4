@@ -6,6 +6,7 @@ import { shuffleArray, shuffleChoices } from "../utils/helpers";
 import { scoreToNote20, getMention, saveQuizGrade } from "../utils/quiz";
 import { BottomNav } from "../components/UI";
 import { idbSavePendingScore } from "../utils/idb";
+import { cacheClear } from "../utils/cache";
 import { hasAccess } from "../utils/freemium";
 
 // ─── ICONS ───────────────────────────────────────────────────
@@ -124,6 +125,7 @@ export function QuizScreen({ user, onNavigate }) {
       if (!user.isFreemium) {
         try {
           await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz" });
+          cacheClear(`leaderboard_${user.phone}_${user.code}`);
         } catch {
           await idbSavePendingScore({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz", ts:Date.now() });
         }
