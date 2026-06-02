@@ -48,6 +48,8 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
     try {
       const result = await callEdge({ action:"freemium_login", phone:phone.trim(), name:name.trim() });
       localStorage.setItem("gid_freemium_expires", result.freemiumExpiresAt ?? new Date(Date.now()+3*86400000).toISOString());
+      const _today = new Date().toLocaleDateString("fr-HT", { timeZone:"America/Port-au-Prince" });
+      try { localStorage.setItem(`gid_scan_${phone.trim()}_${_today}`, String(result.scansToday ?? 0)); } catch {}
       onLogin({
         name: name.trim(), phone: phone.trim(),
         code: "FREEMIUM", school: "Freemium",
@@ -56,7 +58,7 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
         daysRemaining: result.daysRemaining,
         expiresAt: result.freemiumExpiresAt,
         freemiumExpiresAt: result.freemiumExpiresAt,
-        scansToday: 0,
+        scansToday: result.scansToday ?? 0,
       });
     } catch (e) { setError(parseApiError(e).message); }
     setLoading(false);
