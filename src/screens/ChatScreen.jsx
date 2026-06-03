@@ -243,9 +243,7 @@ if (announcements[0]?.created_at) localStorage.setItem(`annonce_seen_${user.phon
 
       {/* HEADER */}
       <div style={{ position:"relative", zIndex:10, display:"flex", alignItems:"center", gap:12, padding:"10px 16px", background:"rgba(6,11,32,0.95)", backdropFilter:"blur(24px)", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
-       <div style={{ width:36, height:36, borderRadius:10, flexShrink:0, overflow:"hidden", background:"#fff", boxShadow:"0 2px 12px rgba(0,0,0,0.4)", border: activeSubject ? `2px solid ${activeColor?.active}` : "2px solid transparent", transition:"border-color .3s" }}>
-          <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }} />
-        </div>
+
         <div style={{ flex:1, minWidth:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
           <span style={{ color:"#fff", fontWeight:800, fontSize:15, letterSpacing:"-0.01em" }}>Gid NS4</span>
