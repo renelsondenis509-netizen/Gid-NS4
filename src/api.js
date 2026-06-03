@@ -4,8 +4,10 @@ export async function callEdge(payload) {
   if (!navigator.onLine) {
     throw { type: "offline", offline: true };
   }
+  
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
+  
   try {
     const res = await fetch(API, {
       method:  "POST",
@@ -16,8 +18,25 @@ export async function callEdge(payload) {
       body:   JSON.stringify(payload),
       signal: controller.signal,
     });
-    const data = await res.json();
-    if (!res.ok) throw { status: res.status, ...data };
+
+    // ✅ CORRECTION : Parsing JSON sécurisé
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      // Si la réponse n'est pas du JSON (ex: page d'erreur HTML 502/504 d'un proxy)
+      const text = await res.text();
+      data = {
+        error: "Réponse serveur invalide",
+        details: text.substring(0, 150) // On garde juste le début du texte pour éviter les payloads énormes
+      };
+    }
+
+    // ✅ Vérification du statut après avoir sécurisé les données
+    if (!res.ok) {
+      throw { status: res.status, ...data };
+    }
+
     return data;
   } finally {
     clearTimeout(timer);
@@ -38,6 +57,6 @@ export function parseApiError(err) {
   if (err?.name === "AbortError")
     return { type: "timeout", message: "Koneksyon an pa bon, eseye ankò !", detail: "Demann an pran twò lontan. Verifye entènèt ou.", icon: "⏱️", retry: true };
   if (err?.error)
-    return { type: "api", message: err.error, detail: null, icon: "⚠️", retry: false };
+    return { type: "api", message: err.error, detail: err.details || null, icon: "⚠️", retry: false };
   return { type: "unknown", message: "Koneksyon an pa bon, eseye ankò !", detail: null, icon: "⚠️", retry: true };
 }
