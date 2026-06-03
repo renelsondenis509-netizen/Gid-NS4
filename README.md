@@ -1,58 +1,46 @@
-# 🎓 Gid NS4 — Tuteur IA pour le Baccalauréat haïtien
+# Gid NS4 — Tuteur IA pour le Baccalauréat haïtien
 
 Application éducative "Prof Lakay" pour les élèves de Terminale (NS4), filières SVT, SES, SMP, LLA.
 
-##  Démarrage rapide (Termux)
+## Stack
+- Frontend : React + Vite + Tailwind
+- Backend : Supabase (DB + Edge Functions)
+- IA : Cascade 6 providers (Groq, SambaNova, OpenRouter, Mistral, LLM7, Cloudflare)
+- Mobile : Capacitor (Android)
+- CI/CD : GitHub Actions → Supabase
 
-~~~bash
-pkg install nodejs git
-git clone https://github.com/renelsondenis509-netizen/Gid-NS4.git
-cd Gid-NS4 && npm install && npm run dev
-~~~
+## Démarrage rapide (Termux)
+    pkg install nodejs git
+    git clone https://github.com/renelsondenis509-netizen/Gid-NS4.git
+    cd Gid-NS4 && npm install && npm run dev
 
-## ⚙️ Configuration
+## Configuration
+Crée un fichier .env à la racine :
+    VITE_SUPABASE_URL=https://ton-projet.supabase.co
+    VITE_SUPABASE_ANON_KEY=ton-anon-key
 
-Crée un fichier `.env` à la racine :
-
-~~~env
-VITE_SUPABASE_URL=https://ton-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=ton-anon-key
-~~~
-
-Variables Edge Function (à configurer dans Supabase Dashboard → Settings → Secrets) :
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `ADMIN_SECRET`
+Variables Edge Function (Supabase Dashboard → Settings → Secrets) :
+- SUPABASE_URL
+- SUPABASE_SERVICE_ROLE_KEY
+- ADMIN_SECRET
+- ADMIN_PHONE
 - Clés API des fournisseurs IA (Groq, SambaNova, etc.)
 
-## 📦 Scripts
-
+## Scripts
 | Commande | Action |
 |----------|--------|
-| `npm run dev` | Lance le serveur de développement |
-| `npm run build` | Compile pour la production |
-| `npm run validate-quiz` | Valide les questions QCM |
-| `git push origin master` | Déclenche le déploiement automatique |
+| npm run dev | Serveur local |
+| npm run build | Build production |
+| npm run validate-quiz | Valider les 1450+ questions |
+| git push origin master | Déploie l'Edge Function |
 
-## ️ Structure du projet
+## Contenu
+- 1450+ questions QCM sur 26 matières (SVT, SES, SMP, LLA)
+- Système freemium (3 jours / 3 scans par jour)
+- Leaderboard par école et universel
+- Dashboard directeur avec export PDF
+- Notifications locales (Capacitor)
+- Mode hors-ligne avec sync automatique
 
-~~~text
-Gid-NS4/
-├── src/                    # Frontend React
-│   ├── screens/            # Écrans de l'application
-│   ├── components/         # Composants UI réutilisables
-│   ├── utils/              # Helpers (cache, IndexedDB, etc.)
-│   └── api.js              # Appels vers l'Edge Function
-├── supabase/
-│   └── functions/
-│       └── ask-prof-lakay/ # Edge Function principale
-└── .github/workflows/      # Configuration CI/CD
-~~~
-
-## 📄 Licence
-
-MIT © Renelson Denis
-
-## 📧 Contact
-
-Renelson Denis - [GitHub](https://github.com/renelsondenis509-netizen)
+## Publication Android
+L'APK/AAB est signé avec un keystore dédié et publié sur Google Play Store.
