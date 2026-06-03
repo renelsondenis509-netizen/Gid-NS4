@@ -1138,6 +1138,15 @@ async function revokeSchool(
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
 
+  // VÉRIFICATION SÉCURITÉ : Header Authorization
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Accès refusé : Token manquant" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
+  }
+
   try {
     const body = await req.json();
     let result: unknown;
