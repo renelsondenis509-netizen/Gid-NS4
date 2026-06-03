@@ -387,18 +387,68 @@ async function validateCode(
 ) {
   const { phone, schoolCode } = body;
 
+  // ✅ Cas spécial Freemium (inchangé)
   if (schoolCode === "FREEMIUM") {
     const fr = await freemiumLogin(db, { phone, name: body.name || phone });
-    return { valid: true, ...fr, school: { name: "Freemium", daily_scans: 3, dailyScans: 3, dailyImageScans: 1, dailyTextScans: 2, subjects: [], daysRemaining: fr.daysRemaining, expiresAt: fr.freemiumExpiresAt } };
+    return { 
+      valid: true, 
+      ...fr, 
+      school: { 
+        name: "Freemium", 
+        daily_scans: 3, 
+        dailyScans: 3, 
+        dailyImageScans: 1, 
+        dailyTextScans: 2, 
+        subjects: [], 
+        daysRemaining: fr.daysRemaining, 
+        expiresAt: fr.freemiumExpiresAt 
+      } 
+    };
   }
 
-  const { data: school, error } = await db
-    .from("schools")
-    .select("*")
-    .eq("code", schoolCode)
-    .single();
+  // ✅ ÉTAPE 1 : Toutes les requêtes indépendantes en PARALLÈLE
+  const [
+    schoolRes,
+    teacherRes,
+    otherSchoolRes,
+    studentCountRes,
+    existingProfileRes
+  ] = await Promise.all([
+    // 1. Récupérer l'école
+    db.from("schools").select("*").eq("code", schoolCode).single(),
+    
+    // 2. Vérifier si c'est un prof
+    db.from("teachers").select("phone").eq("phone", phone).maybeSingle(),
+    
+    // 3. Vérifier si déjà dans une autre école
+    db.from("profiles")
+      .select("school_code")
+      .eq("phone", phone)
+      .neq("school_code", schoolCode)
+      .neq("school_code", "FREEMIUM")
+      .maybeSingle(),
+    
+    // 4. Compter les étudiants de l'école
+    db.from("profiles")
+      .select("*", { count: "exact", head: true })      .eq("school_code", schoolCode),
+    
+    // 5. Vérifier si le profil existe déjà dans cette école
+    db.from("profiles")
+      .select("id")
+      .eq("phone", phone)
+      .eq("school_code", schoolCode)
+      .maybeSingle()
+  ]);
 
-  if (error || !school) return { valid: false, reason: "Kòd la pa valid." };
+  // ✅ Déstructuration des résultats
+  const { data: school, error: schoolError } = schoolRes;
+  const { data: isTeacher } = teacherRes;
+  const { data: existingOtherSchool } = otherSchoolRes;
+  const { count: studentCount } = studentCountRes;
+  const { data: existingProfile } = existingProfileRes;
+
+  // ✅ ÉTAPE 2 : Vérifications logiques (inchangées)
+  if (schoolError || !school) return { valid: false, reason: "Kòd la pa valid." };
   if (!school.active) return { valid: false, reason: "Kòd sa a dezaktive. Kontakte direksyon lekòl ou." };
 
   const now     = new Date();
@@ -411,84 +461,62 @@ async function validateCode(
   const starts = new Date(school.starts_at);
   if (now < starts) return { valid: false, reason: "Kòd sa a poko aktif. Kontakte lekòl ou." };
 
-  const { data: isTeacher } = await db
-    .from("teachers")
-    .select("phone")
-    .eq("phone", phone)
-    .maybeSingle();
-
-  if (!isTeacher) {
-    const { data: existingOtherSchool } = await db
-      .from("profiles")
-      .select("school_code")
-      .eq("phone", phone)
-      .neq("school_code", schoolCode)
-      .neq("school_code", "FREEMIUM")
-      .maybeSingle();
-
-    if (existingOtherSchool) {
-      return { valid: false, reason: "Nimewo sa a deja anrejistre ak yon lòt kòd. Kontakte direksyon lekòl ou." };
-    }
+  // Vérification : si pas prof et déjà dans une autre école
+  if (!isTeacher && existingOtherSchool) {
+    return { valid: false, reason: "Nimewo sa a deja anrejistre ak yon lòt kòd. Kontakte direksyon lekòl ou." };
   }
 
-  const { count: studentCount } = await db
-    .from("profiles")
-    .select("*", { count: "exact", head: true })
-    .eq("school_code", schoolCode);
-
-  const { data: existingProfile } = await db
-    .from("profiles")
-    .select("id")
-    .eq("phone", phone)
-    .eq("school_code", schoolCode)
-    .maybeSingle();
-
+  // Vérification : limite d'étudiants
   if (!existingProfile && (studentCount ?? 0) >= school.max_students) {
     return { valid: false, reason: `Limit ${school.max_students} elèv rive pou kòd sa a.` };
   }
 
+  // ✅ ÉTAPE 3 : Upsert du profil
   await db.from("profiles").upsert(
-  { phone, school_code: schoolCode, last_seen: new Date().toISOString() },
-  { onConflict: "phone,school_code" }
-);
+    { phone, school_code: schoolCode, last_seen: new Date().toISOString() },
+    { onConflict: "phone,school_code" }
+  );
 
-// Récupérer le profil pour obtenir freemium_expires_at
-const { data: profile, error: profileError } = await db
-  .from("profiles")
-  .select("freemium_expires_at")
-  .eq("phone", phone)
-  .eq("school_code", schoolCode)
-  .maybeSingle();
+  // ✅ ÉTAPE 4 : Requêtes finales en PARALLÈLE
+  const [profileRes, scansRes] = await Promise.all([
+    // Récupérer freemium_expires_at    db.from("profiles")
+      .select("freemium_expires_at")
+      .eq("phone", phone)
+      .eq("school_code", schoolCode)
+      .maybeSingle(),
+    
+    // Compter les scans du jour
+    db.from("scans")
+      .select("*", { count: "exact", head: true })
+      .eq("phone", phone)
+      .eq("school_code", schoolCode)
+      .gte("created_at", `${getHaitiDate()}T05:00:00Z`)
+  ]);
 
-const today = getHaitiDate();
-const { count: scansToday } = await db
-  .from("scans")
-  .select("*", { count: "exact", head: true })
-  .eq("phone", phone)
-  .eq("school_code", schoolCode)
-  .gte("created_at", `${today}T05:00:00Z`);
+  const { data: profile } = profileRes;
+  const { count: scansToday } = scansRes;
 
-const daysRemaining = Math.ceil((expires.getTime() - now.getTime()) / 86400000);
+  // ✅ Construction de la réponse finale
+  const daysRemaining = Math.ceil((expires.getTime() - now.getTime()) / 86400000);
+  const ADMIN_PHONE = Deno.env.get("ADMIN_PHONE") ?? "";
 
-const ADMIN_PHONE = Deno.env.get("ADMIN_PHONE") ?? "";
   return {
-  valid: true,
-  isAdmin: ADMIN_PHONE !== "" && phone === ADMIN_PHONE,
-  school: {
-    name:            school.school_name,
-    subjects:        addStatistique(school.subjects ?? []),
-    dailyScans:      school.daily_scans ?? 5,
-    dailyImageScans: school.daily_image_scans ?? 1,
-    dailyTextScans:  school.daily_text_scans  ?? 4,
-    daysRemaining,
-    expiresAt:       school.expires_at,
-    maxStudents:     school.max_students,
-  },
-  scansToday: scansToday ?? 0,
-  freemiumExpiresAt: profile?.freemium_expires_at ?? null,   // <-- AJOUT
-  dailyScans: schoolCode === "FREEMIUM" ? 3 : (school.daily_scans ?? 5),
-};
-
+    valid: true,
+    isAdmin: ADMIN_PHONE !== "" && phone === ADMIN_PHONE,
+    school: {
+      name:            school.school_name,
+      subjects:        addStatistique(school.subjects ?? []),
+      dailyScans:      school.daily_scans ?? 5,
+      dailyImageScans: school.daily_image_scans ?? 1,
+      dailyTextScans:  school.daily_text_scans  ?? 4,
+      daysRemaining,
+      expiresAt:       school.expires_at,
+      maxStudents:     school.max_students,
+    },
+    scansToday: scansToday ?? 0,
+    freemiumExpiresAt: profile?.freemium_expires_at ?? null,
+    dailyScans: schoolCode === "FREEMIUM" ? 3 : (school.daily_scans ?? 5),
+  };
 }
 
 // ─── ACTION : ask (avec cache amélioré) ───────────────────────────────────────
