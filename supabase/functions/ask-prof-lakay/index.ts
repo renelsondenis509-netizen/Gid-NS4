@@ -14,6 +14,15 @@ function getHaitiDate(): string {
 }
 
 
+
+function getHaitiMidnightISO(): string {
+  const now = new Date();
+  const haitiDate = getHaitiDate();
+  const haitiNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Port-au-Prince" }));
+  const offsetMs = now.getTime() - haitiNow.getTime();
+  const midnightUTC = new Date(new Date(`${haitiDate}T00:00:00.000`).getTime() + offsetMs);
+  return midnightUTC.toISOString();
+}
 function addStatistique(subjects: string[]): string[] {
   const smpSubjects = ['Analyse', 'Algèbre', 'Suite', 'Complexe', 'Probabilité', 'Géométrie', 'Physique'];
   if (!subjects.includes("Statistique") && subjects.some(s => smpSubjects.includes(s))) {
@@ -491,7 +500,7 @@ async function validateCode(
       .select("*", { count: "exact", head: true })
       .eq("phone", phone)
       .eq("school_code", schoolCode)
-      .gte("created_at", `${getHaitiDate()}T05:00:00Z`)
+      .gte("created_at", getHaitiMidnightISO())
   ]);
 
   const { data: profile } = profileRes;
@@ -571,7 +580,7 @@ async function processAsk(
     .select("*", { count: "exact", head: true })
     .eq("phone", phone)
     .eq("school_code", schoolCode)
-    .gte("created_at", `${today}T05:00:00Z`);
+    .gte("created_at", getHaitiMidnightISO());
 
   const dailyLimit = dailyLimitOverride ?? 5;
   if ((scansToday ?? 0) >= dailyLimit) {
@@ -773,7 +782,7 @@ async function processDashboard(
   ] = await Promise.all([
     db.from("profiles").select("*", { count: "exact", head: true }).eq("school_code", schoolCode),
     db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode),
-    db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).gte("created_at", `${today}T05:00:00Z`),
+    db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).gte("created_at", getHaitiMidnightISO()),
     db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).eq("has_image", true),
     db.from("scans").select("*", { count: "exact", head: true }).eq("school_code", schoolCode).eq("has_image", false),
     db.from("scans").select("subject").eq("school_code", schoolCode),
@@ -965,7 +974,7 @@ async function freemiumLogin(
   }
 
   const today = getHaitiDate();
-  const { count: scansToday } = await db.from("scans").select("*", { count: "exact", head: true }).eq("phone", phone).gte("created_at", `${today}T05:00:00Z`);
+  const { count: scansToday } = await db.from("scans").select("*", { count: "exact", head: true }).eq("phone", phone).gte("created_at", getHaitiMidnightISO());
 
   return {
     success: true,
