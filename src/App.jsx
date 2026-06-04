@@ -65,7 +65,7 @@ useEffect(() => {
           .then(result => {
             if (saved.code === "FREEMIUM") {
               if (result?.freemiumExpiresAt) {
-                const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0 });
+                const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0, dailyTextScans: result.dailyTextScans ?? 3, dailyImageScans: result.dailyImageScans ?? 1, dailyScans: result.dailyScans ?? 3 });
                 sessionSave(fresh);
                 setUser(fresh);
                 // Sync compteur local avec serveur
