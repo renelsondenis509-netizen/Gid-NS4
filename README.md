@@ -13,8 +13,8 @@ cd Gid-NS4 && npm install && npm run dev
 ## ⚙️ Configuration
 
 ```env
-VITE_SUPABASE_URL=https://ton-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=ton-anon-key
+VITE_SUPABASE_URL=https://aaa-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=aaa-bbbb-key
 ```
 
 Variables Edge Function (à configurer dans Supabase Dashboard → Settings → Secrets) :
