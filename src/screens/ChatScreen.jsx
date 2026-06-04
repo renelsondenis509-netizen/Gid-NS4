@@ -85,8 +85,8 @@ export function ChatScreen({ user, onNavigate }) {
   const [scansUsed, setScansUsed] = useState(0);
   useEffect(() => {
     try {
-      const stored = parseInt(localStorage.getItem(_scanKey) || "0");
-      setScansUsed(stored > 0 ? stored : (user.scansToday ?? 0));
+      const raw = localStorage.getItem(_scanKey);
+      setScansUsed(raw !== null ? parseInt(raw) : 0);
     } catch {}
   }, [_scanKey]);
 
@@ -127,7 +127,8 @@ if (unread > 0) setUnreadCount(unread);
 const openAnnouncements = () => {
   setShowAnnouncements(true);
   setUnreadCount(0);
-if (announcements[0]?.created_at) localStorage.setItem(`annonce_seen_${user.phone}`, announcements[0].created_at);
+const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at : m, "");
+  if (maxDate) localStorage.setItem(`annonce_seen_${user.phone}`, maxDate);
 };  const detectSubject = (text) => {
     const t = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
     if (t.includes("bio")||t.includes("cellule")||t.includes("adn")||t.includes("genetique")) return "Biologie";

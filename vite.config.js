@@ -23,6 +23,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        mode: "development",
+        disableDevLogs: true,
+        inlineWorkboxRuntime: true,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
           {
@@ -54,6 +57,7 @@ export default defineConfig({
 
   build: {
     outDir: "dist",
+    minify: "esbuild",
     rollupOptions: {
       output: {
         manualChunks: {

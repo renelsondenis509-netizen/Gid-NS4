@@ -9,7 +9,9 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasTriedFreemium] = useState(() => {
-    return !!localStorage.getItem("gid_freemium_expires");
+    const exp = localStorage.getItem("gid_freemium_expires");
+    if (!exp) return false;
+    return new Date(exp) > new Date(); // masque seulement si encore actif
   });
 
   const handleLogin = async () => {
@@ -54,7 +56,7 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
         name: name.trim(), phone: phone.trim(),
         code: "FREEMIUM", school: "Freemium",
         subjects: ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
-        dailyScans: 3, dailyImageScans: 1, dailyTextScans: 2,
+        dailyScans: result.dailyScans ?? 3, dailyImageScans: result.dailyImageScans ?? 1, dailyTextScans: result.dailyTextScans ?? 3,
         daysRemaining: result.daysRemaining,
         expiresAt: result.freemiumExpiresAt,
         freemiumExpiresAt: result.freemiumExpiresAt,
