@@ -81,14 +81,25 @@ export function ChatScreen({ user, onNavigate }) {
 
   const DAILY_MAX = user.dailyTextScans ?? user.dailyScans ?? 10;
   const today     = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
+  const getToday = () => new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
+  const getScanKey = () => `gid_scan_${user.phone}_${getToday()}`;
   const _scanKey  = `gid_scan_${user.phone}_${today}`;
   const [scansUsed, setScansUsed] = useState(0);
-  useEffect(() => {
+
+  const refreshScans = () => {
     try {
-      const raw = localStorage.getItem(_scanKey);
+      const raw = localStorage.getItem(getScanKey());
       setScansUsed(raw !== null ? parseInt(raw) : 0);
     } catch {}
-  }, [_scanKey]);
+  };
+
+  useEffect(() => { refreshScans(); }, [_scanKey]);
+
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === "visible") refreshScans(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, []);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages, loading]);
   useEffect(() => {
