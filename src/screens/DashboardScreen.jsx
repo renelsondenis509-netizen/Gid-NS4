@@ -324,16 +324,7 @@ useEffect(() => {
 
   // Cache window — vérifié à chaque remount
 const _winKey = `_gns4_dash_${userCode}`;
-if (window[_winKey]) {
-  const _cached = window[_winKey];
-  const _days = _cached?.school?.daysRemaining ?? _cached?.daysRemaining ?? 1;
-  if (_days > 0) {
-    setStats(_cached);
-    setAuthorized(true);
-    return;
-  }
-  delete window[_winKey]; // cache expiré → forcer un nouvel appel
-}
+delete window[_winKey]; // toujours frais pour scansToday
 
   // Guard anti-double-appel (StrictMode)
   if (hasFetched.current) return;
