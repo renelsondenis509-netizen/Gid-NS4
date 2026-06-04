@@ -479,7 +479,8 @@ async function validateCode(
 
   // ✅ ÉTAPE 4 : Requêtes finales en PARALLÈLE
   const [profileRes, scansRes] = await Promise.all([
-    // Récupérer freemium_expires_at    db.from("profiles")
+    // Récupérer freemium_expires_at
+    db.from("profiles")
       .select("freemium_expires_at")
       .eq("phone", phone)
       .eq("school_code", schoolCode)
