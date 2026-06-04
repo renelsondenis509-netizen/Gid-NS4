@@ -125,12 +125,10 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
           </button>
 
           {/* Bouton freemium */}
-          {!hasTriedFreemium && (
-            <button onClick={handleFreemium} disabled={loading}
+          <button onClick={handleFreemium} disabled={loading}
               style={{ width:"100%", padding:"13px", borderRadius:16, background:"rgba(37,99,235,0.06)", color:"#60a5fa", fontWeight:700, fontSize:14, border:"1px solid rgba(37,99,235,0.2)", cursor: loading?"not-allowed":"pointer", marginTop:10, transition:"all .2s", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-              <span style={{ fontSize:12 }}>✦</span> Eseye gratis — 3 jou
+              <span style={{ fontSize:12 }}>✦</span> {hasTriedFreemium ? "Konekte kont gratis ou" : "Eseye gratis — 3 jou"}
             </button>
-          )}
 
           {/* Hint */}
           <p style={{ textAlign:"center", marginTop:14, marginBottom:0, color:"#2d4080", fontSize:12 }}>
