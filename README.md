@@ -12,8 +12,6 @@ cd Gid-NS4 && npm install && npm run dev
 
 ## ⚙️ Configuration
 
-Crée un fichier `.env` à la racine :
-
 ```env
 VITE_SUPABASE_URL=https://ton-projet.supabase.co
 VITE_SUPABASE_ANON_KEY=ton-anon-key
