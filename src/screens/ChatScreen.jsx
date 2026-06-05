@@ -170,7 +170,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
     return;
   }
   if (offline) { setApiError({ type:"network", message:"Pa gen koneksyon entènèt !", detail:"Konekte epi eseye ankò.", icon:"📶", retry:false }); return; }
-    const freemiumExpired = user.freemiumExpiresAt && new Date(user.freemiumExpiresAt) < new Date() && !user.code;
+    const freemiumExpired = user.code === "FREEMIUM" && (user.daysRemaining ?? 0) <= 0;
     if (freemiumExpired) { onNavigate("payment"); return; }
     if (scansUsed >= DAILY_MAX) return;
     if (loading) return;
