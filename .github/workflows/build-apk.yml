@@ -52,6 +52,9 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
+      - name: Remove duplicate splash resource
+        run: rm -f android/app/src/main/res/drawable/splash.png
+
       - name: Build Release APK
         working-directory: android
         env:
