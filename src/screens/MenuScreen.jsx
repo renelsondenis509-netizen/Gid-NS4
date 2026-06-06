@@ -163,7 +163,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-blue-400">{user.subjects.length} matière{user.subjects.length > 1 ? "s" : ""}</div>
+            <div className="text-xs text-blue-400">{(user.subjects?.length ?? 0)} matière{(user.subjects?.length ?? 0) > 1 ? "s" : ""}</div>
           </div>
         </div>
       </div>
