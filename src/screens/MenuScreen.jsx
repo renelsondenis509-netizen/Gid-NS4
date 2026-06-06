@@ -7,6 +7,7 @@ import { BottomNav } from "../components/UI";
 import { scheduleDailyReminder, cancelAllNotifications, requestNotificationPermission } from "../utils/notifications";
 
 export function MenuScreen({ user, onNavigate, onLogout }) {
+  if (!user) return null;
   // ─── SVG ICONS ───────────────────────────────────────────────────────────
   const KeyIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#6B8ADB" }}>
@@ -77,6 +78,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
   const grades = (() => { try { return JSON.parse(localStorage.getItem(`grades_${user.phone}`) || "{}"); } catch { return {}; } })();
   const [exoCount, setExoCount] = useState(0);
   useEffect(() => { idbGetExercice(user.phone).then(e => setExoCount(e.length)).catch(()=>{}); }, [user.phone]);
+  const safeSubjects = user.subjects ?? [];
   const badges = computeBadges({ grades, exoCount, allSubjectsCount: Object.values(QUIZ_BRANCHES ?? {}).flatMap(f => f.subjects ?? []).length, phone: user?.phone ?? "" }).filter(b => b.unlocked);
 
   const NOTIF_KEY = "gns4_notif_settings";
