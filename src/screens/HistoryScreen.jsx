@@ -256,7 +256,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
       .finally(() => setLoading(false));
   }, [user.phone]);
 
-  useEffect(() => () => window.speechSynthesis.cancel(), []);
+  useEffect(() => () => { try { window.speechSynthesis?.cancel(); } catch {} }, []);
   if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
   const cleanForTTS = (text) => (text || "")

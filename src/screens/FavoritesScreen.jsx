@@ -45,7 +45,7 @@ export function FavoritesScreen({ user, onNavigate }) {
       try { setFavorites(JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]")); } catch {}
     };
     window.addEventListener("focus", sync);
-    return () => { window.speechSynthesis.cancel(); window.removeEventListener("focus", sync); };
+    return () => { try { window.speechSynthesis?.cancel(); } catch {} window.removeEventListener("focus", sync); };
   }, [user.phone]);
 
   const removeFav = (id) => {
