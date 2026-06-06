@@ -51,11 +51,13 @@ jobs:
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
-      - name: Install Pillow
-        run: pip install Pillow
-
       - name: Restore app icons
-        run: python3 scripts/restore_icons.py
+        run: |
+          git checkout HEAD -- android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          git checkout HEAD -- android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          git checkout HEAD -- android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          git checkout HEAD -- android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          git checkout HEAD -- android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
       - name: Remove duplicate splash resource
         run: rm -f android/app/src/main/res/drawable/splash.png
