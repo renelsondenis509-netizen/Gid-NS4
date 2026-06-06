@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
 import { callEdge } from "./api";
 import { getFreemiumStatus, hasAccess } from "./utils/freemium";
@@ -29,6 +29,13 @@ function enrichUser(u) {
       ? Math.ceil((new Date(u.expiresAt) - Date.now()) / 86_400_000)
       : (u.daysRemaining ?? 0);
   return { ...u, isFreemium, daysRemaining, freemiumExpiresAt: u.freemiumExpiresAt ?? null };
+}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error) { console.error("ErrorBoundary:", error); this.setState({ hasError: false }); }
+  render() { return this.props.children; }
 }
 
 export default function App() {
@@ -142,7 +149,7 @@ useEffect(() => {
   return (
     <>
       {isOffline && <OfflineBanner />}
-      {renderContent()}
+      <ErrorBoundary key={screen}>{renderContent()}</ErrorBoundary>
     </>
   );
 }
