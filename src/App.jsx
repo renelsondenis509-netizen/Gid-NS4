@@ -46,13 +46,26 @@ export default function App() {
 
   const nav = (s) => setScreen(s);
 
-  useEffect(() => {
-    const on  = () => setIsOffline(false);
-    const off = () => setIsOffline(true);
-    window.addEventListener("online",  on);
-    window.addEventListener("offline", off);
-    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
-  }, []);
+useEffect(() => {
+  const checkConn = async () => {
+    try {
+      const r = await fetch("https://thxtnnjubzucisrujloe.supabase.co/functions/v1/ask-prof-lakay",
+        { method: "HEAD", signal: AbortSignal.timeout(4000) });
+      setIsOffline(!r.ok && r.status !== 401);
+    } catch { setIsOffline(true); }
+  };
+  const on  = () => { setIsOffline(false); };
+  const off = () => { setIsOffline(true); };
+  window.addEventListener("online",  on);
+  window.addEventListener("offline", off);
+  checkConn();
+  const interval = setInterval(checkConn, 10000);
+  return () => {
+    window.removeEventListener("online",  on);
+    window.removeEventListener("offline", off);
+    clearInterval(interval);
+  };
+}, []);
 
 useEffect(() => {
     const saved = sessionLoad();

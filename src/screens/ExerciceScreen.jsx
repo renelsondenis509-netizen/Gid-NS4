@@ -80,45 +80,18 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     setCurrent(c=>c+1); setSelected(null);
   };
   const handleShare = async () => {
-    const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
     const mention = score === questions.length ? "Pafe !" : score >= questions.length / 2 ? "Byen !" : "Kontinye travay !";
-    const pageW = doc.internal.pageSize.getWidth();
-    let y = 20;
-    doc.setFillColor(10, 15, 46);
-    doc.rect(0, 0, pageW, 297, "F");
-    doc.setTextColor(96, 165, 250);
-    doc.setFontSize(18); doc.setFont("helvetica", "bold");
-    doc.text("Gid NS4 — Rezilta Egzesis", pageW / 2, y, { align: "center" }); y += 8;
-    doc.setFontSize(11); doc.setTextColor(147, 197, 253);
-    doc.text(scan.subject || "Egzesis", pageW / 2, y, { align: "center" }); y += 10;
-    doc.setFontSize(28); doc.setTextColor(96, 165, 250);
-    doc.text(score + "/" + questions.length + " (" + note20 + "/20)", pageW / 2, y, { align: "center" }); y += 8;
-    doc.setFontSize(12); doc.setTextColor(251, 191, 36);
-    doc.text(mention, pageW / 2, y, { align: "center" }); y += 12;
-    doc.setDrawColor(30, 58, 138); doc.line(14, y, pageW - 14, y); y += 8;
-    answers.forEach((a, i) => {
-      if (y > 260) { doc.addPage(); doc.setFillColor(10,15,46); doc.rect(0,0,pageW,297,"F"); y = 20; }
-      doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.setTextColor(232, 238, 255);
-      const qLines = doc.splitTextToSize((i + 1) + ". " + a.q, pageW - 28);
-      doc.text(qLines, 14, y); y += qLines.length * 5 + 2;
-      doc.setFont("helvetica", "normal");
-      if (a.correct) { doc.setTextColor(134, 239, 172); doc.text("✓ " + a.choices[a.selected], 18, y); }
-      else {
-        doc.setTextColor(252, 165, 165); doc.text("✗ " + a.choices[a.selected], 18, y); y += 5;
-        doc.setTextColor(134, 239, 172); doc.text("✓ " + a.choices[a.answer], 18, y);
-      }
-      y += 8;
-    });
-    doc.setFontSize(8); doc.setTextColor(75, 85, 99);
-    doc.text("Pwodwi pa Gid NS4 — pwofese IA ou pou Bakaloreya a", pageW / 2, 285, { align: "center" });
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "rezilta-" + (scan.subject || "egzesis") + ".pdf";
-    a.click(); URL.revokeObjectURL(url);
+    const text = "Gid NS4 - Rezilta Egzesis
+Matye: " + (scan.subject||"") + "
+Not: " + score + "/" + questions.length + " (" + note20 + "/20)
+" + mention + "
+
+Telechaje Gid NS4 sou Google Play !";
+    if (navigator && navigator.share) {
+      try { navigator.share({ title: "Rezilta Gid NS4", text: text }); return; } catch(e) {}
+    }
+    try { navigator.clipboard.writeText(text).then(function(){ alert("Rezilta kopye ! Ou ka kole li kote ou vle."); }); } catch(e) { alert(text); }
   };
   const q=questions[current];
 
