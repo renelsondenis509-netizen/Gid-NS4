@@ -82,12 +82,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const handleShare = async () => {
     const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
     const mention = score === questions.length ? "Pafe !" : score >= questions.length / 2 ? "Byen !" : "Kontinye travay !";
-    const text = "Gid NS4 - Rezilta Egzesis
-Matye: " + (scan.subject||"") + "
-Not: " + score + "/" + questions.length + " (" + note20 + "/20)
-" + mention + "
-
-Telechaje Gid NS4 sou Google Play !";
+    const text = "Gid NS4 - Rezilta Egzesis | Matye: " + (scan.subject||"") + " | Not: " + score + "/" + questions.length + " (" + note20 + "/20) | " + mention + " | Telechaje Gid NS4 sou Google Play !";
     if (navigator && navigator.share) {
       try { navigator.share({ title: "Rezilta Gid NS4", text: text }); return; } catch(e) {}
     }
