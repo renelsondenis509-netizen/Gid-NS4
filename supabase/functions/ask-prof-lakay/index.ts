@@ -129,7 +129,7 @@ async function callSambaNova(systemPrompt: string, userContent: unknown[]): Prom
       model: "gemma-3-12b-it",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userContent },
+        { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
       ],
     }),
   }));
@@ -222,7 +222,7 @@ async function callCloudflare(systemPrompt: string, userContent: unknown[]): Pro
       body: JSON.stringify({
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userContent },
+          { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
         ],
       }),
     }
