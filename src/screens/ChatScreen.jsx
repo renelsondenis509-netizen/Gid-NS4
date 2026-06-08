@@ -231,12 +231,24 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
 
   const speak = (text) => {
     if (!window.speechSynthesis) return;
-    try {
-      window.speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").trim());
-      utt.lang = "fr-FR"; utt.rate = 0.9;
-      setTimeout(() => { try { window.speechSynthesis.speak(utt); } catch {} }, 100);
-    } catch {}
+    const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").trim();
+    const doSpeak = () => {
+      try {
+        window.speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(cleaned);
+        utt.lang = "fr-FR"; utt.rate = 0.9; utt.volume = 1.0;
+        const voices = window.speechSynthesis.getVoices();
+        const frVoice = voices.find(v => v.lang.startsWith("fr"));
+        if (frVoice) utt.voice = frVoice;
+        window.speechSynthesis.speak(utt);
+      } catch {}
+    };
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => { doSpeak(); window.speechSynthesis.onvoiceschanged = null; };
+      setTimeout(doSpeak, 500);
+    }
   };
 
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;
