@@ -231,10 +231,12 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
 
   const speak = (text) => {
     if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").trim());
-    utt.lang = "fr-FR"; utt.rate = 0.9;
-    window.speechSynthesis.speak(utt);
+    try {
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").trim());
+      utt.lang = "fr-FR"; utt.rate = 0.9;
+      setTimeout(() => { try { window.speechSynthesis.speak(utt); } catch {} }, 100);
+    } catch {}
   };
 
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;

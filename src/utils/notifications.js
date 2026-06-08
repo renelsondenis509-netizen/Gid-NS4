@@ -19,7 +19,7 @@ export async function scheduleDailyReminder(hour = 18) {
         body: "Ou pa etidye jodi a ankò ! Ouvri app la epi poze yon kesyon.",
         schedule: { on: { hour, minute: 0 }, repeats: true, allowWhileIdle: true },
         sound: null,
-        smallIcon: "ic_launcher",
+        smallIcon: "ic_stat_notify",
       }]
     });
   } catch {}
@@ -36,7 +36,7 @@ export async function scheduleExpiryReminder(daysRemaining) {
         body: `Kòd lekòl ou a ekspire nan ${daysRemaining} jou. Kontakte direksyon lekòl ou.`,
         schedule: { at: new Date(Date.now() + 1000) },
         sound: null,
-        smallIcon: "ic_launcher",
+        smallIcon: "ic_stat_notify",
       }]
     });
   } catch {}
