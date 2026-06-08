@@ -24,19 +24,24 @@ export function FavoritesScreen({ user, onNavigate }) {
     .replace(/\n/g, ", ")
     .trim();
 
-  const handleSpeak = (text, id) => {
+  const handleSpeak = async (text, id) => {
+    const Tts = window.Capacitor?.Plugins?.Tts;
     if (speakingId === id) {
-      window.speechSynthesis.cancel();
+      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
       setSpeakingId(null);
     } else {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(cleanForTTS(text));
-      utterance.lang = 'fr-FR';
-      utterance.rate = 0.9;
-      utterance.onend = () => setSpeakingId(null);
-      utterance.onerror = () => setSpeakingId(null);
-      window.speechSynthesis.speak(utterance);
+      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
       setSpeakingId(id);
+      try {
+        if (Tts) {
+          await Tts.speak({ text: cleanForTTS(text).slice(0,500), rate: 0.9 });
+        } else {
+          const utt = new SpeechSynthesisUtterance(cleanForTTS(text));
+          utt.lang = "fr-FR"; utt.rate = 0.9;
+          utt.onend = () => setSpeakingId(null);
+          window.speechSynthesis.speak(utt);
+        }
+      } catch { setSpeakingId(null); }
     }
   };
 

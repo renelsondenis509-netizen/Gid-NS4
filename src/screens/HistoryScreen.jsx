@@ -270,16 +270,24 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     .replace(/\n/g, ", ")
     .trim();
 
-  const handleSpeak = (text, id) => {
-    if (speakingId === id) { window.speechSynthesis.cancel(); setSpeakingId(null); }
-    else {
-      window.speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(cleanForTTS(text));
-      utt.lang = "fr-FR"; utt.rate = 0.9;
-      utt.onend = () => setSpeakingId(null);
-      utt.onerror = () => setSpeakingId(null);
-      window.speechSynthesis.speak(utt);
+  const handleSpeak = async (text, id) => {
+    const Tts = window.Capacitor?.Plugins?.Tts;
+    if (speakingId === id) {
+      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
+      setSpeakingId(null);
+    } else {
+      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
       setSpeakingId(id);
+      try {
+        if (Tts) {
+          await Tts.speak({ text: cleanForTTS(text).slice(0,500), rate: 0.9 });
+        } else {
+          const utt = new SpeechSynthesisUtterance(cleanForTTS(text));
+          utt.lang = "fr-FR"; utt.rate = 0.9;
+          utt.onend = () => setSpeakingId(null);
+          window.speechSynthesis.speak(utt);
+        }
+      } catch { setSpeakingId(null); }
     }
   };
 
