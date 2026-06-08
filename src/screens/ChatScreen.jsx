@@ -229,18 +229,13 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
     });
   };
 
-  const speak = (text) => {
-    if (!window.speechSynthesis) return;
+  const speak = async (text) => {
+    const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").slice(0,500).trim();
     try {
-      window.speechSynthesis.cancel();
-      const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").slice(0,400).trim();
-      const utt = new SpeechSynthesisUtterance(cleaned);
-      utt.lang = "fr-FR";
-      utt.rate = 0.85;
-      utt.volume = 1.0;
-      utt.pitch = 1.0;
-      window.speechSynthesis.speak(utt);
-    } catch {}
+      const { Tts } = window.Capacitor.Plugins;
+      await Tts.stop();
+      await Tts.speak({ text: cleaned, rate: 0.9 });
+    } catch(e) { console.warn("TTS:", e); }
   };
 
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;
