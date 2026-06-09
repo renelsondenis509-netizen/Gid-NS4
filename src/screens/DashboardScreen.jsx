@@ -277,12 +277,8 @@ const generateAndSharePDF = async (school, stats) => {
         url: saved.uri,
         dialogTitle: "Pataje oswa Telechaje PDF",
       });
-    } catch {
-      // Fallback navigateur (PWA / desktop)
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement("a");
-      a.href = url; a.download = fileName; a.click();
-      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert("PDF erreur: " + (e?.message || String(e)));
     }
   } catch (err) {
     alert("Enposib jenere PDF la. Verifye koneksyon entènèt ou (jsPDF bezwen entènèt premye fwa).");
