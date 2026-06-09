@@ -250,17 +250,37 @@ const generateAndSharePDF = async (school, stats) => {
 
     const pdfBlob = doc.output("blob");
     const fileName = `rapport-${cleanText(school.name)}-${date}.pdf`;
-    const file = new File([pdfBlob], fileName, { type: "application/pdf" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: "Rapò Gid NS4", text: `Rapò ofisyèl — ${school.name}` });
-    } else {
+
+    // ✅ Capacitor Android : Filesystem + Share
+    try {
+      const { Filesystem } = await import("@capacitor/filesystem");
+      const { Share } = await import("@capacitor/share");
+      const { Directory } = await import("@capacitor/filesystem");
+
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+      const saved = await Filesystem.writeFile({
+        path: fileName,
+        data: base64,
+        directory: Directory.Cache,
+      });
+
+      await Share.share({
+        title: "Rapò Gid NS4",
+        text: `Rapò ofisyèl — ${school.name}`,
+        url: saved.uri,
+        dialogTitle: "Pataje oswa Telechaje PDF",
+      });
+    } catch {
+      // Fallback navigateur (PWA / desktop)
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url; a.download = fileName; a.click();
       URL.revokeObjectURL(url);
     }
   } catch (err) {
-    alert('Enposib jenere PDF la. Verifye koneksyon entènèt ou (jsPDF bezwen entènèt premye fwa).');
+    alert("Enposib jenere PDF la. Verifye koneksyon entènèt ou (jsPDF bezwen entènèt premye fwa).");
   }
 };
 
