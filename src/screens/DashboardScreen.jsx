@@ -251,7 +251,9 @@ const generateAndSharePDF = async (school, stats) => {
   doc.text("Pwodwi ak Gid NS4  •  Prof Lakay  •  Konfidansyèl", W/2, 292, { align:"center" });
 
     const pdfBlob = doc.output("blob");
-    const fileName = `rapport-${cleanText(school.name)}-${date}.pdf`;
+    const safeName = cleanText(school.name).replace(/[^a-zA-Z0-9-_]/g, '_');
+    const safeDate = date.replace(/[/\\:]/g, '-');
+    const fileName = `rapport-${safeName}-${safeDate}.pdf`;
 
     // ✅ Capacitor Android : Filesystem + Share
     try {
@@ -268,8 +270,7 @@ const generateAndSharePDF = async (school, stats) => {
       const saved = await Filesystem.writeFile({
         path: fileName,
         data: base64,
-        directory: Directory.Data,
-        recursive: true,
+        directory: Directory.Cache,
       });
 
       await Share.share({
