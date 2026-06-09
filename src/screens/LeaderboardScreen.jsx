@@ -119,6 +119,8 @@ export function LeaderboardScreen({ user, onNavigate }) {
   <button onClick={() => onNavigate("chat")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
     style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Pale ak Prof Lakay</button>
 )}
+          </div>
+        )}
 
         {!loading && !error && board?.length > 0 && (
           <>
