@@ -15,8 +15,8 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   });
 
 const handleLogin = async () => {
-  // ...
-  const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
+  try {
+    const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
   if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
 
   // ✅ FIX : sync localStorage avec valeur serveur (indépendant de l'appareil)
