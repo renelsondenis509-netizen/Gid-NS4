@@ -1,4 +1,5 @@
 import { callEdge, parseApiError } from "../api";
+import { jsPDF } from "jspdf";
 import { useState, useEffect, useRef } from "react";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
@@ -8,7 +9,6 @@ const generateAndSharePDF = async (school, stats) => {
   const cleanText = (str) => (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x00-\x7F]/g, "?");
   const date = new Date().toLocaleDateString("fr-HT", { timeZone: "America/Port-au-Prince" });
   const time = new Date().toLocaleTimeString("fr-HT", { timeZone: "America/Port-au-Prince" });
-  const { jsPDF } = await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
   const W = 210, M = 14;
