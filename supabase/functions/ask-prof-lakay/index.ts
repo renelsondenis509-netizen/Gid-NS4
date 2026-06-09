@@ -673,9 +673,12 @@ async function getLeaderboard(
 ) {
   const { phone } = body;
 
-  const { data: allScores } = await db
-    .from("quiz_scores")
-    .select("phone, name, note20, score, school_code, subject");
+  // ✅ Fetch quiz scores + scans en parallèle
+  const [{ data: allScores }, { data: allScansData }, { data: weekScoresData }] = await Promise.all([
+    db.from("quiz_scores").select("phone, name, note20, score, school_code, subject"),
+    db.from("scans").select("phone, school_code, created_at"),
+    db.from("quiz_scores").select("phone, score").eq("week", getWeekKey()),
+  ]);
 
   // ── Noms des écoles ──
   const codes = [...new Set((allScores ?? []).map((r: any) => r.school_code).filter(Boolean))];
@@ -713,16 +716,19 @@ async function getLeaderboard(
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
 
-  // ── Scores de la semaine (global) ──
-  const currentWeek = getWeekKey();
-  const { data: weekScores } = await db
-    .from("quiz_scores")
-    .select("phone, score")
-    .eq("week", currentWeek);
-
+  // ── Classement semaine (quiz uniquement) ──
   const weekMap: Record<string, number> = {};
-  (weekScores ?? []).forEach((row: any) => {
+  (weekScoresData ?? []).forEach((row: any) => {
     weekMap[row.phone] = (weekMap[row.phone] ?? 0) + row.score;
+  });
+
+  // ✅ FIX : Classement activité = total des requêtes AI (scans) par téléphone
+  const activityMap: Record<string, number> = {};
+  (allScansData ?? []).forEach((row: any) => {
+    activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 1;
+    if (!schoolMap[row.phone] && row.school_code) {
+      schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
+    }
   });
 
   const formatBoard = (map: Record<string, number>, myPhone: string) =>
@@ -739,10 +745,11 @@ async function getLeaderboard(
       }));
 
   return {
-    bestNote: formatBoard(bestNoteMap, phone),
+    bestNote:     formatBoard(bestNoteMap, phone),
     totalCorrect: formatBoard(totalCorrectMap, phone),
-    thisWeek: formatBoard(weekMap, phone),
-    currentWeek,
+    thisWeek:     formatBoard(weekMap, phone),
+    activity:     formatBoard(activityMap, phone),
+    currentWeek:  getWeekKey(),
   };
 }
 
@@ -1223,5 +1230,4 @@ Deno.serve(async (req) => {
     );
   }
 });
-// Tue May 26 18:26:37 EST 2026
-// redeploy Tue May 26 23:55:20 EST 2026
+// Mon Jun 08 2026 - activity leaderboard + scansToday server-side fix

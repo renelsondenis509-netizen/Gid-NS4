@@ -9,6 +9,7 @@ const IcoCalendar= ({size=20}) => <svg width={size} height={size} viewBox="0 0 2
 const IcoWarning = ({size=14}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
 const IcoRefresh = ({size=13}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>;
 const IcoChart   = ({size=48}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
+const IcoBolt    = ({size=20}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;
 
 const Medal = ({ rank }) => {
   const configs = {
@@ -52,6 +53,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
     { id:"bestNote",    Icon:IcoTrophy,   label:"Pi bon nòt",  valueLabel:" pts" },
     { id:"totalCorrect",Icon:IcoFlame,    label:"Total Kòrèk", valueLabel:" pts" },
     { id:"thisWeek",    Icon:IcoCalendar, label:"Semèn Sa",    valueLabel:" pts" },
+    { id:"activity",    Icon:IcoBolt,     label:"Aktivite",    valueLabel:" req" },
   ];
 
   const currentTab = tabs.find(t => t.id === tab);
@@ -102,11 +104,21 @@ export function LeaderboardScreen({ user, onNavigate }) {
         {!loading && !error && board?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <IcoChart/>
-            <p className="text-blue-400 text-center text-sm">Poko gen done.<br/>Fè kèk quiz pou parèt nan klasman an !</p>
-            <button onClick={() => onNavigate("quiz")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan Quiz</button>
-          </div>
-        )}
+           <p className="text-blue-400 text-center text-sm">
+  Poko gen done.<br/>
+  {tab === "activity"
+    ? "Poze kesyon ak Prof Lakay pou parèt nan klasman an !"
+    : "Fè kèk quiz pou parèt nan klasman an !"}
+</p>
+
+{tab !== "activity" && (
+  <button onClick={() => onNavigate("quiz")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
+    style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Ale nan Quiz</button>
+)}
+{tab === "activity" && (
+  <button onClick={() => onNavigate("chat")} className="px-6 py-3 rounded-xl font-bold text-white text-sm"
+    style={{ background:"linear-gradient(135deg,#d4002a,#ff6b35)" }}>Pale ak Prof Lakay</button>
+)}
 
         {!loading && !error && board?.length > 0 && (
           <>

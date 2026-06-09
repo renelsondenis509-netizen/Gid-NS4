@@ -14,15 +14,15 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
     return new Date(exp) > new Date(); // masque seulement si encore actif
   });
 
-  const handleLogin = async () => {
-    setError("");
-    if (!name.trim() || name.trim().length < 2) { setError("Antre non ou ki valid (omwen 2 lèt)."); return; }
-    if (!phone.trim() || phone.trim().length < 8)       { setError("Antre yon nimewo telefòn valid."); return; }
-    if (!code.trim())                             { setError("Antre kòd lekòl ou a."); return; }
-    setLoading(true);
-    try {
-      const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
-      if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
+const handleLogin = async () => {
+  // ...
+  const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
+  if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
+
+  // ✅ FIX : sync localStorage avec valeur serveur (indépendant de l'appareil)
+  const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
+  try { localStorage.setItem(`gid_scan_${phone.trim()}_${_today}`, String(result.scansToday ?? 0)); } catch {}
+
       onLogin({
           name:            name.trim(),
           phone:           phone.trim(),
