@@ -1,5 +1,7 @@
 import { callEdge, parseApiError } from "../api";
 import { useState, useEffect, useRef } from "react";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 
 const generateAndSharePDF = async (school, stats) => {
   try {
@@ -253,12 +255,15 @@ const generateAndSharePDF = async (school, stats) => {
 
     // ✅ Capacitor Android : Filesystem + Share
     try {
-      const { Filesystem } = await import("@capacitor/filesystem");
-      const { Share } = await import("@capacitor/share");
-      const { Directory } = await import("@capacitor/filesystem");
-
+      // Conversion base64 compatible grands fichiers
       const arrayBuffer = await pdfBlob.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = "";
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+      }
+      const base64 = btoa(binary);
 
       const saved = await Filesystem.writeFile({
         path: fileName,
