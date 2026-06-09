@@ -268,7 +268,8 @@ const generateAndSharePDF = async (school, stats) => {
       const saved = await Filesystem.writeFile({
         path: fileName,
         data: base64,
-        directory: Directory.Cache,
+        directory: Directory.Data,
+        recursive: true,
       });
 
       await Share.share({
