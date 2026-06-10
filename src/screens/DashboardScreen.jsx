@@ -485,7 +485,7 @@ delete window[_winKey]; // toujours frais pour scansToday
 
   if (!authorized) {
     return (
-      <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#8B0000,#8B0000)" }}>
+      <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
         <div className="flex items-center gap-3 px-4 py-4 border-b" style={{ borderColor: "#ffffff10" }}>
           <button onClick={onBack} className="text-blue-400 text-xl">←</button>
           <button
@@ -552,7 +552,7 @@ delete window[_winKey]; // toujours frais pour scansToday
   const colors = ["#22c55e", "#3b82f6", "#f59e0b", "#a855f7", "#ec4899", "#14b8a6", "#f97316"];
 
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#8B0000,#8B0000)" }}>
+    <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
       <div className="flex items-center gap-3 px-4 py-4 border-b" style={{ borderColor: "#ffffff10" }}>
         <button onClick={onBack} className="text-blue-400 text-xl">←</button>
         <div className="flex-1">
