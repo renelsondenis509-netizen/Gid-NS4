@@ -9,3 +9,6 @@ dist/
 
 # Fichiers temporaires
 *.save
+gid-ns4-release.keystore
+gid-ns4-release.keystore.b64
+*.keystore
