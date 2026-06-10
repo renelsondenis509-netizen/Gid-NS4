@@ -138,7 +138,15 @@ useEffect(() => {
     });
   };
 
-  const handleLogout = () => { sessionClear(); setUser(null); setScreen("login"); };
+  const handleLogout = () => {
+  sessionClear();
+  // Supprimer le cache dashboard de ce directeur
+  if (user?.code && user?.phone) {
+    localStorage.removeItem(`gid_dir_v3_${user.code}_${user.phone}`);
+  }
+  setUser(null);
+  setScreen("login");
+};
 
   function renderContent() {
     if (screen === "splash")      return <SplashScreen onDone={() => { const s = sessionLoad(); if (s?.phone && s?.code) { setUser(enrichUser(s)); setScreen("chat"); } else setScreen("login"); }} />;
@@ -150,7 +158,7 @@ useEffect(() => {
     if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); setScreen("exercice"); }} />;
     if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
     if (screen === "payment")     return <PaymentScreen onBack={() => nav(user ? "menu" : "login")} />;
-    if (screen === "dashboard")   return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} />;
+    if (screen === "dashboard") return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} userPhone={user?.phone} />;
     if (screen === "partner")     return <PartnerScreen onBack={() => nav(user ? "menu" : "login")} />;
     if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />;
     if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
