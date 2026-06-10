@@ -288,8 +288,8 @@ const generateAndSharePDF = async (school, stats) => {
 };
 
 
-export function DashboardScreen({ onBack, userCode }) {
-  const [dirCode, setDirCode] = useState("");
+export function DashboardScreen({ onBack, userCode, userPhone }) {
+  const _dirKey = `gid_dir_v3_${userCode}_${userPhone}`;  // ← clé unique      par directeur
   const [authorized, setAuthorized] = useState(false);
   const _dirKey = `gid_dir_v3_${userCode}`;
   const [error, setError] = useState("");
@@ -370,9 +370,9 @@ delete window[_winKey]; // toujours frais pour scansToday
       window[`_gns4_dash_${userCode}`] = full;
     })
     .catch(() => {
-      setStats(parsed);
-      setAuthorized(true);
-    })
+  // Ne PAS auto-autoriser sur erreur réseau
+  setLoading(false);
+})
     .finally(() => setLoading(false));
 }, []);
 
