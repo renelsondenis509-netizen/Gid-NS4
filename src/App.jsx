@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { App as CapApp } from "@capacitor/app";
 import { sessionSave, sessionLoad, sessionClear } from "./utils/helpers";
 import { callEdge } from "./api";
 import { getFreemiumStatus, hasAccess } from "./utils/freemium";
@@ -124,6 +125,16 @@ useEffect(() => {
     sync();
     return () => window.removeEventListener("online", sync);
   }, []);
+
+  useEffect(() => {
+    const handler = CapApp.addListener("backButton", ({ canGoBack }) => {
+      if (screen === "chat") { CapApp.exitApp(); return; }
+      if (screen === "login" || screen === "splash") { CapApp.exitApp(); return; }
+      setScreen("chat");
+    });
+    return () => { handler.then(h => h.remove()); };
+  }, [screen]);
+
 
   const handleLogin = (u) => {
     const enriched = enrichUser(u);
