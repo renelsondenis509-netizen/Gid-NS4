@@ -62,7 +62,7 @@ export const QUIZ_DATA_NEW = {
     { q: "Un tsunami est cause par :", choices: ["Des vents violents en mer", "Un tremblement de terre, eruption volcanique ou glissement sous-marin — vagues pouvant atteindre 30 m", "La maree haute uniquement", "L'effet El Nino"], answer: 1, note: "Tsunami : seisme ou volcan sous-marin -> deplacement d'eau -> vagues geantes (~30 m). Durent des heures." },
     { q: "La supernova est :", choices: ["Une nouvelle planete", "L'explosion gigantesque d'une etoile en fin de vie — le systeme solaire s'est forme a partir d'une nebuleuse issue d'une supernova", "Un type de galaxie", "Un asteroide entrant dans l'atmosphere"], answer: 1, note: "Supernova : mort explosive d'une etoile massive. Le systeme solaire s'est forme a partir d'une nebuleuse issue d'une supernova ancienne." },
     { q: "Les trois types de galaxies sont :", choices: ["Spirales, circulaires et ovales", "Elliptiques, spirales et irregulieres", "Spheriques, plates et coniques", "Jeunes, moyennes et vieilles"], answer: 1, note: "3 types de galaxies : elliptiques, spirales et irregulieres. La Voie lactee est une galaxie spirale." },
-,
+  ],
 
   // ============================================================
   // SES → HISTOIRE
