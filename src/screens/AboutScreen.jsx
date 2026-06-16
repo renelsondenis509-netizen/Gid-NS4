@@ -23,18 +23,18 @@ export function AboutScreen({ onNavigate }) {
 
         <Card>
           <Row label="Vèsyon" value={`v${APP_VERSION}`} />
-          <Row label="Platfòm" value="Android (Capacitor)" />
+          <Row label="Platfòm" value="Android" />
           <Row label="Backend" value="SB" last />
         </Card>
 
         <Card>
           <Row label="Devlopè" value="Milokan App" />
-          <Row label="Peyi" value="🇭🇹 Ayiti" last />
+          <Row label="Peyi" value="Ayiti" last />
         </Card>
 
         <Card>
           <Row label="Sijè kouvri" value="20+ matyè NS4" />
-          <Row label="Modèl IA" value="Prof Lakay (Multi-AI)" last />
+          <Row label="Modèl IA" value="Prof Lakay" last />
         </Card>
 
         {/* Privacy */}
