@@ -731,6 +731,11 @@ async function getLeaderboard(
     }
   });
 
+// Les requêtes AI comptent aussi dans "Pi bon nòt"
+  Object.entries(activityMap).forEach(([p, count]) => {
+    totalCorrectMap[p] = (totalCorrectMap[p] ?? 0) + count;
+  });
+
   const formatBoard = (map: Record<string, number>, myPhone: string) =>
     Object.entries(map)
       .sort((a, b) => b[1] - a[1])
