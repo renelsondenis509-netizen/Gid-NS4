@@ -1,6 +1,6 @@
 
 
-export const QUIZ_DATA = {
+export const QUIZ_DATA = {.
 
   "Biologie": [
     { q: "L'ADN est composé de :", choices: ["Acides aminés", "Nucléotides", "Acides gras", "Glucose"], answer: 1, note: "L'ADN est un polynucléotide (base azotée + désoxyribose + phosphate)." },
