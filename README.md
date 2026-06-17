@@ -17,11 +17,12 @@ VITE_SUPABASE_URL=https://aaa-projet.supabase.co
 VITE_SUPABASE_ANON_KEY=aaa-bbbb-key
 ```
 
-Variables Edge Function (à configurer dans Supabase Dashboard → Settings → Secrets) :
+Variables Edge Function :
+
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ADMIN_SECRET`
-- Clés API des fournisseurs IA (Groq, SambaNova, etc.)
+-  Clés API des fournisseurs IA
 
 ## 📦 Scripts
 
