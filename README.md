@@ -2,7 +2,7 @@
 
 Application éducative "Prof Lakay" pour les élèves de Terminale (NS4), filières SVT, SES, SMP, LLA.
 
-## 🚀 Démarrage rapide (Termux)
+## 🚀 Démarrage rapide 
 
 ```bash
 pkg install nodejs git
