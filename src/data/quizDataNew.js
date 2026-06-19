@@ -64,6 +64,7 @@ export const QUIZ_DATA_NEW = {
     { q: "Les trois types de galaxies sont :", choices: ["Spirales, circulaires et ovales", "Elliptiques, spirales et irregulieres", "Spheriques, plates et coniques", "Jeunes, moyennes et vieilles"], answer: 1, note: "3 types de galaxies : elliptiques, spirales et irregulieres. La Voie lactee est une galaxie spirale." },
     { q: "La théorie de la dérive des continents (Wegener) propose que :", choices: ["Les continents sont fixes", "Les continents actuels proviennent d'un supercontinent (Pangée) fragmenté", "Les océans se forment par évaporation", "Les montagnes se forment par compression de l'air"], answer: 1, note: "Wegener (1912) : la Pangée s'est fragmentée il y a ~200 Ma pour former les continents actuels. Preuve : correspondance des côtes, fossiles identiques sur continents séparés." },
 
+    { q: "Les plastiques sont des polymères synthétiques. Le PVC (polychlorure de vinyle) est formé par :", choices: ["Condensation de molécules d'acide et d'alcool", "Polymérisation par addition du chlorure de vinyle (CH₂=CHCl)", "Saponification de corps gras", "Hydrolyse de l'amidon"], answer: 1, note: "PVC : polymérisation par addition du monomère CH₂=CHCl (chlorure de vinyle). Utilisé en tuyauterie, câbles électriques, revêtements de sol." },
   ],
 
   // ============================================================
