@@ -172,7 +172,9 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
   if (offline) { setApiError({ type:"network", message:"Pa gen koneksyon entènèt !", detail:"Konekte epi eseye ankò.", icon:"📶", retry:false }); return; }
     const freemiumExpired = user.code === "FREEMIUM" && (user.daysRemaining ?? 0) <= 0;
     if (freemiumExpired) { onNavigate("payment"); return; }
-    if (scansUsed >= DAILY_MAX) return;
+    const currentScans = (() => { try { const raw = localStorage.getItem(getScanKey()); return raw !== null ? parseInt(raw) : scansUsed; } catch { return scansUsed; } })();
+    if (currentScans >= DAILY_MAX) return;
+    setScansUsed(currentScans);
     if (loading) return;
     await new Promise(r => setTimeout(r, 300));
     const payload = retryPayload || {
@@ -192,9 +194,9 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         history:     messages.slice(-6), subject,
       });
       setMessages(p => [...p, { role:"assistant", content:result.reply, subject }]);
-      const next = scansUsed + 1;
+      const next = result.scansUsed ?? (scansUsed + 1);
       setScansUsed(next);
-      try { localStorage.setItem(_scanKey, String(next)); } catch {}
+      try { localStorage.setItem(getScanKey(), String(next)); } catch {}
       setLastPayload(null);
       await idbSaveScan(user.phone, {
         date:     new Date().toLocaleString("fr-HT", { timeZone:"America/Port-au-Prince" }),
