@@ -927,7 +927,7 @@ async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
   return {
     numbers: [
       { method: "MonCash", number: "+509 48 69 50 79" },
-      { method: "NatCash", number: "+509 40 66 91 05" },
+      { method: "NatCash", number: "+509 40 66 90 98" },
     ],
   };
 }
