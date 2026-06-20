@@ -15,6 +15,9 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   });
 
 const handleLogin = async () => {
+  setLoading(true); setError("");
+  if (!phone.trim() || phone.trim().length < 8) { setError("Antre yon nimewo telefòn valid."); setLoading(false); return; }
+  if (!code.trim() || code.trim().length < 4) { setError("Antre yon kòd etablisman valid."); setLoading(false); return; }
   try {
     const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
   if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
@@ -38,7 +41,7 @@ const handleLogin = async () => {
           isAdmin:         result.isAdmin ?? false,
           scansToday:      result.scansToday,
       });
-    } catch (e) { setError(parseApiError(e).message); }
+    } catch (e) { setError(parseApiError(e).message); setLoading(false); }
     setLoading(false);
   };
 
@@ -62,7 +65,7 @@ const handleLogin = async () => {
         freemiumExpiresAt: result.freemiumExpiresAt,
         scansToday: result.scansToday ?? 0,
       });
-    } catch (e) { setError(parseApiError(e).message); }
+    } catch (e) { setError(parseApiError(e).message); setLoading(false); }
     setLoading(false);
   };
 
