@@ -120,7 +120,20 @@ const [dismissedIds, setDismissedIds] = useState(() => {
 useEffect(() => {
   if (!user.code || user.code === "FREEMIUM") return;
   const annKey = `annonce_ts_${user.code}`;
+  const annCacheKey = `annonce_data_${user.code}`;
   const annTs = parseInt(localStorage.getItem(annKey) || "0");
+  const cached = localStorage.getItem(annCacheKey);
+  if (cached) {
+    try {
+      const list = JSON.parse(cached);
+      const dismissed = JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]");
+      const visible = list.filter(a => !dismissed.includes(String(a.id)));
+      setAnnouncements(visible);
+      const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
+      const unread = lastSeen ? visible.filter(a => new Date(a.created_at) > new Date(lastSeen)).length : visible.length;
+      if (unread > 0) setUnreadCount(unread);
+    } catch {}
+  }
   if (Date.now() - annTs < 10 * 60 * 1000) return;
   localStorage.setItem(annKey, String(Date.now()));
   callEdge({ action: "get_announcements", schoolCode: user.code })
@@ -129,6 +142,7 @@ useEffect(() => {
 const dismissed = JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]");
 const visible = list.filter(a => !dismissed.includes(String(a.id)));
 setAnnouncements(visible);
+try { localStorage.setItem(annCacheKey, JSON.stringify(list)); } catch {}
 if (visible.length === 0) return;
 const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
 const unread = lastSeen
@@ -286,7 +300,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         </div>
 
         {/* Compteur circulaire */}
-<button onClick={announcements.length > 0 ? openAnnouncements : undefined} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:announcements.length > 0 ? "pointer" : "default", color:announcements.length > 0 ? "#60a5fa" : "#2d3f6e", flexShrink:0, opacity:announcements.length > 0 ? 1 : 0.4 }}>
+<button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#60a5fa", flexShrink:0, opacity:1 }}>
   <EnvelopeIcon />
   {unreadCount > 0 && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{unreadCount}</span>}
 </button>
