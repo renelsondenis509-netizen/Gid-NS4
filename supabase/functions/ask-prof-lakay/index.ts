@@ -675,9 +675,9 @@ async function getLeaderboard(
 
   // ✅ Fetch quiz scores + scans en parallèle
   const [{ data: allScores }, { data: allScansData }, { data: weekScoresData }] = await Promise.all([
-    db.from("quiz_scores").select("phone, name, note20, score, school_code, subject"),
+    db.from("quiz_scores").select("phone, name, note20, school_code, subject"),
     db.from("scans").select("phone, school_code, created_at"),
-    db.from("quiz_scores").select("phone, score").eq("week", getWeekKey()),
+    db.from("quiz_scores").select("phone").eq("week", getWeekKey()),
   ]);
 
   // ── Noms des écoles ──

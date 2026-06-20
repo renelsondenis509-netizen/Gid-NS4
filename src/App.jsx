@@ -60,7 +60,7 @@ useEffect(() => {
   window.addEventListener("online",  on);
   window.addEventListener("offline", off);
   checkConn();
-  const interval = setInterval(checkConn, 10000);
+  const interval = setInterval(checkConn, 60000);
   return () => {
     window.removeEventListener("online",  on);
     window.removeEventListener("offline", off);
@@ -76,8 +76,11 @@ useEffect(() => {
       requestNotificationPermission().then(granted => {
         if (granted && enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
       });
-      // Refresh données école en arrière-plan
-      if (navigator.onLine) {
+      // Refresh données école en arrière-plan (throttle 5 min)
+      const lastRefresh = parseInt(localStorage.getItem("gid_last_refresh") || "0");
+      const now = Date.now();
+      if (navigator.onLine && (now - lastRefresh > 5 * 60 * 1000)) {
+        localStorage.setItem("gid_last_refresh", String(now));
         const refreshAction = saved.code === "FREEMIUM" ? "freemium_login" : "validate_code";
         const refreshPayload = saved.code === "FREEMIUM"
           ? { action: "freemium_login", phone: saved.phone, name: saved.name || saved.phone }

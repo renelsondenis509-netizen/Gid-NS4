@@ -119,6 +119,10 @@ const [dismissedIds, setDismissedIds] = useState(() => {
 
 useEffect(() => {
   if (!user.code || user.code === "FREEMIUM") return;
+  const annKey = `annonce_ts_${user.code}`;
+  const annTs = parseInt(localStorage.getItem(annKey) || "0");
+  if (Date.now() - annTs < 10 * 60 * 1000) return;
+  localStorage.setItem(annKey, String(Date.now()));
   callEdge({ action: "get_announcements", schoolCode: user.code })
     .then(res => {
       const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());

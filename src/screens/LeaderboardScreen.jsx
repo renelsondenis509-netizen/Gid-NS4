@@ -42,7 +42,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
     }
     setLoading(true); setError(null);
     callEdge({ action:"get_leaderboard", phone:user.phone, schoolCode:user.code })
-      .then(d => { cacheSet(key, d, 5 * 60 * 1000); setData(d); })
+      .then(d => { cacheSet(key, d, 15 * 60 * 1000); setData(d); })
       .catch(e => setError(parseApiError(e).message))
       .finally(() => setLoading(false));
   };
