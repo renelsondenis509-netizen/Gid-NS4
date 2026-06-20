@@ -316,6 +316,7 @@ const sendAnnonce = async () => {
     });
     setAnnonceStatus("ok");
     setAnnonce({ title: "", message: "", expiresAt: "" });
+    try { localStorage.removeItem(`annonce_ts_${userCode}`); localStorage.removeItem(`annonce_data_${userCode}`); } catch {}
   } catch {
     setAnnonceStatus("err");
   }
