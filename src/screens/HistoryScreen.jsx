@@ -4,6 +4,7 @@ import { idbGetScans, idbDeleteScan, idbGetExercice, idbDeleteExercice } from ".
 import { LatexText } from "../components/LatexText";
 import { BottomNav } from "../components/UI";
 import { hasAccess } from "../utils/freemium";
+import { TextToSpeech } from "@capacitor-community/text-to-speech";
 
 /* ─── Icons ─────────────────────────────────────────────────────────── */
 const IcoClipboard  = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>);
@@ -256,7 +257,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
       .finally(() => setLoading(false));
   }, [user.phone]);
 
-  useEffect(() => () => { try { window.speechSynthesis?.cancel(); } catch {} }, []);
+  useEffect(() => () => { TextToSpeech.stop().catch(()=>{}); }, []);
   if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
   const cleanForTTS = (text) => (text || "")
@@ -271,22 +272,15 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     .trim();
 
   const handleSpeak = async (text, id) => {
-    const Tts = window.Capacitor?.Plugins?.Tts;
     if (speakingId === id) {
-      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
+      await TextToSpeech.stop().catch(()=>{});
       setSpeakingId(null);
     } else {
-      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
+      await TextToSpeech.stop().catch(()=>{});
       setSpeakingId(id);
       try {
-        if (Tts) {
-          await Tts.speak({ text: cleanForTTS(text).slice(0,500), rate: 0.9 });
-        } else {
-          const utt = new SpeechSynthesisUtterance(cleanForTTS(text));
-          utt.lang = "fr-FR"; utt.rate = 0.9;
-          utt.onend = () => setSpeakingId(null);
-          window.speechSynthesis.speak(utt);
-        }
+        await TextToSpeech.speak({ text: cleanForTTS(text).slice(0,500), lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
+        setSpeakingId(null);
       } catch { setSpeakingId(null); }
     }
   };
@@ -296,7 +290,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     await idbDeleteScan(entry.id);
     setHistory(h => h.filter(x => x.id !== entry.id));
     if (selected?.id === entry.id) setSelected(null);
-    if (speakingId === entry.id) { window.speechSynthesis.cancel(); setSpeakingId(null); }
+    if (speakingId === entry.id) { TextToSpeech.stop().catch(()=>{}); setSpeakingId(null); }
     setDeleting(null);
   };
 

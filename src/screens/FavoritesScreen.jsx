@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { LatexText } from "../components/LatexText";
 import { BottomNav } from "../components/UI";
+import { TextToSpeech } from "@capacitor-community/text-to-speech";
 
 // Icônes SVG pour synthèse vocale
 const IcoVolumeUp = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
@@ -25,22 +26,15 @@ export function FavoritesScreen({ user, onNavigate }) {
     .trim();
 
   const handleSpeak = async (text, id) => {
-    const Tts = window.Capacitor?.Plugins?.Tts;
     if (speakingId === id) {
-      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
+      await TextToSpeech.stop().catch(()=>{});
       setSpeakingId(null);
     } else {
-      try { if (Tts) await Tts.stop(); else window.speechSynthesis?.cancel(); } catch {}
+      await TextToSpeech.stop().catch(()=>{});
       setSpeakingId(id);
       try {
-        if (Tts) {
-          await Tts.speak({ text: cleanForTTS(text).slice(0,500), rate: 0.9 });
-        } else {
-          const utt = new SpeechSynthesisUtterance(cleanForTTS(text));
-          utt.lang = "fr-FR"; utt.rate = 0.9;
-          utt.onend = () => setSpeakingId(null);
-          window.speechSynthesis.speak(utt);
-        }
+        await TextToSpeech.speak({ text: cleanForTTS(text).slice(0,500), lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
+        setSpeakingId(null);
       } catch { setSpeakingId(null); }
     }
   };
@@ -50,7 +44,7 @@ export function FavoritesScreen({ user, onNavigate }) {
       try { setFavorites(JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]")); } catch {}
     };
     window.addEventListener("focus", sync);
-    return () => { try { window.speechSynthesis?.cancel(); } catch {} window.removeEventListener("focus", sync); };
+    return () => { TextToSpeech.stop().catch(()=>{}); window.removeEventListener("focus", sync); };
   }, [user.phone]);
 
   const removeFav = (id) => {
@@ -59,7 +53,7 @@ export function FavoritesScreen({ user, onNavigate }) {
     try { localStorage.setItem(`fav_${user.phone}`, JSON.stringify(next)); } catch {}
     if (selected?.id === id) setSelected(null);
     if (speakingId === id) {
-      window.speechSynthesis.cancel();
+      TextToSpeech.stop().catch(()=>{});
       setSpeakingId(null);
     }
   };

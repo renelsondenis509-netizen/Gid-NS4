@@ -7,6 +7,7 @@ import { useOffline } from "../utils/useOffline";
 import { LatexText } from "../components/LatexText";
 import { ErrorToast, ExpiryBanner } from "../components/UI";
 import { BottomNav } from "../components/UI";
+import { TextToSpeech } from "@capacitor-community/text-to-speech";
 
 // ─── Couleurs par matière ─────────────────────────────────────
 const SUBJECT_COLORS = {
@@ -252,9 +253,8 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
   const speak = async (text) => {
     const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").slice(0,500).trim();
     try {
-      const { Tts } = window.Capacitor.Plugins;
-      await Tts.stop();
-      await Tts.speak({ text: cleaned, rate: 0.9 });
+      await TextToSpeech.stop();
+      await TextToSpeech.speak({ text: cleaned, lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
     } catch(e) { console.warn("TTS:", e); }
   };
 
