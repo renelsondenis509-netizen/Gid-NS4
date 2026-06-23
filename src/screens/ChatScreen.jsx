@@ -252,10 +252,10 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
 
   const speak = async (text) => {
     const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").slice(0,500).trim();
+    try { await TextToSpeech.stop(); } catch {}
     try {
-      await TextToSpeech.stop();
       await TextToSpeech.speak({ text: cleaned, lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
-    } catch(e) { console.warn("TTS:", e); alert("TTS erreur: " + JSON.stringify(e)); }
+    } catch(e) { alert("TTS speak erreur: " + JSON.stringify(e)); }
   };
 
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;
