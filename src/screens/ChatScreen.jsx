@@ -255,7 +255,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
     try {
       await TextToSpeech.stop();
       await TextToSpeech.speak({ text: cleaned, lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
-    } catch(e) { console.warn("TTS:", e); }
+    } catch(e) { console.warn("TTS:", e); alert("TTS erreur: " + JSON.stringify(e)); }
   };
 
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;
