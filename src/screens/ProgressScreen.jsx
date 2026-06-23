@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from "react";
 import { BottomNav } from "../components/UI";
 import { getQuizGrades } from "../utils/quiz";
 import { QUIZ_BRANCHES } from "../data/quizData";
-import { idbGetExercice } from "../utils/idb";
+import { idbGetExercice, idbGetScans } from "../utils/idb";
 import { BADGES, computeBadges } from "../utils/badges";
 
 const ALL_SUBJECTS = Object.values(QUIZ_BRANCHES).flatMap(f => f.subjects);
@@ -18,6 +18,9 @@ const IcoBook    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="n
 const IcoLock    = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2d4080" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
 const IcoFlash   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
 const IcoChart   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
+const IcoEval    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>;
+const IcoClose   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IcoAlert   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
 const IcoPencil  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
 
 function Bar({ value, max = 20, color }) {
@@ -61,12 +64,164 @@ function SubjectCard({ sub, best, last, count, exoCount = 0, highlight }) {
   );
 }
 
+
+/* ─── Evalyasyon ─────────────────────────────────────────────── */
+function EvalModal({ grades, exoData, scanData, allSubjects, onClose }) {
+  const result = useMemo(() => {
+    // Scans par matière
+    const scanMap = {};
+    scanData.forEach(s => {
+      const sub = s.subject || s.subjectName || null;
+      if (sub) scanMap[sub] = (scanMap[sub] || 0) + 1;
+    });
+
+    // Exercices par matière
+    const exoMap = {};
+    exoData.forEach(e => {
+      if (!e.subject) return;
+      if (!exoMap[e.subject]) exoMap[e.subject] = [];
+      if (e.total > 0) exoMap[e.subject].push(Math.round((e.score / e.total) * 20));
+    });
+
+    const tried = Object.keys(grades);
+    if (!tried.length) return null;
+
+    const subScores = tried.map(sub => {
+      const entries = grades[sub];
+      const quizBest = Math.max(...entries.map(e => e.note20));
+      const exoAvg = exoMap[sub]?.length
+        ? exoMap[sub].reduce((a, b) => a + b, 0) / exoMap[sub].length
+        : null;
+      const scanBonus = Math.min((scanMap[sub] || 0) * 0.5, 2); // max +2
+      const score = exoAvg !== null
+        ? quizBest * 0.5 + exoAvg * 0.3 + quizBest * 0.2 + scanBonus
+        : quizBest * 0.8 + scanBonus;
+      return { sub, score: Math.min(Math.round(score * 10) / 10, 20), quizBest, exoAvg, scans: scanMap[sub] || 0 };
+    });
+
+    const globalAvg = Math.round(subScores.reduce((a, b) => a + b.score, 0) / subScores.length * 10) / 10;
+    const readiness = Math.round((globalAvg / 20) * 100);
+    const strong = subScores.filter(s => s.score >= 14).sort((a, b) => b.score - a.score);
+    const weak   = subScores.filter(s => s.score < 12).sort((a, b) => a.score - b.score);
+    const mid    = subScores.filter(s => s.score >= 12 && s.score < 14);
+    const untried = allSubjects.filter(s => !tried.includes(s));
+
+    let verdict, verdictColor, verdictBg;
+    if (readiness >= 75)      { verdict = "✅ Ou prèske pare pou Bak la !";     verdictColor = "#22c55e"; verdictBg = "#14532d22"; }
+    else if (readiness >= 55) { verdict = "⚡ Bon chemen, kontinye efò a !";    verdictColor = "#f59e0b"; verdictBg = "#78350f22"; }
+    else                      { verdict = "📚 Ou bezwen travay plis chak jou."; verdictColor = "#ef4444"; verdictBg = "#7f1d1d22"; }
+
+    return { readiness, globalAvg, strong, weak, mid, untried, verdict, verdictColor, verdictBg, total: subScores.length };
+  }, [grades, exoData, scanData, allSubjects]);
+
+  if (!result) return (
+    <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:60, background:"rgba(0,0,0,0.7)", display:"flex", alignItems:"flex-end" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width:"100%", background:"#080e24", borderRadius:"20px 20px 0 0", border:"1px solid rgba(139,92,246,0.3)", padding:"24px 20px 40px" }}>
+        <p style={{ color:"#4B6ABA", textAlign:"center" }}>Pako gen done pou evalye. Fè kèk quiz anvan !</p>
+        <button onClick={onClose} style={{ display:"block", margin:"16px auto 0", padding:"10px 28px", borderRadius:12, background:"#2563eb", color:"#fff", border:"none", cursor:"pointer", fontWeight:700 }}>Ferme</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:60, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(4px)", display:"flex", alignItems:"flex-end" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width:"100%", maxHeight:"85vh", overflowY:"auto", background:"#080e24", borderRadius:"22px 22px 0 0", border:"1px solid rgba(139,92,246,0.3)", padding:"20px 16px 36px" }}>
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+          <span style={{ color:"#e2e8ff", fontWeight:800, fontSize:16, display:"flex", alignItems:"center", gap:8 }}><IcoEval/> Evalyasyon Semènn nan</span>
+          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, width:30, height:30, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#93c5fd" }}><IcoClose/></button>
+        </div>
+
+        {/* Score global */}
+        <div style={{ background: result.verdictBg, border:`1px solid ${result.verdictColor}33`, borderRadius:16, padding:"16px", marginBottom:14, textAlign:"center" }}>
+          <div style={{ fontSize:48, fontWeight:900, color: result.verdictColor, lineHeight:1 }}>{result.readiness}%</div>
+          <div style={{ color:"#93c5fd", fontSize:12, marginTop:4 }}>Nivo preparasyon Bak</div>
+          <div style={{ color: result.verdictColor, fontSize:13, fontWeight:700, marginTop:8 }}>{result.verdict}</div>
+          <div style={{ color:"#4B6ABA", fontSize:11, marginTop:4 }}>Mwayèn global: {result.globalAvg}/20 · {result.total} matyè evalye</div>
+        </div>
+
+        {/* Barre visuelle */}
+        <div style={{ marginBottom:14 }}>
+          <div style={{ background:"#1e3a8a33", borderRadius:99, height:10, overflow:"hidden" }}>
+            <div style={{ width:`${result.readiness}%`, height:"100%", borderRadius:99, background: result.readiness >= 75 ? "linear-gradient(90deg,#16a34a,#22c55e)" : result.readiness >= 55 ? "linear-gradient(90deg,#d97706,#f59e0b)" : "linear-gradient(90deg,#dc2626,#ef4444)", transition:"width .8s ease" }} />
+          </div>
+        </div>
+
+        {/* Matyè fò */}
+        {result.strong.length > 0 && (
+          <div style={{ marginBottom:14 }}>
+            <div style={{ color:"#22c55e", fontSize:12, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoStar/> Matyè ou maîtrise ({result.strong.length})</div>
+            {result.strong.map(s => (
+              <div key={s.sub} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 12px", background:"#14532d18", border:"1px solid #22c55e22", borderRadius:10, marginBottom:6 }}>
+                <span style={{ color:"#e2e8ff", fontSize:13 }}>{s.sub}</span>
+                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                  {s.exoAvg !== null && <span style={{ color:"#34d399", fontSize:11 }}>Exo: {s.exoAvg}/20</span>}
+                  {s.scans > 0 && <span style={{ color:"#60a5fa", fontSize:11 }}>{s.scans} IA</span>}
+                  <span style={{ color:"#22c55e", fontWeight:800, fontSize:14 }}>{s.score}/20</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Matyè mwayèn */}
+        {result.mid.length > 0 && (
+          <div style={{ marginBottom:14 }}>
+            <div style={{ color:"#f59e0b", fontSize:12, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoTarget/> Matyè pou renfòse ({result.mid.length})</div>
+            {result.mid.map(s => (
+              <div key={s.sub} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 12px", background:"#78350f18", border:"1px solid #f59e0b22", borderRadius:10, marginBottom:6 }}>
+                <span style={{ color:"#e2e8ff", fontSize:13 }}>{s.sub}</span>
+                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                  {s.exoAvg !== null && <span style={{ color:"#fbbf24", fontSize:11 }}>Exo: {s.exoAvg}/20</span>}
+                  <span style={{ color:"#f59e0b", fontWeight:800, fontSize:14 }}>{s.score}/20</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Matyè fèb */}
+        {result.weak.length > 0 && (
+          <div style={{ marginBottom:14 }}>
+            <div style={{ color:"#ef4444", fontSize:12, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoAlert/> Matyè ki bezwen travay ijan ({result.weak.length})</div>
+            {result.weak.map(s => (
+              <div key={s.sub} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 12px", background:"#7f1d1d18", border:"1px solid #ef444422", borderRadius:10, marginBottom:6 }}>
+                <span style={{ color:"#e2e8ff", fontSize:13 }}>{s.sub}</span>
+                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                  {s.exoAvg !== null && <span style={{ color:"#fca5a5", fontSize:11 }}>Exo: {s.exoAvg}/20</span>}
+                  <span style={{ color:"#ef4444", fontWeight:800, fontSize:14 }}>{s.score}/20</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Matyè poko eseye */}
+        {result.untried.length > 0 && (
+          <div style={{ marginBottom:8 }}>
+            <div style={{ color:"#4B6ABA", fontSize:12, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoLock/> Matyè poko eseye ({result.untried.length})</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+              {result.untried.slice(0, 8).map(s => (
+                <span key={s} style={{ background:"rgba(15,28,60,0.7)", border:"1px solid #1e3a8a22", borderRadius:20, padding:"3px 10px", color:"#2d4080", fontSize:11 }}>{s}</span>
+              ))}
+              {result.untried.length > 8 && <span style={{ color:"#2d4080", fontSize:11, alignSelf:"center" }}>+{result.untried.length - 8} lòt</span>}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ProgressScreen({ user, onNavigate }) {
   const grades = useMemo(() => getQuizGrades(user.phone), [user.phone]);
   const [exoData, setExoData] = useState([]);
+  const [scanData, setScanData] = useState([]);
+  const [showEval, setShowEval] = useState(false);
 
   useEffect(() => {
     idbGetExercice(user.phone).then(setExoData).catch(() => {});
+    idbGetScans(user.phone).then(setScanData).catch(() => {});
   }, [user.phone]);
 
   const stats = useMemo(() => {
@@ -109,10 +264,11 @@ export function ProgressScreen({ user, onNavigate }) {
       <div style={{ padding:"32px 20px 16px", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <button onClick={() => onNavigate("menu")} style={{ background:"rgba(37,99,235,0.12)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:10, width:36, height:36, color:"#60a5fa", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><IcoBack/></button>
-          <div>
+          <div style={{ flex:1 }}>
             <h1 style={{ color:"#E8EEFF", fontWeight:800, fontSize:18, margin:0, display:"flex", alignItems:"center", gap:8 }}><IcoTrend/> Pwogresyon</h1>
             <p style={{ color:"#4B6ABA", fontSize:11, margin:0 }}>{user.name || user.phone}</p>
           </div>
+          <button onClick={() => setShowEval(true)} style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 14px", borderRadius:12, background:"linear-gradient(135deg,#4c1d95,#7c3aed)", border:"1px solid rgba(139,92,246,0.4)", color:"#e9d5ff", fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.3)" }}><IcoEval/> Evalyasyon</button>
         </div>
       </div>
 
@@ -201,6 +357,7 @@ export function ProgressScreen({ user, onNavigate }) {
 
         </>)}
       </div>
+      {showEval && <EvalModal grades={grades} exoData={exoData} scanData={scanData} allSubjects={ALL_SUBJECTS} onClose={() => setShowEval(false)} />}
       <BottomNav active="menu" onNavigate={onNavigate} />
     </div>
   );
