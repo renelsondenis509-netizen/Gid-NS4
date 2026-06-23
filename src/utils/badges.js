@@ -36,7 +36,8 @@ export function computeBadges({ grades, exoCount, allSubjectsCount, phone = "" }
     const today      = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
     const scanUsed   = parseInt(localStorage.getItem(`gid_scan_${phone}_${today}`) || "0");
 
-    if (scanUsed >= 1 || allGrades.length >= 1) unlocked.add("first_scan");
+    const everScanned = scanUsed >= 1 || localStorage.getItem(`gid_first_scan_${phone}`) === "1";
+    if (everScanned) unlocked.add("first_scan");
     if (allGrades.length >= 1)   unlocked.add("first_quiz");
     if (perfect >= 1)            unlocked.add("perfect");
     if (subjects20.length >= 3)  unlocked.add("master");

@@ -184,6 +184,7 @@ useEffect(() => {
 
   return (
     <>
+      <div className="blob-bg"><div className="diag"/></div>
       {isOffline && <OfflineBanner />}
       <ErrorBoundary key={screen}>{renderContent()}</ErrorBoundary>
     </>

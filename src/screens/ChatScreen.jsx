@@ -215,7 +215,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
       setMessages(p => [...p, { role:"assistant", content:result.reply, subject }]);
       const next = result.scansUsed ?? (scansUsed + 1);
       setScansUsed(next);
-      try { localStorage.setItem(getScanKey(), String(next)); } catch {}
+      try { localStorage.setItem(getScanKey(), String(next)); localStorage.setItem(`gid_first_scan_${user.phone}`, "1"); } catch {}
       setLastPayload(null);
       await idbSaveScan(user.phone, {
         date:     new Date().toLocaleString("fr-HT", { timeZone:"America/Port-au-Prince" }),

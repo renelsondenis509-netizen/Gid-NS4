@@ -45,3 +45,28 @@ html, body {
 
 /* ── Sélection de texte désactivée sur les boutons ── */
 button { user-select: none; -webkit-user-select: none; }
+
+/* ── Navy blob + diagonal background ── */
+@keyframes floatBlob {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-18px) scale(1.04); }
+}
+.blob-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.blob-bg::before, .blob-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(37,99,235,0.13);
+  animation: floatBlob 8s ease-in-out infinite;
+}
+.blob-bg::before { width: 300px; height: 190px; top: 6%; left: -70px; animation-delay: 0s; }
+.blob-bg::after  { width: 220px; height: 140px; bottom: 16%; right: -50px; animation-delay: 3.5s; }
+.blob-bg .diag {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg, transparent, transparent 60px,
+    rgba(255,255,255,0.025) 60px, rgba(255,255,255,0.025) 61px
+  );
+}
