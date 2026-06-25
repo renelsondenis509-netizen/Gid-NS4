@@ -309,7 +309,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
             <svg width="44" height="44" style={{ transform:"rotate(-90deg)" }}>
               <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="3"/>
               <circle cx="22" cy="22" r="18" fill="none"
-                stroke={allDone ? "#374151" : "#2563eb"}
+                stroke={allDone ? "#374151" : "#22c55e"}
                 strokeWidth="3"
                 strokeDasharray={`${2*Math.PI*18}`}
                 strokeDashoffset={`${2*Math.PI*18*(1-scansUsed/DAILY_MAX)}`}
@@ -318,10 +318,10 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
               />
             </svg>
             <span style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:0 }}>
-              {allDone ? <span style={{color:"#374151"}}><CheckIcon/></span> : <><span style={{fontSize:13,fontWeight:900,color:"#60a5fa",lineHeight:1}}>{scansUsed}</span><span style={{fontSize:13,fontWeight:900,color:"#3b82f6",lineHeight:1}}>/{DAILY_MAX}</span></>}
+              {allDone ? <span style={{color:"#374151"}}><CheckIcon/></span> : <><span style={{fontSize:13,fontWeight:900,color:"#22c55e",lineHeight:1}}>{scansUsed}</span><span style={{fontSize:13,fontWeight:900,color:"#16a34a",lineHeight:1}}>/{DAILY_MAX}</span></>}
             </span>
           </div>
-          <span style={{ fontSize:10, color:"#4b6cb7", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
+          <span style={{ fontSize:10, color:"#22c55c", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
         </div>
       </div>
 
@@ -365,7 +365,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
                   <button onClick={()=>toggleFav(msg,i)} style={{ width:28, height:28, borderRadius:8, background:"none", border:"none", cursor:"pointer", color:"#fbbf24", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     {favorites.findIndex(f=>f.id===`${msg.subject||"gen"}_${(msg.content||"").slice(0,32).replace(/\s/g,"_")}`)>=0 ? <StarFullIcon/> : <StarOutlineIcon/>}
                   </button>
-                  <button onClick={()=>speak(msg.content)} style={{ width:28, height:28, borderRadius:8, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.2)", cursor:"pointer", color:"#60a5fa", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
+                  <button onClick={()=>speak(msg.content)} style={{ width:28, height:28, borderRadius:8, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.2)", cursor:"pointer", color:"#22c55e", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     <SpeakIcon/>
                   </button>
                   <button onClick={()=>copyText(msg.content, i)} style={{ width:28, height:28, borderRadius:8, background:copiedId===i?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.05)", border:copiedId===i?"1px solid rgba(34,197,94,0.4)":"1px solid rgba(255,255,255,0.1)", cursor:"pointer", color:copiedId===i?"#4ade80":"#6b7280", display:"inline-flex", alignItems:"center", justifyContent:"center", transition:"all .2s" }}>
