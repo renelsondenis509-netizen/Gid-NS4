@@ -106,7 +106,7 @@ export function PaymentScreen({ onBack }) {
             </div>
           );
         })}
-        <button onClick={() => window.open("https://wa.me/50900000000?text=Bonjou%2C%20mwen%20vle%20aktive%20Gid%20NS4.", "_blank")}
+        <button onClick={() => window.open("https://wa.me/50940669098?text=Bonjou%2C%20mwen%20vle%20aktive%20Gid%20NS4.", "_blank")}
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg,#25d366,#128c7e)", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}>
           <WhatsAppIcon /> Konfime Pèman sou WhatsApp
