@@ -32,7 +32,7 @@ export function AboutScreen({ onNavigate }) {
         </Card>
 
         <Card>
-          <Row label="Sijè kouvri" value="20+ matyè NS4" />
+          <Row label="Sijè kouvri" value="Matyè NS4" />
           <Row label="Modèl IA" value="Prof Lakay" last />
         </Card>
 
