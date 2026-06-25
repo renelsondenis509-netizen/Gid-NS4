@@ -164,6 +164,11 @@ export function QuizScreen({ user, onNavigate }) {
     setQIndex(0); setSelected(null); setRoundScore(0); setRound(r => r + 1); setPhase("qcm");
   };
 
+const handleShareQuiz = (note20, mention) => {
+  const text = `Gid NS4 — Quiz ${subject}\nNot: ${note20}/20 — ${mention}\n${score}/${totalAnswered} kòrèk · Streak max: ${maxStreak}\nTelechaje Gid NS4 !`;
+  if (navigator?.share) { navigator.share({ title:"Rezilta Quiz NS4", text }).catch(()=>{}); return; }
+  navigator.clipboard?.writeText(text).then(()=>alert("Rezilta kopye !"));
+};
   // ── SELECT ───────────────────────────────────────────────────
   if (phase === "select") {
     const totalAvailable = Object.values(FILIERES).flatMap(f => f.subjects)
@@ -354,7 +359,9 @@ export function QuizScreen({ user, onNavigate }) {
                     border:`1px solid ${isCorrect ? "#22c55e" : isWrong ? "#ef4444" : `${letterColors[idx]}44`}` }}>
                     {letters[idx]}
                   </span>
-                  <span style={{ flex:1, color: isCorrect ? "#86efac" : isWrong ? "#fca5a5" : "#e2e8ff", fontSize:14, fontWeight:500, lineHeight:1.4 }}>{choice}</span>
+                  <span style={{ flex:1, color: isCorrect ? "#86efac" : isWrong ? "#fca5a5" : "#e2e8ff", fontSize:14, fontWeight:500, lineHeight:1.4 }}>
+  {String(choice).replace(/^[\-–—]\s*/, "")}
+</span>
                   {isCorrect && <CheckCircleIcon size={16}/>}
                   {isWrong   && <XCircleIcon size={16}/>}
                 </button>
@@ -434,6 +441,10 @@ export function QuizScreen({ user, onNavigate }) {
               <XCircleIcon size={20} color="#93c5fd"/> Non
             </button>
           </div>
+<button onClick={() => handleShareQuiz(note20, mention.label)}
+  style={{ width:"100%", padding:"13px", borderRadius:16, background:"linear-gradient(135deg,#059669,#10b981)", color:"#fff", fontWeight:800, fontSize:14, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+  📤 Pataje Rezilta
+</button>
 
           {!hasMore && seenCount >= allCount && (
             <p style={{ color:"#fbbf24", fontSize:12, textAlign:"center" }}>🏆 Ou fini tout {allCount} kesyon yo !</p>
@@ -507,7 +518,11 @@ export function QuizScreen({ user, onNavigate }) {
             style={{ width:"100%", padding:"15px", borderRadius:16, background:"rgba(12,20,50,0.9)", border:"1px solid rgba(37,99,235,0.15)", color:"#93c5fd", fontWeight:700, fontSize:14, cursor:"pointer" }}>
             ← Chwazi lòt matyè
           </button>
-        </div>
+     <button onClick={() => handleShareQuiz(note20, mention.label)}
+  style={{ width:"100%", padding:"13px", borderRadius:16, background:"linear-gradient(135deg,#059669,#10b981)", color:"#fff", fontWeight:800, fontSize:14, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+  📤 Pataje Rezilta
+</button>
+   </div>
         <BottomNav active="quiz" onNavigate={onNavigate} />
       </div>
     );
