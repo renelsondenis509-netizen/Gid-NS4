@@ -150,7 +150,7 @@ function EvalModal({ grades, exoData, scanData, allSubjects, onClose }) {
         {/* Matyè fò */}
         {result.strong.length > 0 && (
           <div style={{ marginBottom:14 }}>
-            <div style={{ color:"#22c55e", fontSize:12, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoStar/> Matyè ou maîtrise ({result.strong.length})</div>
+            <div style={{ color:"#22c55e", fontSize:12, fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}><IcoStar/> Matyè ou metrize ({result.strong.length})</div>
             {result.strong.map(s => (
               <div key={s.sub} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 12px", background:"#14532d18", border:"1px solid #22c55e22", borderRadius:10, marginBottom:6 }}>
                 <span style={{ color:"#e2e8ff", fontSize:13 }}>{s.sub}</span>
