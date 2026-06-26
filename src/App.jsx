@@ -133,6 +133,8 @@ useEffect(() => {
     const handler = CapApp.addListener("backButton", ({ canGoBack }) => {
       if (screen === "chat") { CapApp.exitApp(); return; }
       if (screen === "login" || screen === "splash") { CapApp.exitApp(); return; }
+      if (screen === "partner" || screen === "payment" || screen === "about") { setScreen("menu"); return; }
+      if (screen === "progress" || screen === "favorites" || screen === "leaderboard" || screen === "history" || screen === "quiz") { setScreen("chat"); return; }
       setScreen("chat");
     });
     return () => { handler.then(h => h.remove()); };
