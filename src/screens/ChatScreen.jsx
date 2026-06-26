@@ -310,7 +310,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         </div>
 
         {/* Compteur circulaire */}
-<button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#22c55e", flexShrink:0, opacity:1 }}>
+<button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#ffffff", flexShrink:0, opacity:1 }}>
   <EnvelopeIcon />
   {unreadCount > 0 && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{unreadCount}</span>}
 </button>
@@ -319,7 +319,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
             <svg width="44" height="44" style={{ transform:"rotate(-90deg)" }}>
               <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="3"/>
               <circle cx="22" cy="22" r="18" fill="none"
-                stroke={allDone ? "#374151" : "#22c55e"}
+                stroke={allDone ? "#374151" : "#ffffff"}
                 strokeWidth="3"
                 strokeDasharray={`${2*Math.PI*18}`}
                 strokeDashoffset={`${2*Math.PI*18*(1-scansUsed/DAILY_MAX)}`}
@@ -328,10 +328,10 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
               />
             </svg>
             <span style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:0 }}>
-              {allDone ? <span style={{color:"#374151"}}><CheckIcon/></span> : <><span style={{fontSize:13,fontWeight:900,color:"#22c55e",lineHeight:1}}>{scansUsed}</span><span style={{fontSize:13,fontWeight:900,color:"#16a34a",lineHeight:1}}>/{DAILY_MAX}</span></>}
+              {allDone ? <span style={{color:"#374151"}}><CheckIcon/></span> : <><span style={{fontSize:13,fontWeight:900,color:"#ffffff",lineHeight:1}}>{scansUsed}</span><span style={{fontSize:13,fontWeight:900,color:"#e2e8ff",lineHeight:1}}>/{DAILY_MAX}</span></>}
             </span>
           </div>
-          <span style={{ fontSize:10, color:"#22c55e", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
+          <span style={{ fontSize:10, color:"#ffffff", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
         </div>
       </div>
 
