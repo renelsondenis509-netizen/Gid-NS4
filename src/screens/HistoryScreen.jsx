@@ -272,18 +272,42 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     .trim();
 
   const handleSpeak = async (text, id) => {
-    if (speakingId === id) {
-      await TextToSpeech.stop().catch(()=>{});
-      setSpeakingId(null);
+  if (speakingId === id) {
+    await TextToSpeech.stop().catch(()=>{});
+    setSpeakingId(null);
+    return;
+  }
+  await TextToSpeech.stop().catch(()=>{});
+  setSpeakingId(id);
+
+  const cleaned = cleanForTTS(text);
+  // Découper en phrases de max 200 chars pour éviter les coupures Android
+  const chunks = [];
+  const sentences = cleaned.split(/(?<=[.!?;])\s+/);
+  let current = "";
+  for (const s of sentences) {
+    if ((current + " " + s).length > 200) {
+      if (current) chunks.push(current.trim());
+      current = s;
     } else {
-      await TextToSpeech.stop().catch(()=>{});
-      setSpeakingId(id);
-      try {
-        await TextToSpeech.speak({ text: cleanForTTS(text).slice(0,500), lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
-        setSpeakingId(null);
-      } catch { setSpeakingId(null); }
+      current = current ? current + " " + s : s;
     }
-  };
+  }
+  if (current) chunks.push(current.trim());
+
+  try {
+    for (const chunk of chunks.slice(0, 15)) { // max 15 chunks
+      await TextToSpeech.speak({
+        text: chunk,
+        lang: "fr-FR",
+        rate: 0.85,   // légèrement plus lent = plus naturel
+        pitch: 1.05,  // pitch légèrement au-dessus = plus humain
+        volume: 1.0,
+      });
+    }
+  } catch {}
+  setSpeakingId(null);
+};
 
   const handleDeleteScan = async (entry) => {
     setDeleting(entry.id);
@@ -528,21 +552,34 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                   </button>
                 </div>
 
-              : <>
-                  <p style={{ color: "#475569", fontSize: 12, fontWeight: 700,
-                    textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                    Tout rekèt yo
-                  </p>
-                  {history.map(h => (
-                    <HistoryCard key={h.id} h={h}
-                      onSelect={setSelected}
-                      onSpeak={handleSpeak}
-                      onDelete={handleDeleteScan}
-                      speakingId={speakingId}
-                      deleting={deleting}/>
-                  ))}
-                  <div style={{ height: 16 }}/>
-                </>
+: (() => {
+    // Grouper par matière
+    const groups = {};
+    history.forEach(h => {
+      const sub = h.subject || h.matiere || h.subjectName || "Jeneral";
+      if (!groups[sub]) groups[sub] = [];
+      groups[sub].push(h);
+    });
+    return <>
+      {Object.entries(groups).map(([sub, items]) => (
+        <div key={sub}>
+          <p style={{ color:"#60a5fa", fontSize:12, fontWeight:700, textTransform:"uppercase",
+            letterSpacing:"0.08em", marginBottom:8, marginTop:4,
+            display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ width:8, height:8, borderRadius:"50%", background:"#60a5fa", display:"inline-block" }}/>
+            {sub} ({items.length})
+          </p>
+          {items.map(h => (
+            <HistoryCard key={h.id} h={h}
+              onSelect={setSelected} onSpeak={handleSpeak}
+              onDelete={handleDeleteScan} speakingId={speakingId} deleting={deleting}/>
+          ))}
+        </div>
+      ))}
+      <div style={{ height: 16 }}/>
+    </>;
+
+  })()
             }
           </>
         )}
@@ -562,19 +599,32 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                   </p>
                 </div>
 
-              : <>
-                  <p style={{ color: "#475569", fontSize: 12, fontWeight: 700,
-                    textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                    Egzèsis sove yo
-                  </p>
-                  {exercices.map(exo => (
-                    <ExerciceCard key={exo.id} exo={exo}
-                      onRedo={onStartExercice}
-                      onDelete={handleDeleteExercice}
-                      deleting={deleting}/>
-                  ))}
-                  <div style={{ height: 16 }}/>
-                </>
+: (() => {
+    const groups = {};
+    exercices.forEach(exo => {
+      const sub = exo.subject || exo.matiere || "Jeneral";
+      if (!groups[sub]) groups[sub] = [];
+      groups[sub].push(exo);
+    });
+    return <>
+      {Object.entries(groups).map(([sub, items]) => (
+        <div key={sub}>
+          <p style={{ color:"#34d399", fontSize:12, fontWeight:700, textTransform:"uppercase",
+            letterSpacing:"0.08em", marginBottom:8, marginTop:4,
+            display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ width:8, height:8, borderRadius:"50%", background:"#34d399", display:"inline-block" }}/>
+            {sub} ({items.length})
+          </p>
+          {items.map(exo => (
+            <ExerciceCard key={exo.id} exo={exo}
+              onRedo={onStartExercice} onDelete={handleDeleteExercice} deleting={deleting}/>
+          ))}
+        </div>
+      ))}
+      <div style={{ height: 16 }}/>
+    </>;
+
+  })()
             }
           </>
         )}
