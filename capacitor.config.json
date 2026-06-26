@@ -1,5 +1,13 @@
 {
   "appId": "com.gidns4.app",
   "appName": "Gid NS4",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "launchAutoHide": false,
+      "backgroundColor": "#070d1f",
+      "showSpinner": false
+    }
+  }
 }

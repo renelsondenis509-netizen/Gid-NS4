@@ -139,7 +139,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
                       }}>
                         <div style={{ color:"#E8EEFF", fontWeight:700, fontSize:10, textAlign:"center", lineHeight:1.3 }}>{entry.name||entry.phone}</div>
                         <div style={{ fontWeight:900, marginTop:5, color:colors[rank], fontSize:rank===0?20:14 }}>{entry.value}{currentTab.valueLabel}</div>
-                        {entry.isMe && <div style={{ color:colors[rank], fontSize:10, marginTop:3 }}>← Ou</div>}
+                        
                       </div>
                     </div>
                   )})}

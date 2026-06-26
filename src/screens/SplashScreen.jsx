@@ -1,9 +1,13 @@
 import { useEffect } from "react";
 import { APP_LOGO } from "../config";
 import { GLOBAL_STYLES } from "../components/UI";
+import { SplashScreen as CapSplash } from "@capacitor/splash-screen";
 
 export function SplashScreen({ onDone }) {
-  useEffect(() => { setTimeout(onDone, 2000); }, []);
+  useEffect(() => {
+    CapSplash.hide({ fadeOutDuration: 200 }).catch(() => {});
+    setTimeout(onDone, 2000);
+  }, []);
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
       style={{ background:"linear-gradient(145deg,#04081A 0%,#080E24 50%,#0D0A1E 100%)" }}>
