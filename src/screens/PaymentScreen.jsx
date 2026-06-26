@@ -12,7 +12,7 @@ export function PaymentScreen({ onBack }) {
     if (cached) { setPayments(cached); setLoading(false); return; }
     callEdge({ action: "get_payment_numbers" })
       .then(d => { const p = d.numbers || d.payments || []; cacheSet("payment_numbers", p, 60 * 60 * 1000); setPayments(p); })
-      .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669105" }]))
+      .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669098" }]))
       .finally(() => setLoading(false));
   }, []);
 
