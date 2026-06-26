@@ -612,6 +612,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                     ));
                   })()}
                   <div style={{ height: 16 }}/>
+                </>
             }
           </>
         )}
