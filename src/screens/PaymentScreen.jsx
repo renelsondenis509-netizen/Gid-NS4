@@ -6,15 +6,27 @@ export function PaymentScreen({ onBack }) {
   const [payments, setPayments] = useState([]);
   const [copied, setCopied] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [revealed, setRevealed] = useState({});
 
   useEffect(() => {
     const cached = cacheGet("payment_numbers");
     if (cached) { setPayments(cached); setLoading(false); return; }
     callEdge({ action: "get_payment_numbers" })
       .then(d => { const p = d.numbers || d.payments || []; cacheSet("payment_numbers", p, 60 * 60 * 1000); setPayments(p); })
-      .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669098" }]))
+      .catch(() => setPayments([{ method: "MonCash", number: "50948695079" }, { method: "NatCash", number: "50940669105" }]))
       .finally(() => setLoading(false));
   }, []);
+
+  const maskNumber = (num) => {
+    const s = String(num);
+    return s.slice(0, 3) + " •••• " + s.slice(-3);
+  };
+
+  const copy = (number, method) => {
+    navigator.clipboard?.writeText(number);
+    setCopied(method);
+    setTimeout(() => setCopied(null), 2500);
+  };
 
   // ─── SVG ICONS ───────────────────────────────────────────────────────────
   const CopyIcon = () => (
@@ -27,6 +39,20 @@ export function PaymentScreen({ onBack }) {
   const CheckIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+
+  const EyeIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+
+  const EyeOffIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
     </svg>
   );
 
@@ -48,6 +74,7 @@ export function PaymentScreen({ onBack }) {
       <line x1="2" y1="10" x2="22" y2="10" />
     </svg>
   );
+
   const cardStyle = {
     MonCash: { grad: "linear-gradient(135deg,#c0392b,#e74c3c)", icon: "https://i.postimg.cc/J4h15HZC/telechargement.jpg", sub: "Digicel Haiti" },
     NatCash: { grad: "linear-gradient(135deg,#e67e22,#f39c12)", icon: "https://i.postimg.cc/1zXmJhDn/file-00000000ae3c71f788921fb0d044db44.jpg", sub: "Natcom Haiti" },
@@ -66,39 +93,58 @@ export function PaymentScreen({ onBack }) {
           </div>
         ) : payments.map(p => {
           const style = cardStyle[p.method] || { grad: "linear-gradient(135deg,#333,#555)", icon: null, sub: "" };
+          const isRevealed = !!revealed[p.method];
           return (
             <div key={p.method} className="rounded-3xl" style={{ background: style.grad }}>
               <div className="px-5 py-5">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center" style={{ overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
                     {style.icon ? (
-                      <img 
-                        src={style.icon} 
-                        alt={p.method}
-                        style={{ width: "70%", height: "70%", objectFit: "contain" }}
-                      />
+                      <img src={style.icon} alt={p.method} style={{ width: "70%", height: "70%", objectFit: "contain" }} />
                     ) : (
                       <CreditCardIcon />
                     )}
                   </div>
-                  <div><div className="text-white font-black text-xl">{p.method}</div><div className="text-white/70 text-xs">{style.sub}</div></div>
+                  <div>
+                    <div className="text-white font-black text-xl">{p.method}</div>
+                    <div className="text-white/70 text-xs">{style.sub}</div>
+                  </div>
                 </div>
-                <div className="bg-white/15 rounded-2xl px-4 py-3 mb-4">
+
+                {/* Numéro masqué par défaut */}
+                <div className="bg-white/15 rounded-2xl px-4 py-3 mb-3">
                   <div className="text-white/70 text-xs mb-1">Nimewo {p.method}</div>
-                  <div className="text-white font-black text-2xl tracking-widest">{p.number}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div className="text-white font-black text-2xl tracking-widest" style={{ letterSpacing: isRevealed ? "0.1em" : "0.15em" }}>
+                      {isRevealed ? p.number : maskNumber(p.number)}
+                    </div>
+                    <button
+                      onClick={() => setRevealed(prev => ({ ...prev, [p.method]: !isRevealed }))}
+                      style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 8, padding: "6px 8px", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600 }}>
+                      {isRevealed ? <EyeOffIcon /> : <EyeIcon />}
+                      {isRevealed ? "Kache" : "Montre"}
+                    </button>
+                  </div>
                 </div>
-                <button onClick={() => copy(p.number, p.method)}
+
+                {/* Bouton copier — disponible seulement si révélé */}
+                <button
+                  onClick={() => isRevealed && copy(p.number, p.method)}
                   className="w-full py-3.5 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all"
-                  style={{ 
-                    background: copied === p.method ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.2)", 
+                  style={{
+                    background: copied === p.method ? "rgba(34,197,94,0.3)" : isRevealed ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)",
                     border: "1px solid rgba(255,255,255,0.3)",
-                    backdropFilter: "blur(8px)"
+                    backdropFilter: "blur(8px)",
+                    opacity: isRevealed ? 1 : 0.5,
+                    cursor: isRevealed ? "pointer" : "not-allowed",
                   }}>
                   {copied === p.method ? (
                     <><CheckIcon /> Kopye !</>
                   ) : (
-                    <><CopyIcon /> Kopye Nimewo a</>                  )}
+                    <><CopyIcon /> {isRevealed ? "Kopye Nimewo a" : "Montre nimewo pou kopye"}</>
+                  )}
                 </button>
+
                 <p className="text-white/60 text-xs text-center mt-3 flex items-center justify-center gap-1">
                   <LightningIcon /> Aktivasyon garanti an mwens 30 minit
                 </p>
@@ -106,7 +152,8 @@ export function PaymentScreen({ onBack }) {
             </div>
           );
         })}
-        <button onClick={() => window.open("https://wa.me/50940669098?text=Bonjou%2C%20mwen%20vle%20aktive%20Gid%20NS4.", "_blank")}
+
+        <button onClick={() => window.open("https://wa.me/50900000000?text=Bonjou%2C%20mwen%20vle%20aktive%20Gid%20NS4.", "_blank")}
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg,#25d366,#128c7e)", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}>
           <WhatsAppIcon /> Konfime Pèman sou WhatsApp
