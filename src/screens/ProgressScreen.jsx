@@ -269,12 +269,6 @@ export function ProgressScreen({ user, onNavigate }) {
     return { subjectStats: sorted, avg, top3, weak3, bestStreak, untried, totalExo, total: subjectStats.length, max: ALL_SUBJECTS.length, badgeList };
   }, [grades, exoData]);
 
-const handleShareProgress = () => {
-  if (!stats) return;
-  const text = `Gid NS4 — Pwogresyon mwen\nMwayèn: ${stats.avg}/20 · ${stats.total} matyè\nStreak max: ${stats.bestStreak} · ${stats.totalExo} egzèsis\nTelechaje Gid NS4 !`;
-  if (navigator?.share) { navigator.share({ title:"Pwogresyon Gid NS4", text }).catch(()=>{}); return; }
-  navigator.clipboard?.writeText(text).then(()=>alert("Rezilta kopye !"));
-};
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"linear-gradient(145deg,#04081A,#080E24)" }}>
