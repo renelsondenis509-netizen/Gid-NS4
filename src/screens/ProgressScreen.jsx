@@ -128,9 +128,15 @@ function EvalModal({ grades, exoData, scanData, allSubjects, onClose }) {
       <div onClick={e => e.stopPropagation()} style={{ width:"100%", maxHeight:"85vh", overflowY:"auto", background:"#080e24", borderRadius:"22px 22px 0 0", border:"1px solid rgba(139,92,246,0.3)", padding:"20px 16px 36px" }}>
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-          <span style={{ color:"#e2e8ff", fontWeight:800, fontSize:16, display:"flex", alignItems:"center", gap:8 }}><IcoEval/> Evalyasyon Semènn nan</span>
+          <span style={{ color:"#e2e8ff", fontWeight:800, fontSize:16, display:"flex", alignItems:"center", gap:8 }}><IcoEval/> Evalyasyon Semèn lan</span>
           <button onClick={onClose} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, width:30, height:30, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#93c5fd" }}><IcoClose/></button>
         </div>
+{stats && (
+  <button onClick={handleShareProgress}
+    style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 12px", borderRadius:12, background:"linear-gradient(135deg,#059669,#10b981)", border:"1px solid rgba(16,185,129,0.4)", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+    📤
+  </button>
+)}
 
         {/* Score global */}
         <div style={{ background: result.verdictBg, border:`1px solid ${result.verdictColor}33`, borderRadius:16, padding:"16px", marginBottom:14, textAlign:"center" }}>
@@ -255,6 +261,13 @@ export function ProgressScreen({ user, onNavigate }) {
 
     return { subjectStats: sorted, avg, top3, weak3, bestStreak, untried, totalExo, total: subjectStats.length, max: ALL_SUBJECTS.length, badgeList };
   }, [grades, exoData]);
+
+const handleShareProgress = () => {
+  if (!stats) return;
+  const text = `Gid NS4 — Pwogresyon mwen\nMwayèn: ${stats.avg}/20 · ${stats.total} matyè\nStreak max: ${stats.bestStreak} · ${stats.totalExo} egzèsis\nTelechaje Gid NS4 !`;
+  if (navigator?.share) { navigator.share({ title:"Pwogresyon Gid NS4", text }).catch(()=>{}); return; }
+  navigator.clipboard?.writeText(text).then(()=>alert("Rezilta kopye !"));
+};
 
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"linear-gradient(145deg,#04081A,#080E24)" }}>
