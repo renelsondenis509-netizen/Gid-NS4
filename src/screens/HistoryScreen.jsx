@@ -272,42 +272,29 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     .trim();
 
   const handleSpeak = async (text, id) => {
-  if (speakingId === id) {
+    if (speakingId === id) {
+      await TextToSpeech.stop().catch(()=>{});
+      setSpeakingId(null);
+      return;
+    }
     await TextToSpeech.stop().catch(()=>{});
+    setSpeakingId(id);
+    const cleaned = cleanForTTS(text);
+    const sentences = cleaned.split(/(?<=[.!?;])\s+/);
+    const chunks = [];
+    let cur = "";
+    for (const s of sentences) {
+      if ((cur + " " + s).length > 200) { if (cur) chunks.push(cur.trim()); cur = s; }
+      else { cur = cur ? cur + " " + s : s; }
+    }
+    if (cur) chunks.push(cur.trim());
+    try {
+      for (const chunk of chunks.slice(0, 15)) {
+        await TextToSpeech.speak({ text: chunk, lang: "fr-FR", rate: 0.85, pitch: 1.05, volume: 1.0 });
+      }
+    } catch {}
     setSpeakingId(null);
-    return;
-  }
-  await TextToSpeech.stop().catch(()=>{});
-  setSpeakingId(id);
-
-  const cleaned = cleanForTTS(text);
-  // Découper en phrases de max 200 chars pour éviter les coupures Android
-  const chunks = [];
-  const sentences = cleaned.split(/(?<=[.!?;])\s+/);
-  let current = "";
-  for (const s of sentences) {
-    if ((current + " " + s).length > 200) {
-      if (current) chunks.push(current.trim());
-      current = s;
-    } else {
-      current = current ? current + " " + s : s;
-    }
-  }
-  if (current) chunks.push(current.trim());
-
-  try {
-    for (const chunk of chunks.slice(0, 15)) { // max 15 chunks
-      await TextToSpeech.speak({
-        text: chunk,
-        lang: "fr-FR",
-        rate: 0.85,   // légèrement plus lent = plus naturel
-        pitch: 1.05,  // pitch légèrement au-dessus = plus humain
-        volume: 1.0,
-      });
-    }
-  } catch {}
-  setSpeakingId(null);
-};
+  };
 
   const handleDeleteScan = async (entry) => {
     setDeleting(entry.id);
@@ -552,34 +539,34 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                   </button>
                 </div>
 
-: (() => {
-    // Grouper par matière
-    const groups = {};
-    history.forEach(h => {
-      const sub = h.subject || h.matiere || h.subjectName || "Jeneral";
-      if (!groups[sub]) groups[sub] = [];
-      groups[sub].push(h);
-    });
-    return <>
-      {Object.entries(groups).map(([sub, items]) => (
-        <div key={sub}>
-          <p style={{ color:"#60a5fa", fontSize:12, fontWeight:700, textTransform:"uppercase",
-            letterSpacing:"0.08em", marginBottom:8, marginTop:4,
-            display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ width:8, height:8, borderRadius:"50%", background:"#60a5fa", display:"inline-block" }}/>
-            {sub} ({items.length})
-          </p>
-          {items.map(h => (
-            <HistoryCard key={h.id} h={h}
-              onSelect={setSelected} onSpeak={handleSpeak}
-              onDelete={handleDeleteScan} speakingId={speakingId} deleting={deleting}/>
-          ))}
-        </div>
-      ))}
-      <div style={{ height: 16 }}/>
-    </>;
-
-  })()
+              : <>
+                  <p style={{ color: "#475569", fontSize: 12, fontWeight: 700,
+                    textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    Tout rekèt yo
+                  </p>
+                  {(() => {
+                    const groups = {};
+                    history.forEach(h => {
+                      const sub = h.subject || h.matiere || h.subjectName || "Jeneral";
+                      if (!groups[sub]) groups[sub] = [];
+                      groups[sub].push(h);
+                    });
+                    return Object.entries(groups).map(([sub, items]) => (
+                      <div key={sub}>
+                        <p style={{ color:"#60a5fa", fontSize:12, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8, marginTop:8, display:"flex", alignItems:"center", gap:6 }}>
+                          <span style={{ width:7, height:7, borderRadius:"50%", background:"#60a5fa", display:"inline-block", flexShrink:0 }}/>
+                          {sub} ({items.length})
+                        </p>
+                        {items.map(h => (
+                          <HistoryCard key={h.id} h={h}
+                            onSelect={setSelected} onSpeak={handleSpeak}
+                            onDelete={handleDeleteScan} speakingId={speakingId} deleting={deleting}/>
+                        ))}
+                      </div>
+                    ));
+                  })()}
+                  <div style={{ height: 16 }}/>
+                <>
             }
           </>
         )}
@@ -599,32 +586,33 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                   </p>
                 </div>
 
-: (() => {
-    const groups = {};
-    exercices.forEach(exo => {
-      const sub = exo.subject || exo.matiere || "Jeneral";
-      if (!groups[sub]) groups[sub] = [];
-      groups[sub].push(exo);
-    });
-    return <>
-      {Object.entries(groups).map(([sub, items]) => (
-        <div key={sub}>
-          <p style={{ color:"#34d399", fontSize:12, fontWeight:700, textTransform:"uppercase",
-            letterSpacing:"0.08em", marginBottom:8, marginTop:4,
-            display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ width:8, height:8, borderRadius:"50%", background:"#34d399", display:"inline-block" }}/>
-            {sub} ({items.length})
-          </p>
-          {items.map(exo => (
-            <ExerciceCard key={exo.id} exo={exo}
-              onRedo={onStartExercice} onDelete={handleDeleteExercice} deleting={deleting}/>
-          ))}
-        </div>
-      ))}
-      <div style={{ height: 16 }}/>
-    </>;
-
-  })()
+              : <>
+                  <p style={{ color: "#475569", fontSize: 12, fontWeight: 700,
+                    textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    Egzèsis sove yo
+                  </p>
+                  {(() => {
+                    const groups = {};
+                    exercices.forEach(exo => {
+                      const sub = exo.subject || exo.matiere || "Jeneral";
+                      if (!groups[sub]) groups[sub] = [];
+                      groups[sub].push(exo);
+                    });
+                    return Object.entries(groups).map(([sub, items]) => (
+                      <div key={sub}>
+                        <p style={{ color:"#34d399", fontSize:12, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8, marginTop:8, display:"flex", alignItems:"center", gap:6 }}>
+                          <span style={{ width:7, height:7, borderRadius:"50%", background:"#34d399", display:"inline-block", flexShrink:0 }}/>
+                          {sub} ({items.length})
+                        </p>
+                        {items.map(exo => (
+                          <ExerciceCard key={exo.id} exo={exo}
+                            onRedo={onStartExercice} onDelete={handleDeleteExercice} deleting={deleting}/>
+                        ))}
+                      </div>
+                    ));
+                  })()}
+                  <div style={{ height: 16 }}/>
+                </>
             }
           </>
         )}

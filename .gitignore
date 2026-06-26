@@ -12,3 +12,4 @@ dist/
 gid-ns4-release.keystore
 gid-ns4-release.keystore.b64
 *.keystore
+node\nnpm\napply_patches.py\noffline_patch.py\nshare_patch.py\n***@1.0.0

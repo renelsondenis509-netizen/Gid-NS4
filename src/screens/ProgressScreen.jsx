@@ -225,6 +225,13 @@ export function ProgressScreen({ user, onNavigate }) {
   const [scanData, setScanData] = useState([]);
   const [showEval, setShowEval] = useState(false);
 
+  const handleShareProgress = () => {
+    if (!stats) return;
+    const text = `Gid NS4 — Pwogresyon mwen\nMwayèn: ${stats.avg}/20 · ${stats.total} matye\nStreak max: ${stats.bestStreak} · ${stats.totalExo} egzèsis\nTelechaje Gid NS4 !`;
+    if (navigator?.share) { navigator.share({ title: "Pwogresyon Gid NS4", text }).catch(() => {}); return; }
+    navigator.clipboard?.writeText(text).then(() => alert("Rezilta kopye !"));
+  };
+
   useEffect(() => {
     idbGetExercice(user.phone).then(setExoData).catch(() => {});
     idbGetScans(user.phone).then(setScanData).catch(() => {});
@@ -282,6 +289,7 @@ const handleShareProgress = () => {
             <p style={{ color:"#4B6ABA", fontSize:11, margin:0 }}>{user.name || user.phone}</p>
           </div>
           <button onClick={() => setShowEval(true)} style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 14px", borderRadius:12, background:"linear-gradient(135deg,#4c1d95,#7c3aed)", border:"1px solid rgba(139,92,246,0.4)", color:"#e9d5ff", fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.3)" }}><IcoEval/> Evalyasyon</button>
+          {stats && <button onClick={handleShareProgress} style={{ display:"flex", alignItems:"center", padding:"8px 10px", borderRadius:12, background:"linear-gradient(135deg,#059669,#10b981)", border:"1px solid rgba(16,185,129,0.4)", color:"#fff", fontSize:16, cursor:"pointer" }}>📤</button>}
         </div>
       </div>
 

@@ -251,28 +251,22 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
   };
 
   const speak = async (text) => {
-  const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").trim();
-  try { await TextToSpeech.stop(); } catch {}
-
-  const sentences = cleaned.split(/(?<=[.!?;])\s+/);
-  const chunks = [];
-  let current = "";
-  for (const s of sentences) {
-    if ((current + " " + s).length > 200) {
-      if (current) chunks.push(current.trim());
-      current = s;
-    } else {
-      current = current ? current + " " + s : s;
+    const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").replace(/\n{2,}/g,". ").replace(/\n/g,", ").trim();
+    try { await TextToSpeech.stop(); } catch {}
+    const sentences = cleaned.split(/(?<=[.!?;])\s+/);
+    const chunks = [];
+    let cur = "";
+    for (const s of sentences) {
+      if ((cur + " " + s).length > 200) { if (cur) chunks.push(cur.trim()); cur = s; }
+      else { cur = cur ? cur + " " + s : s; }
     }
-  }
-  if (current) chunks.push(current.trim());
-
-  try {
-    for (const chunk of chunks.slice(0, 15)) {
-      await TextToSpeech.speak({ text: chunk, lang: "fr-FR", rate: 0.85, pitch: 1.05, volume: 1.0 });
-    }
-  } catch(e) { console.warn("TTS:", e); }
-};
+    if (cur) chunks.push(cur.trim());
+    try {
+      for (const chunk of chunks.slice(0, 15)) {
+        await TextToSpeech.speak({ text: chunk, lang: "fr-FR", rate: 0.85, pitch: 1.05, volume: 1.0 });
+      }
+    } catch(e) { console.warn("TTS:", e); }
+  };
 
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;
 
@@ -316,7 +310,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         </div>
 
         {/* Compteur circulaire */}
-<button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#60a5fa", flexShrink:0, opacity:1 }}>
+<button onClick={openAnnouncements} style={{ position:"relative", width:38, height:38, borderRadius:12, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#22c55e", flexShrink:0, opacity:1 }}>
   <EnvelopeIcon />
   {unreadCount > 0 && <span style={{ position:"absolute", top:-5, right:-5, minWidth:18, height:18, borderRadius:"50%", background:"#ef4444", boxShadow:"0 0 6px #ef4444", color:"#fff", fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px" }}>{unreadCount}</span>}
 </button>
@@ -337,7 +331,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
               {allDone ? <span style={{color:"#374151"}}><CheckIcon/></span> : <><span style={{fontSize:13,fontWeight:900,color:"#22c55e",lineHeight:1}}>{scansUsed}</span><span style={{fontSize:13,fontWeight:900,color:"#16a34a",lineHeight:1}}>/{DAILY_MAX}</span></>}
             </span>
           </div>
-          <span style={{ fontSize:10, color:"#22c55c", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
+          <span style={{ fontSize:10, color:"#22c55e", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
         </div>
       </div>
 
@@ -381,7 +375,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
                   <button onClick={()=>toggleFav(msg,i)} style={{ width:28, height:28, borderRadius:8, background:"none", border:"none", cursor:"pointer", color:"#fbbf24", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     {favorites.findIndex(f=>f.id===`${msg.subject||"gen"}_${(msg.content||"").slice(0,32).replace(/\s/g,"_")}`)>=0 ? <StarFullIcon/> : <StarOutlineIcon/>}
                   </button>
-                  <button onClick={()=>speak(msg.content)} style={{ width:28, height:28, borderRadius:8, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.2)", cursor:"pointer", color:"#22c55e", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
+                  <button onClick={()=>speak(msg.content)} style={{ width:28, height:28, borderRadius:8, background:"rgba(37,99,235,0.1)", border:"1px solid rgba(37,99,235,0.2)", cursor:"pointer", color:"#60a5fa", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     <SpeakIcon/>
                   </button>
                   <button onClick={()=>copyText(msg.content, i)} style={{ width:28, height:28, borderRadius:8, background:copiedId===i?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.05)", border:copiedId===i?"1px solid rgba(34,197,94,0.4)":"1px solid rgba(255,255,255,0.1)", cursor:"pointer", color:copiedId===i?"#4ade80":"#6b7280", display:"inline-flex", alignItems:"center", justifyContent:"center", transition:"all .2s" }}>
