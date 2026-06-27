@@ -156,6 +156,7 @@ const HistoryCard = ({ h, onSelect, onSpeak, onDelete, speakingId, deleting }) =
               fontSize: 14, color: "#93c5fd", lineHeight: 1.5,
               overflow: "hidden", maxHeight: "3em",
             }}>
+              {h.query && <p style={{ fontSize: 12, color: "#4b6cb7", lineHeight: 1.4, marginBottom: 4, fontStyle: "italic", overflow: "hidden", maxHeight: "1.8em" }}>❓ {h.query.slice(0, 90)}{h.query.length > 90 ? "…" : ""}</p>}
               {h.response?.slice(0, 110)}…
             </p>
           </div>
@@ -376,6 +377,15 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                 <span style={{ color: "#3b82f6", fontSize: 14 }}>Kesyon tèks sèlman. Pa gen imaj.</span>
               </div>
           }
+
+          {/* Question */}
+          {selected.query && (
+            <div style={{ borderRadius: 14, padding: "10px 14px", marginBottom: 0,
+              background: "rgba(37,99,235,0.07)", border: "1px solid rgba(37,99,235,0.18)" }}>
+              <p style={{ fontSize: 12, color: "#60a5fa", fontWeight: 600, marginBottom: 2 }}>❓ Kesyon ou</p>
+              <p style={{ fontSize: 14, color: "#93c5fd", lineHeight: 1.55 }}>{selected.query}</p>
+            </div>
+          )}
 
           {/* Response card */}
           <div style={{ borderRadius: 18, padding: 16,

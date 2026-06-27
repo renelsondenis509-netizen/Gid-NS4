@@ -54,8 +54,9 @@ const ScrollDownIcon= () => (<svg width="16" height="16" viewBox="0 0 24 24" fil
 const EnvelopeIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>);
 const CopyIcon      = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>);
 
-export function ChatScreen({ user, onNavigate }) {
-  const offline = useOffline();
+export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
+  const offlineLocal = useOffline();
+  const offline = isOfflineProp ?? offlineLocal;
 
   const [messages,      setMessages]      = useState([{ role:"assistant", content:`Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**.\n\n**Ann al travay !**` }]);
   const [input,         setInput]         = useState("");
@@ -221,6 +222,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         date:     new Date().toLocaleString("fr-HT", { timeZone:"America/Port-au-Prince" }),
         scanDate: new Date().toISOString().split("T")[0],
         subject, image:payload.userMsg.image||null, response:result.reply,
+        query: payload.userMsg.content||payload.currentInput||"",
         dailyLimit:DAILY_MAX, scansUsed:next,
       });
     } catch(e) {
