@@ -147,12 +147,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
                 }}>✦ Freemium</span>
               )}
             </div>
-            <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:5, flexWrap:"wrap" }}>
-              <span style={{ fontSize:11, color: user.daysRemaining <= 7 ? "#ff8080" : "#6ee7b7", fontWeight:600 }}>
-                {user.daysRemaining <= 7 ? "⚠️" : "✅"} {user.daysRemaining}j • {user.dailyTextScans ?? user.dailyScans} rekèt/jou
-              </span>
-              <span style={{ fontSize:11, color:"#60a5fa" }}>· {(user.subjects?.length ?? 0)} matyè</span>
-            </div>
+
             <div style={{ color:"#3B5BA8", fontSize:10, marginTop:2 }}>{user.school}</div>
           </div>
         </div>
@@ -169,9 +164,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
               {user.daysRemaining} jou ki rete • {user.dailyTextScans ?? user.dailyScans} rekèt/jou
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-xs text-blue-400">{(user.subjects?.length ?? 0)} matière{(user.subjects?.length ?? 0) > 1 ? "s" : ""}</div>
-          </div>
+
         </div>
       </div>
 

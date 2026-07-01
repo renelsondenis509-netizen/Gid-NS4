@@ -111,42 +111,8 @@ export function PaymentScreen({ onBack }) {
                   </div>
                 </div>
 
-                {/* Numéro masqué par défaut */}
-                <div className="bg-white/15 rounded-2xl px-4 py-3 mb-3">
-                  <div className="text-white/70 text-xs mb-1">Nimewo {p.method}</div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div className="text-white font-black text-2xl tracking-widest" style={{ letterSpacing: isRevealed ? "0.1em" : "0.15em" }}>
-                      {isRevealed ? p.number : maskNumber(p.number)}
-                    </div>
-                    <button
-                      onClick={() => setRevealed(prev => ({ ...prev, [p.method]: !isRevealed }))}
-                      style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 8, padding: "6px 8px", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600 }}>
-                      {isRevealed ? <EyeOffIcon /> : <EyeIcon />}
-                      {isRevealed ? "Kache" : "Montre"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Bouton copier — disponible seulement si révélé */}
-                <button
-                  onClick={() => isRevealed && copy(p.number, p.method)}
-                  className="w-full py-3.5 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all"
-                  style={{
-                    background: copied === p.method ? "rgba(34,197,94,0.3)" : isRevealed ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)",
-                    border: "1px solid rgba(255,255,255,0.3)",
-                    backdropFilter: "blur(8px)",
-                    opacity: isRevealed ? 1 : 0.5,
-                    cursor: isRevealed ? "pointer" : "not-allowed",
-                  }}>
-                  {copied === p.method ? (
-                    <><CheckIcon /> Kopye !</>
-                  ) : (
-                    <><CopyIcon /> {isRevealed ? "Kopye Nimewo a" : "Montre nimewo pou kopye"}</>
-                  )}
-                </button>
-
-                <p className="text-white/60 text-xs text-center mt-3 flex items-center justify-center gap-1">
-                  <LightningIcon /> Aktivasyon garanti an mwens 30 minit
+                <p className="text-white/80 text-sm text-center mt-2">
+                  Kontakte nou sou WhatsApp pou abònman.
                 </p>
               </div>
             </div>
@@ -156,7 +122,7 @@ export function PaymentScreen({ onBack }) {
         <button onClick={() => window.open("https://wa.me/50940669098?text=Bonjou%2C%20mwen%20vle%20aktive%20Gid%20NS4.", "_blank")}
           className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg,#25d366,#128c7e)", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}>
-          <WhatsAppIcon /> Konfime Pèman sou WhatsApp
+          <WhatsAppIcon /> Kontakte nou pou abònman
         </button>
       </div>
     </div>

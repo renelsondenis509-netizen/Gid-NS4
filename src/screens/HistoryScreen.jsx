@@ -1,3 +1,4 @@
+import { cleanForTTS } from "../utils/ttsClean";
 import { useState, useEffect } from "react";
 import { PROF_LAKAY_PHOTO } from "../config";
 import { idbGetScans, idbDeleteScan, idbGetExercice, idbDeleteExercice } from "../utils/idb";
@@ -261,16 +262,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   useEffect(() => () => { TextToSpeech.stop().catch(()=>{}); }, []);
   if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
-  const cleanForTTS = (text) => (text || "")
-    .replace(/\*\*(.*?)\*\*/g, "$1")
-    .replace(/\*(.*?)\*/g, "$1")
-    .replace(/_{1,2}(.*?)_{1,2}/g, "$1")
-    .replace(/#{1,6}\s*/g, "")
-    .replace(/`{1,3}[^`]*`{1,3}/g, "")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/\n{2,}/g, ". ")
-    .replace(/\n/g, ", ")
-    .trim();
+
 
   const handleSpeak = async (text, id) => {
     if (speakingId === id) {

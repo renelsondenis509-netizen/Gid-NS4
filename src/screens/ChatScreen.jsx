@@ -1,3 +1,4 @@
+import { cleanForTTS } from "../utils/ttsClean";
 import { useState, useRef, useEffect } from "react";
 import { APP_LOGO, PROF_LAKAY_PHOTO } from "../config";
 import { callEdge, parseApiError } from "../api";
@@ -253,7 +254,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
   };
 
   const speak = async (text) => {
-    const cleaned = text.replace(/\*\*(.*?)\*\*/g,"$1").replace(/[#*_~`]/g,"").replace(/\$[^$]*\$/g,"formule").replace(/\n{2,}/g,". ").replace(/\n/g,", ").trim();
+    const cleaned = cleanForTTS(text);
     try { await TextToSpeech.stop(); } catch {}
     const sentences = cleaned.split(/(?<=[.!?;])\s+/);
     const chunks = [];
