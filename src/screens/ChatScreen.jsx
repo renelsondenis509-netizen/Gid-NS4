@@ -254,20 +254,10 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
   };
 
   const speak = async (text) => {
-    const cleaned = cleanForTTS(text);
+    const cleaned = cleanForTTS(text).slice(0, 3000);
     try { await TextToSpeech.stop(); } catch {}
-    const sentences = cleaned.split(/(?<=[.!?;])\s+/);
-    const chunks = [];
-    let cur = "";
-    for (const s of sentences) {
-      if ((cur + " " + s).length > 200) { if (cur) chunks.push(cur.trim()); cur = s; }
-      else { cur = cur ? cur + " " + s : s; }
-    }
-    if (cur) chunks.push(cur.trim());
     try {
-      for (const chunk of chunks.slice(0, 15)) {
-        await TextToSpeech.speak({ text: chunk, lang: "fr-FR", rate: 0.85, pitch: 1.05, volume: 1.0 });
-      }
+      await TextToSpeech.speak({ text: cleaned, lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
     } catch(e) { console.warn("TTS:", e); }
   };
 
