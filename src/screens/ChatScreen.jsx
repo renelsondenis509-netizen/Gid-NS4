@@ -257,7 +257,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
     const cleaned = cleanForTTS(text).slice(0, 3000);
     try { await TextToSpeech.stop(); } catch {}
     try {
-      await TextToSpeech.speak({ text: cleaned, lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0 });
+      await TextToSpeech.speak({ text: cleaned, lang: "fr-FR", rate: 0.9, pitch: 1.0, volume: 1.0, queueStrategy: 1 });
     } catch(e) { console.warn("TTS:", e); }
   };
 
