@@ -153,7 +153,7 @@ useEffect(() => {
   if (Date.now() - annTs < 10 * 60 * 1000) return;
   localStorage.setItem(annKey, String(Date.now()));
   callEdge({ action: "get_announcements", schoolCode: user.code })
-    .then(res => {
+    .then(async res => {
       const list = (res.announcements ?? []).filter(a => !a.expires_at || new Date(a.expires_at) > new Date());
 const dismissed = JSON.parse(localStorage.getItem(`annonce_dismissed_${user.phone}`) || "[]");
 const visible = list.filter(a => !dismissed.includes(String(a.id)));
