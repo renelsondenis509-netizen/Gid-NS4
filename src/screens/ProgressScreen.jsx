@@ -118,7 +118,7 @@ function EvalModal({ grades, exoData, scanData, allSubjects, onClose }) {
     <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:60, background:"rgba(0,0,0,0.7)", display:"flex", alignItems:"flex-end" }}>
       <div onClick={e => e.stopPropagation()} style={{ width:"100%", background:"#080e24", borderRadius:"20px 20px 0 0", border:"1px solid rgba(139,92,246,0.3)", padding:"24px 20px 40px" }}>
         <p style={{ color:"#4B6ABA", textAlign:"center" }}>Pako gen done pou evalye. Fè kèk quiz anvan !</p>
-        <button onClick={onClose} style={{ display:"block", margin:"16px auto 0", padding:"10px 28px", borderRadius:12, background:"#2563eb", color:"#fff", border:"none", cursor:"pointer", fontWeight:700 }}>Ferme</button>
+        <button onClick={onClose} style={{ display:"block", margin:"16px auto 0", padding:"10px 28px", borderRadius:12, background:"#2563eb", color:"#fff", border:"none", cursor:"pointer", fontWeight:700 }}>Fèmen</button>
       </div>
     </div>
   );
@@ -286,7 +286,7 @@ export function ProgressScreen({ user, onNavigate }) {
           <div style={{ textAlign:"center", marginTop:80 }}>
             <div style={{ display:"flex", justifyContent:"center", marginBottom:16 }}><IcoBook/></div>
             <p style={{ color:"#4B6ABA", fontSize:14, fontWeight:600 }}>Poko gen done</p>
-            <p style={{ color:"#2d4080", fontSize:12 }}>Fè premye quiz ou a pou wè pwogresyon ou yo.</p>
+            <p style={{ color:"#2d4080", fontSize:12 }}>Fè premye quiz, egzèsis ou a pou wè pwogresyon ou yo.</p>
             <button onClick={() => onNavigate("quiz")} style={{ marginTop:20, padding:"12px 28px", borderRadius:14, background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"#fff", fontWeight:800, fontSize:14, border:"none", cursor:"pointer" }}>
               Kòmanse yon Quiz
             </button>
