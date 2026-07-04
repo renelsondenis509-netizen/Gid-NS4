@@ -43,7 +43,7 @@ const supabase = createClient(
 );
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
-function withTimeout<T>(promise: Promise<T>, ms = 20000): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms = 35000): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error("Timeout")), ms)
   );
@@ -126,7 +126,7 @@ async function callSambaNova(systemPrompt: string, userContent: unknown[]): Prom
       "Authorization": `Bearer ${SAMBANOVA_KEY}`,
     },
     body: JSON.stringify({
-      model: "gemma-4-31B-it",
+      model: "Meta-Llama-3.3-70B-Instruct",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
