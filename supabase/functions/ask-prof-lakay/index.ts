@@ -149,7 +149,7 @@ async function callGroq(systemPrompt: string, userText: string): Promise<string>
       "Authorization": `Bearer ${Math.random() < 0.5 ? GROQ_KEY : (Deno.env.get("GROQ_KEY_2") || GROQ_KEY)}`,
     },
     body: JSON.stringify({
-      model: "qwen-qwq-32b",
+      model: "gpt-oss-120b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userText },
