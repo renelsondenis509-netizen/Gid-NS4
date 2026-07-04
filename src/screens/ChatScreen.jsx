@@ -9,6 +9,7 @@ import { LatexText } from "../components/LatexText";
 import { ErrorToast, ExpiryBanner } from "../components/UI";
 import { BottomNav } from "../components/UI";
 import { TextToSpeech } from "@capacitor-community/text-to-speech";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
 // ─── Couleurs par matière ─────────────────────────────────────
 const SUBJECT_COLORS = {
@@ -134,7 +135,19 @@ useEffect(() => {
       setAnnouncements(visible);
       const lastSeen = localStorage.getItem(`annonce_seen_${user.phone}`) ?? "";
       const unread = lastSeen ? visible.filter(a => new Date(a.created_at) > new Date(lastSeen)).length : visible.length;
-      if (unread > 0) setUnreadCount(unread);
+      if (unread > 0) {
+  setUnreadCount(unread);
+  try {
+    const ann = visible.filter(a => !lastSeen || new Date(a.created_at) > new Date(lastSeen));
+    await LocalNotifications.schedule({ notifications: [{
+      id: 9001,
+      title: "📢 Nouvo mesaj — Gid NS4",
+      body: ann[0]?.message?.slice(0, 100) ?? `${unread} nouvo mesaj`,
+      channelId: "gidns4_default",
+      schedule: { at: new Date(Date.now() + 500) },
+    }]});
+  } catch {}
+}
     } catch {}
   }
   if (Date.now() - annTs < 10 * 60 * 1000) return;
@@ -473,13 +486,8 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         )}
 
         <div style={{ display:"flex", gap:8, alignItems:"flex-end" }}>
-          <button
-            onClick={()=>{ if(!allDone&&!offline) fileRef.current?.click(); }}
-            disabled={allDone||offline}
-            style={{ width:46, height:46, borderRadius:14, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background:(allDone||offline)?"rgba(255,255,255,0.04)":"linear-gradient(135deg,#1d4ed8,#2563eb)", border:"none", cursor:(allDone||offline)?"not-allowed":"pointer", color:"#fff", boxShadow:(allDone||offline)?"none":"0 4px 14px rgba(37,99,235,0.35)" }}>
-            <CameraIcon/>
-          </button>
           <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} style={{ position:"absolute", width:0, height:0, opacity:0, pointerEvents:"none" }} />
+          <div style={{ position:"relative", flex:1 }}>
           <textarea
             value={input}
             onChange={e=>setInput(e.target.value)}
@@ -487,10 +495,17 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
             placeholder={offline?"Hors-ligne...":allDone?"Limit ou a rive...":activeSubject?`Poze yon kesyon sou ${activeSubject}...`:"Chwazi yon matyè anvan..."}
             rows={1}
             disabled={allDone||offline}
-            style={{ flex:1, background:"rgba(255,255,255,0.04)", border:`1px solid ${activeColor?activeColor.active+"44":"rgba(255,255,255,0.1)"}`, borderRadius:14, padding:"12px 16px", color:"#e2e8ff", fontSize:14, outline:"none", resize:"none", maxHeight:80, fontFamily:"inherit", transition:"border-color .2s" }}
             onFocus={e=>e.target.style.borderColor=activeColor?activeColor.active+"99":"rgba(37,99,235,0.5)"}
             onBlur={e=>e.target.style.borderColor=activeColor?activeColor.active+"44":"rgba(255,255,255,0.1)"}
+            style={{ flex:1, background:"rgba(255,255,255,0.04)", border:`1px solid ${activeColor?activeColor.active+"44":"rgba(255,255,255,0.1)"}`, borderRadius:14, padding:"12px 48px 12px 16px", color:"#e2e8ff", fontSize:14, outline:"none", resize:"none", maxHeight:80, fontFamily:"inherit", transition:"border-color .2s" }}
           />
+          <button
+            onClick={()=>{ if(!allDone&&!offline) fileRef.current?.click(); }}
+            disabled={allDone||offline}
+            style={{ position:"absolute", right:10, bottom:10, background:"none", border:"none", cursor:(allDone||offline)?"not-allowed":"pointer", color:(allDone||offline)?"rgba(255,255,255,0.2)":"#4b6cb7", display:"flex", alignItems:"center", padding:4 }}>
+            <CameraIcon/>
+          </button>
+          </div>
           <button
             onClick={()=>sendMessage()}
             disabled={loading||allDone||offline||(user.subjects?.length>0&&!activeSubject)}
