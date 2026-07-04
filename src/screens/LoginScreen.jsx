@@ -112,7 +112,8 @@ const handleLogin = async () => {
             <div key={i} style={{ marginBottom:14 }}>
               <label style={{ display:"block", color:"#3b5ba8", fontSize:10, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase", marginBottom:7 }}>{label}</label>
               <input type={type} value={val} onChange={fn} placeholder={ph}
-                style={{ width:"100%", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:14, padding:"13px 16px", color:"#e2e8ff", fontSize:15, outline:"none", boxSizing:"border-box", transition:"border-color .2s, box-shadow .2s", ...extra }}
+                readOnly={!!extra.readOnly}
+                style={{ width:"100%", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:14, padding:"13px 16px", color:"#e2e8ff", fontSize:15, outline:"none", boxSizing:"border-box", transition:"border-color .2s, box-shadow .2s", ...(({readOnly,...rest})=>rest)(extra) }}
                 onFocus={e=>{ e.target.style.borderColor="rgba(37,99,235,0.5)"; e.target.style.boxShadow="0 0 0 3px rgba(37,99,235,0.1)"; }}
                 onBlur={e =>{ e.target.style.borderColor="rgba(255,255,255,0.08)"; e.target.style.boxShadow="none"; }} />
             </div>
