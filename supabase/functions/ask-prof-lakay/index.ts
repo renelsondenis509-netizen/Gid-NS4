@@ -126,7 +126,7 @@ async function callSambaNova(systemPrompt: string, userContent: unknown[]): Prom
       "Authorization": `Bearer ${SAMBANOVA_KEY}`,
     },
     body: JSON.stringify({
-      model: "gemma-4-31b-it",
+      model: "gemma-4-31B-it",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
