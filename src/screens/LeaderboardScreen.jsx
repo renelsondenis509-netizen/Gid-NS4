@@ -59,6 +59,21 @@ export function LeaderboardScreen({ user, onNavigate }) {
   const board = data ? data[tab] : [];
   const colors = ["#fbbf24","#94a3b8","#cd7c32","#3b82f6","#22c55e","#a855f7","#f97316","#14b8a6","#ec4899","#6366f1"];
 
+  if (user.isFreemium) return (
+    <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background:"#0a0f2e" }}>
+      <span style={{ fontSize: 48 }}>🏆</span>
+      <h2 style={{ color:"#fbbf24", fontWeight:800, fontSize:18, marginTop:12 }}>Klasman</h2>
+      <p style={{ color:"#4b6aaf", fontSize:13, textAlign:"center", marginTop:8, padding:"0 32px" }}>
+        Pran yon abònman pou wè klasman an ak pozisyon ou.
+      </p>
+      <button onClick={() => onNavigate("payment")}
+        style={{ marginTop:20, padding:"12px 28px", borderRadius:14, background:"linear-gradient(135deg,#d4002a,#ff6b35)", color:"white", fontWeight:700, fontSize:14 }}>
+        Wè plan yo
+      </button>
+      <BottomNav active="leaderboard" onNavigate={onNavigate}/>
+    </div>
+  );
+
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background:"#0a0f2e" }}>
       <div className="px-4 py-4 border-b" style={{ background:"rgba(10,15,46,0.98)", borderColor:"#ffffff10" }}>

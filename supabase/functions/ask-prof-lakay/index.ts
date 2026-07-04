@@ -712,7 +712,7 @@ async function getLeaderboard(
   // 2. Remplir les autres maps (totalCorrect, name, school)
   (allScores ?? []).forEach((row: any) => {
     totalCorrectMap[row.phone] = (totalCorrectMap[row.phone] ?? 0) + 5;
-    if (row.name) nameMap[row.phone] = row.name;
+    if (row.name) { const cur = nameMap[row.phone]; if (!cur || /^\d+$/.test(cur)) nameMap[row.phone] = row.name; }
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
 
