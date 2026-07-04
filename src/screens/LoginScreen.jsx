@@ -4,6 +4,8 @@ import { callEdge, parseApiError } from "../api";
 
 export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   const [name,  setName]  = useState("");
+  const savedNameForPhone = (p) => { try { return localStorage.getItem(`gid_name_${p.trim()}`) || ""; } catch { return ""; } };
+  const handlePhoneChange = (e) => { const p = e.target.value; setPhone(p); if (p.trim().length >= 8) { const n = savedNameForPhone(p); if (n) setName(n); } };
   const [phone, setPhone] = useState("");
   const [code,  setCode]  = useState("");
   const [error, setError] = useState("");
@@ -26,6 +28,7 @@ const handleLogin = async () => {
   const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
   try { localStorage.setItem(`gid_scan_${phone.trim()}_${_today}`, String(result.scansToday ?? 0)); } catch {}
 
+      localStorage.setItem(`gid_name_${phone.trim()}`, name.trim());
       onLogin({
           name:            name.trim(),
           phone:           phone.trim(),
@@ -55,6 +58,7 @@ const handleLogin = async () => {
       localStorage.setItem("gid_freemium_expires", result.freemiumExpiresAt ?? new Date(Date.now()+3*86400000).toISOString());
       const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
       try { localStorage.setItem(`gid_scan_${phone.trim()}_${_today}`, String(result.scansToday ?? 0)); } catch {}
+      localStorage.setItem(`gid_name_${phone.trim()}`, name.trim());
       onLogin({
         name: name.trim(), phone: phone.trim(),
         code: "FREEMIUM", school: "Freemium",
@@ -70,8 +74,8 @@ const handleLogin = async () => {
   };
 
   const fields = [
-    { label:"Non Konplè",     type:"text", val:name,  fn:e=>setName(e.target.value),               ph:"Marie Joseph",  extra:{} },
-    { label:"Nimewo Telefòn", type:"tel",  val:phone, fn:e=>setPhone(e.target.value),              ph:"50934567890",   extra:{} },
+    { label:"Non Konplè",     type:"text", val:name,  fn:e=>setName(e.target.value), ph:"Marie Joseph",  extra: savedNameForPhone(phone) ? { readOnly:true, opacity:0.7, cursor:"not-allowed" } : {} },
+    { label:"Nimewo Telefòn", type:"tel",  val:phone, fn:handlePhoneChange,              ph:"50934567890",   extra:{} },
     { label:"Kòd Etablisman", type:"text", val:code,  fn:e=>setCode(e.target.value.toUpperCase()), ph:"DNMM-0000",     extra:{ fontFamily:"monospace", letterSpacing:"0.14em", fontWeight:700 } },
   ];
 
