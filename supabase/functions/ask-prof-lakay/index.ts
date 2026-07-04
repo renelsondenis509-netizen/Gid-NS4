@@ -725,7 +725,7 @@ async function getLeaderboard(
   // ✅ FIX : Classement activité = total des requêtes AI (scans) par téléphone
   const activityMap: Record<string, number> = {};
   (allScansData ?? []).forEach((row: any) => {
-    activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 1;
+    activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 3;
     if (!schoolMap[row.phone] && row.school_code) {
       schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
     }
