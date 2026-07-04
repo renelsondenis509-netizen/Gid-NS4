@@ -711,7 +711,7 @@ async function getLeaderboard(
 
   // 2. Remplir les autres maps (totalCorrect, name, school)
   (allScores ?? []).forEach((row: any) => {
-    totalCorrectMap[row.phone] = (totalCorrectMap[row.phone] ?? 0) + 5;
+    totalCorrectMap[row.phone] = (totalCorrectMap[row.phone] ?? 0) + (row.score ?? 0);
     if (row.name) { const cur = nameMap[row.phone]; if (!cur || /^\d+$/.test(cur)) nameMap[row.phone] = row.name; }
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
@@ -719,7 +719,7 @@ async function getLeaderboard(
   // ── Classement semaine (quiz uniquement) ──
   const weekMap: Record<string, number> = {};
   (weekScoresData ?? []).forEach((row: any) => {
-    weekMap[row.phone] = (weekMap[row.phone] ?? 0) + 5;
+    weekMap[row.phone] = (weekMap[row.phone] ?? 0) + (row.score ?? 0);
   });
 
   // ✅ FIX : Classement activité = total des requêtes AI (scans) par téléphone
