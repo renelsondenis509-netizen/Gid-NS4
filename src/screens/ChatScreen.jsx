@@ -139,13 +139,13 @@ useEffect(() => {
   setUnreadCount(unread);
   try {
     const ann = visible.filter(a => !lastSeen || new Date(a.created_at) > new Date(lastSeen));
-    await LocalNotifications.schedule({ notifications: [{
+    LocalNotifications.schedule({ notifications: [{
       id: 9001,
       title: "📢 Nouvo mesaj — Gid NS4",
       body: ann[0]?.message?.slice(0, 100) ?? `${unread} nouvo mesaj`,
       channelId: "gidns4_default",
       schedule: { at: new Date(Date.now() + 500) },
-    }]});
+    }]}).catch(()=>{});
   } catch {}
 }
     } catch {}
