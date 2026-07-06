@@ -144,6 +144,7 @@ useEffect(() => {
       title: "📢 Nouvo mesaj — Gid NS4",
       body: ann[0]?.message?.slice(0, 100) ?? `${unread} nouvo mesaj`,
       channelId: "gidns4_default",
+      smallIcon: "ic_stat_notify",
       schedule: { at: new Date(Date.now() + 500) },
     }]}).catch(()=>{});
   } catch {}
@@ -492,7 +493,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
           <button
             onClick={()=>{ if(!allDone&&!offline) fileRef.current?.click(); }}
             disabled={allDone||offline}
-            style={{ flexShrink:0, background:"none", border:"none", cursor:(allDone||offline)?"not-allowed":"pointer", color:(allDone||offline)?"rgba(255,255,255,0.2)":"#4b6cb7", display:"flex", alignItems:"center", padding:"4px 2px", marginBottom:2 }}>
+            style={{ flexShrink:0, background:"none", border:"none", cursor:(allDone||offline)?"not-allowed":"pointer", color:(allDone||offline)?"rgba(255,255,255,0.2)":"#ffffff", display:"flex", alignItems:"center", padding:"4px 2px", marginBottom:2 }}>
             <CameraIcon/>
           </button>
           <textarea
