@@ -117,7 +117,7 @@ function EvalModal({ grades, exoData, scanData, allSubjects, onClose }) {
   if (!result) return (
     <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:60, background:"rgba(0,0,0,0.7)", display:"flex", alignItems:"flex-end" }}>
       <div onClick={e => e.stopPropagation()} style={{ width:"100%", background:"#080e24", borderRadius:"20px 20px 0 0", border:"1px solid rgba(139,92,246,0.3)", padding:"24px 20px 40px" }}>
-        <p style={{ color:"#4B6ABA", textAlign:"center" }}>Pako gen done pou evalye. Fè kèk quiz anvan !</p>
+        <p style={{ color:"#4B6ABA", textAlign:"center" }}>Poko gen done pou evalyasyon. Fè kèk quiz ak egzèsis anvan !</p>
         <button onClick={onClose} style={{ display:"block", margin:"16px auto 0", padding:"10px 28px", borderRadius:12, background:"#2563eb", color:"#fff", border:"none", cursor:"pointer", fontWeight:700 }}>Fèmen</button>
       </div>
     </div>
