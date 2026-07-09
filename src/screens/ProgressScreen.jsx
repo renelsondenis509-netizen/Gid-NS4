@@ -286,7 +286,7 @@ export function ProgressScreen({ user, onNavigate }) {
           <div style={{ textAlign:"center", marginTop:80 }}>
             <div style={{ display:"flex", justifyContent:"center", marginBottom:16 }}><IcoBook/></div>
             <p style={{ color:"#4B6ABA", fontSize:14, fontWeight:600 }}>Poko gen done</p>
-            <p style={{ color:"#2d4080", fontSize:12 }}>Fè premye quiz, egzèsis ou a pou wè pwogresyon ou yo.</p>
+            <p style={{ color:"#2d4080", fontSize:12 }}>Fè premye quiz ak egzèsis pou wè pwogresyon ou yo.</p>
             <button onClick={() => onNavigate("quiz")} style={{ marginTop:20, padding:"12px 28px", borderRadius:14, background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"#fff", fontWeight:800, fontSize:14, border:"none", cursor:"pointer" }}>
               Kòmanse
             </button>
