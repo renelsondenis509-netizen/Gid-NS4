@@ -588,7 +588,7 @@ async function processAsk(
   }
 
   const creoleWords = message.toLowerCase().split(/\s+/);
-  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini","mwenmenm","noumenm"];
+  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini","mwenmenm","noumenm","ye","yon","kap","tap","kote","konnen","men"];
   const creoleCount = creoleMarkers.filter(w => creoleWords.includes(w)).length;
   const detectedLang = creoleCount >= 2 ? "ht" : "fr";
   const langRule = detectedLang === "ht"
@@ -937,7 +937,9 @@ async function generateQuiz(_db: unknown, body: Record<string, string>) {
   const { content, subject } = body;
   if (!content) throw { status: 400, error: "Contenu manquant" };
 
-  const prompt = "Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti. " + "OBLIGATION ABSOLUE: génère EXACTEMENT 5 questions (ni plus, ni moins) basées UNIQUEMENT sur ce contenu de " + (subject || "cours") + ". " + "Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte. " + "N'invente rien qui ne soit pas dans le texte. " + "Alterne les types : QCM (4 choix), Vrè/Fo (2 choix), Trou (4 choix). " + 'RÉPONDS UNIQUEMENT avec un JSON valide sans backticks. Format: {"questions":[{"q":"...","choices":["A","B","C","D"],"answer":0,"note":"..."}]}' + "\n\nContenu:\n" + content.slice(0, 3000);
+  const isCreole = /[ò]|kisa|kijan|poukisa|\bmwen\b|\bnou\b|\byo\b/i.test(content.slice(0, 500));
+  const tfLabel = isCreole ? "Vrè/Fo" : "Vrai/Faux";
+  const prompt = "Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti. " + "OBLIGATION ABSOLUE: génère EXACTEMENT 5 questions (ni plus, ni moins) basées UNIQUEMENT sur ce contenu de " + (subject || "cours") + ". " + "Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte. " + "N'invente rien qui ne soit pas dans le texte. " + "Génère TOUJOURS questions ET choix dans la MÊME langue que le contenu source ci-dessous. " + `Alterne les types : QCM (4 choix), ${tfLabel} (2 choix), Trou (4 choix). ` + 'RÉPONDS UNIQUEMENT avec un JSON valide sans backticks. Format: {"questions":[{"q":"...","choices":["A","B","C","D"],"answer":0,"note":"..."}]}' + "\n\nContenu:\n" + content.slice(0, 3000);
 
   const systemPrompt = "Tu es un générateur d'exercices. Réponds UNIQUEMENT en JSON valide.";
   const fullPrompt = systemPrompt + "\n\nÉlève: " + prompt;

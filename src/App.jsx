@@ -48,14 +48,21 @@ export default function App() {
   const nav = (s) => setScreen(s);
 
 useEffect(() => {
+  let failCount = 0;
   const checkConn = async () => {
     try {
       const r = await fetch("https://thxtnnjubzucisrujloe.supabase.co/functions/v1/ask-prof-lakay",
-        { method: "HEAD", signal: AbortSignal.timeout(4000) });
-      setIsOffline(!r.ok && r.status !== 401);
-    } catch { setIsOffline(true); }
+        { method: "HEAD", signal: AbortSignal.timeout(8000) });
+      const ok = r.ok || r.status === 401;
+      failCount = ok ? 0 : failCount + 1;
+      if (ok) setIsOffline(false);
+      else if (failCount >= 2) setIsOffline(true);
+    } catch {
+      failCount += 1;
+      if (failCount >= 2) setIsOffline(true);
+    }
   };
-  const on  = () => { setIsOffline(false); };
+  const on  = () => { failCount = 0; setIsOffline(false); };
   const off = () => { setIsOffline(true); };
   window.addEventListener("online",  on);
   window.addEventListener("offline", off);
