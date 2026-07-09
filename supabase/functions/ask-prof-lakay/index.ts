@@ -31,6 +31,14 @@ function addStatistique(subjects: string[]): string[] {
   return subjects;
 }
 
+// Normalise un numéro haïtien : garde les 8 derniers chiffres, peu importe le
+// format reçu (+509, 509, espaces, tirets...). Garantit une identité stable
+// pour le classement/historique quel que soit l'appareil ou le format saisi.
+function normalizePhone(raw: string): string {
+  const digits = (raw ?? "").replace(/\D/g, "");
+  return digits.slice(-8);
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -1201,6 +1209,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+    if (typeof body.phone === "string") body.phone = normalizePhone(body.phone);
     let result: unknown;
 
     switch (body.action) {

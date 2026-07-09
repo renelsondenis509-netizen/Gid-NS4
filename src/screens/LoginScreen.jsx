@@ -2,10 +2,19 @@ import { useState } from "react";
 import { APP_LOGO } from "../config";
 import { callEdge, parseApiError } from "../api";
 
+// Normalise un numéro haïtien : garde les 8 derniers chiffres, peu importe
+// le format saisi (+509, 509, espaces, tirets...). Garantit une identité
+// stable pour le classement/historique même si l'élève change d'appareil
+// ou de format de saisie.
+function normalizePhone(raw) {
+  const digits = (raw || "").replace(/\D/g, "");
+  return digits.slice(-8);
+}
+
 export function LoginScreen({ onLogin, onNavigate, expired = false }) {
   const [name,  setName]  = useState("");
-  const savedNameForPhone = (p) => { try { return localStorage.getItem(`gid_name_${p.trim()}`) || ""; } catch { return ""; } };
-  const handlePhoneChange = (e) => { const p = e.target.value; setPhone(p); if (p.trim().length >= 8) { const n = savedNameForPhone(p); if (n) setName(n); } };
+  const savedNameForPhone = (p) => { try { return localStorage.getItem(`gid_name_${normalizePhone(p)}`) || ""; } catch { return ""; } };
+  const handlePhoneChange = (e) => { const p = e.target.value; setPhone(p); if (normalizePhone(p).length === 8) { const n = savedNameForPhone(p); if (n) setName(n); } };
   const [phone, setPhone] = useState("");
   const [code,  setCode]  = useState("");
   const [error, setError] = useState("");
@@ -18,20 +27,21 @@ export function LoginScreen({ onLogin, onNavigate, expired = false }) {
 
 const handleLogin = async () => {
   setLoading(true); setError("");
-  if (!phone.trim() || phone.trim().length < 8) { setError("Antre yon nimewo telefòn valid."); setLoading(false); return; }
+  const phoneN = normalizePhone(phone);
+  if (phoneN.length !== 8) { setError("Antre yon nimewo telefòn valid (8 chif)."); setLoading(false); return; }
   if (!code.trim() || code.trim().length < 4) { setError("Antre yon kòd etablisman valid."); setLoading(false); return; }
   try {
-    const result = await callEdge({ action:"validate_code", phone:phone.trim(), schoolCode:code.toUpperCase().trim() });
+    const result = await callEdge({ action:"validate_code", phone:phoneN, schoolCode:code.toUpperCase().trim() });
   if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
 
   // ✅ FIX : sync localStorage avec valeur serveur (indépendant de l'appareil)
   const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
-  try { localStorage.setItem(`gid_scan_${phone.trim()}_${_today}`, String(result.scansToday ?? 0)); } catch {}
+  try { localStorage.setItem(`gid_scan_${phoneN}_${_today}`, String(result.scansToday ?? 0)); } catch {}
 
-      localStorage.setItem(`gid_name_${phone.trim()}`, name.trim());
+      localStorage.setItem(`gid_name_${phoneN}`, name.trim());
       onLogin({
           name:            name.trim(),
-          phone:           phone.trim(),
+          phone:           phoneN,
           code:            code.toUpperCase().trim(),
           school:          result.school.name,
           subjects:        result.school.subjects,
@@ -51,16 +61,17 @@ const handleLogin = async () => {
   const handleFreemium = async () => {
     setError("");
     if (!name.trim() || name.trim().length < 2) { setError("Antre non ou ki valid (omwen 2 lèt)."); return; }
-    if (!phone.trim() || phone.trim().length < 8)       { setError("Antre yon nimewo telefòn valid."); return; }
+    const phoneN = normalizePhone(phone);
+    if (phoneN.length !== 8) { setError("Antre yon nimewo telefòn valid (8 chif)."); return; }
     setLoading(true);
     try {
-      const result = await callEdge({ action:"freemium_login", phone:phone.trim(), name:name.trim() });
+      const result = await callEdge({ action:"freemium_login", phone:phoneN, name:name.trim() });
       localStorage.setItem("gid_freemium_expires", result.freemiumExpiresAt ?? new Date(Date.now()+3*86400000).toISOString());
       const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
-      try { localStorage.setItem(`gid_scan_${phone.trim()}_${_today}`, String(result.scansToday ?? 0)); } catch {}
-      localStorage.setItem(`gid_name_${phone.trim()}`, name.trim());
+      try { localStorage.setItem(`gid_scan_${phoneN}_${_today}`, String(result.scansToday ?? 0)); } catch {}
+      localStorage.setItem(`gid_name_${phoneN}`, name.trim());
       onLogin({
-        name: name.trim(), phone: phone.trim(),
+        name: name.trim(), phone: phoneN,
         code: "FREEMIUM", school: "Freemium",
         subjects: ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
         dailyScans: result.dailyScans ?? 3, dailyImageScans: result.dailyImageScans ?? 1, dailyTextScans: result.dailyTextScans ?? 3,
