@@ -730,18 +730,14 @@ async function getLeaderboard(
     weekMap[row.phone] = (weekMap[row.phone] ?? 0) + (row.score ?? 0);
   });
 
-  // ✅ FIX : Classement activité = total des requêtes AI (scans) par téléphone
+  // Classement activité = total des requêtes AI (scans) par téléphone, 3 pts/requête
+  // Indépendant de "Pi bon nòt" (totalCorrectMap = points corrects quiz/exercices uniquement)
   const activityMap: Record<string, number> = {};
   (allScansData ?? []).forEach((row: any) => {
     activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 3;
     if (!schoolMap[row.phone] && row.school_code) {
       schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
     }
-  });
-
-// Les requêtes AI comptent aussi dans "Pi bon nòt"
-  Object.entries(activityMap).forEach(([p, count]) => {
-    totalCorrectMap[p] = (totalCorrectMap[p] ?? 0) + count;
   });
 
   const formatBoard = (map: Record<string, number>, myPhone: string) =>
