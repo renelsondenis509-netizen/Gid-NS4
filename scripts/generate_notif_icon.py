@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from PIL import Image
+from PIL import Image, ImageFilter
 import os
 
 SRC = "public/logo_icon.png"
@@ -11,9 +11,16 @@ SIZES = {
 NOISE_FLOOR = 15
 RAMP_END    = 90
 FILL_RATIO  = 0.82
+DILATE_PASSES_MASTER = 2
+DILATE_PASSES_FINAL  = 1
 
 def dist_from_white(r, g, b):
     return max(255 - r, 255 - g, 255 - b)
+
+def dilate(mask_img, passes):
+    for _ in range(passes):
+        mask_img = mask_img.filter(ImageFilter.MaxFilter(3))
+    return mask_img
 
 def build_master_mask(src_path):
     img = Image.open(src_path).convert("RGB")
@@ -26,6 +33,7 @@ def build_master_mask(src_path):
             d = dist_from_white(r, g, b)
             a = 0 if d <= NOISE_FLOOR else min(255, int((d - NOISE_FLOOR) * 255 / (RAMP_END - NOISE_FLOOR)))
             mpix[x, y] = a
+    mask = dilate(mask, DILATE_PASSES_MASTER)
     bbox = mask.getbbox()
     if bbox is None:
         raise SystemExit("Aucun pixel non-blanc trouvé dans le logo source.")
@@ -50,7 +58,9 @@ def main():
         canvas = Image.new("RGBA", (size, size), (255,255,255,0))
         off_x = (size-new_w)//2; off_y = (size-new_h)//2
         canvas.alpha_composite(resized_content, (off_x, off_y))
-        alpha2 = canvas.getchannel("A").point(lambda a: 255 if a>100 else (0 if a<25 else a))
+        alpha_channel = canvas.getchannel("A")
+        alpha_channel = dilate(alpha_channel, DILATE_PASSES_FINAL)
+        alpha2 = alpha_channel.point(lambda a: 255 if a>80 else (0 if a<25 else a))
         final = Image.new("RGBA", (size, size), (255,255,255,0))
         final.putalpha(alpha2)
         final.save(out_path, "PNG")
