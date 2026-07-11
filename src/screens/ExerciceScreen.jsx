@@ -4,7 +4,7 @@ import { idbSaveExercice } from "../utils/idb";
 import { callEdge } from "../api";
 import { hasAccess } from "../utils/freemium";
 
-import { cacheGet, cacheSet } from "../utils/cache";
+import { cacheGet, cacheSet, cacheClear } from "../utils/cache";
 const IcoArrowLeft = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>);
 const IcoArrowRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>);
 const IcoCheck = ({ size = 13 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>);
@@ -74,7 +74,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         score, total: questions.length,
         note20, streak: score === questions.length ? 1 : 0,
         name: user.name, source: "exercice",
-      }).catch(() => {});
+      }).then(() => cacheClear(`leaderboard_${user.phone}_${user.code}`)).catch(() => {});
       setDone(true); return;
     }
     setCurrent(c=>c+1); setSelected(null);

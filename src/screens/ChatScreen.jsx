@@ -8,6 +8,7 @@ import { useOffline } from "../utils/useOffline";
 import { LatexText } from "../components/LatexText";
 import { ErrorToast, ExpiryBanner } from "../components/UI";
 import { BottomNav } from "../components/UI";
+import { cacheClear } from "../utils/cache";
 import { TextToSpeech } from "@capacitor-community/text-to-speech";
 import { LocalNotifications } from "@capacitor/local-notifications";
 
@@ -231,6 +232,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
       setMessages(p => [...p, { role:"assistant", content:result.reply, subject }]);
       const next = result.scansUsed ?? (scansUsed + 1);
       setScansUsed(next);
+      cacheClear(`leaderboard_${user.phone}_${user.code}`);
       try { localStorage.setItem(getScanKey(), String(next)); localStorage.setItem(`gid_first_scan_${user.phone}`, "1"); } catch {}
       setLastPayload(null);
       await idbSaveScan(user.phone, {
