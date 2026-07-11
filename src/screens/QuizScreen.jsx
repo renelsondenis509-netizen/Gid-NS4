@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { APP_LOGO } from "../config";
 import { callEdge } from "../api";
 import { QUIZ_DATA, QUIZ_BRANCHES as FILIERES } from "../data/quizData";
@@ -6,7 +6,7 @@ import { shuffleArray, shuffleChoices } from "../utils/helpers";
 import { scoreToNote20, getMention, saveQuizGrade } from "../utils/quiz";
 import { BottomNav } from "../components/UI";
 import { idbSavePendingScore } from "../utils/idb";
-import { cacheClear } from "../utils/cache";
+import { cacheClear, cacheGet, cacheSet } from "../utils/cache";
 import { hasAccess } from "../utils/freemium";
 
 // ─── ICONS ───────────────────────────────────────────────────
@@ -105,6 +105,16 @@ export function QuizScreen({ user, onNavigate }) {
   const [usedQKeys,     setUsedQKeys]     = useState(new Set());
   const [openBranch,    setOpenBranch]    = useState(null);
   const [fullPool,      setFullPool]      = useState([]);
+  const [genCounts,     setGenCounts]     = useState({});
+
+  useEffect(() => {
+    const key = "question_counts";
+    const cached = cacheGet(key);
+    if (cached) { setGenCounts(cached); return; }
+    callEdge({ action: "get_question_counts" })
+      .then(r => { const c = r?.counts || {}; setGenCounts(c); cacheSet(key, c, 15 * 60 * 1000); })
+      .catch(() => {});
+  }, []);
 
   if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
@@ -218,7 +228,7 @@ export function QuizScreen({ user, onNavigate }) {
               const cfg = FILIERE_CONFIG[key] || { gradient:"linear-gradient(135deg,#0f172a,#1e293b)", accent:"#3b82f6", glow:"#3b82f6" };
               const isOpen = openBranch === key;
               const availableInBranch = filiere.subjects.filter(s => user.subjects.includes(s) && QUIZ_DATA[s]).length;
-              const totalQs = filiere.subjects.filter(s => QUIZ_DATA[s]).reduce((acc, s) => acc + (QUIZ_DATA[s]?.length || 0), 0);
+              const totalQs = filiere.subjects.filter(s => QUIZ_DATA[s]).reduce((acc, s) => acc + (QUIZ_DATA[s]?.length || 0) + (genCounts[s] || 0), 0);
 
               return (
                 <div key={key} style={{ borderRadius:20, overflow:"hidden", border:`1px solid ${isOpen ? cfg.accent+"55" : "rgba(255,255,255,0.07)"}`, boxShadow: isOpen ? `0 8px 32px ${cfg.glow}22` : "0 2px 12px rgba(0,0,0,0.2)", transition:"all .3s" }}>
@@ -256,7 +266,7 @@ export function QuizScreen({ user, onNavigate }) {
                     <div style={{ background:"rgba(6,10,28,0.98)", borderTop:`1px solid ${cfg.accent}22` }}>
                       {filiere.subjects.map((sub, idx) => {
                         const available = user.subjects.includes(sub) && QUIZ_DATA[sub];
-                        const qCount    = QUIZ_DATA[sub]?.length || 0;
+                        const qCount    = (QUIZ_DATA[sub]?.length || 0) + (genCounts[sub] || 0);
 
                         return available ? (
                           <button key={sub} onClick={() => startQCM(sub)}
@@ -402,7 +412,7 @@ export function QuizScreen({ user, onNavigate }) {
   if (phase === "bravo") {
     const note20   = scoreToNote20(roundScore, shuffledQs.length || 10);
     const mention  = getMention(note20);
-    const allCount = (QUIZ_DATA[subject]||[]).length;
+    const allCount = fullPool.length || (QUIZ_DATA[subject]||[]).length;
     const seenCount = usedQKeys.size;
     const hasMore  = (allCount - seenCount) >= 5;
 

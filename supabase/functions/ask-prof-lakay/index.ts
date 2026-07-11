@@ -991,7 +991,7 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
     // 🆕 Banque partagée automatique (option A) : chaque question valide est
     // ajoutée à generated_questions, dédupliquée par hash. Ne bloque jamais
     // la réponse à l'élève même en cas d'échec d'écriture.
-    if (Array.isArray(parsed?.questions) && subject) {
+    if (Array.isArray(parsed?.questions) && subject && subject !== "Général") {
       for (const q of parsed.questions) {
         if (!q?.q || !Array.isArray(q.choices) || typeof q.answer !== "number") continue;
         try {
@@ -1010,6 +1010,15 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
 
     return parsed;
   } catch { throw { status: 500, error: "Format JSON invalide" }; }
+}
+
+// ─── ACTION : get_question_counts (comptage seul, aucun appel IA) ────────────
+async function getQuestionCounts(db: ReturnType<typeof createClient>) {
+  const { data, error } = await db.from("generated_questions").select("subject");
+  if (error) throw { status: 500, error: error.message };
+  const counts: Record<string, number> = {};
+  (data ?? []).forEach((row: any) => { counts[row.subject] = (counts[row.subject] ?? 0) + 1; });
+  return { counts };
 }
 
 // ─── ACTION : get_generated_questions (banque partagée auto-générée) ─────────
@@ -1288,6 +1297,7 @@ Deno.serve(async (req) => {
     switch (body.action) {
       case "generate_quiz":        result = await generateQuiz(supabase, body); break;
       case "get_generated_questions": result = await getGeneratedQuestions(supabase, body); break;
+      case "get_question_counts":  result = await getQuestionCounts(supabase); break;
       case "freemium_login":      result = await freemiumLogin(supabase, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
       case "ask":                 result = await processAsk(supabase, callAIProvider, body); break;
