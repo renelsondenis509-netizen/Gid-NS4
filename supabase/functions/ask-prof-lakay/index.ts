@@ -1014,10 +1014,10 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
 
 // ─── ACTION : get_question_counts (comptage seul, aucun appel IA) ────────────
 async function getQuestionCounts(db: ReturnType<typeof createClient>) {
-  const { data, error } = await db.from("generated_questions").select("subject");
+  const { data, error } = await db.rpc("get_question_counts_by_subject");
   if (error) throw { status: 500, error: error.message };
   const counts: Record<string, number> = {};
-  (data ?? []).forEach((row: any) => { counts[row.subject] = (counts[row.subject] ?? 0) + 1; });
+  (data ?? []).forEach((row: any) => { counts[row.subject] = Number(row.cnt); });
   return { counts };
 }
 
