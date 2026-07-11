@@ -31,16 +31,17 @@ const handleLogin = async () => {
   if (phoneN.length !== 8) { setError("Antre yon nimewo telefòn valid (8 chif)."); setLoading(false); return; }
   if (!code.trim() || code.trim().length < 4) { setError("Antre yon kòd etablisman valid."); setLoading(false); return; }
   try {
-    const result = await callEdge({ action:"validate_code", phone:phoneN, schoolCode:code.toUpperCase().trim() });
+    const result = await callEdge({ action:"validate_code", phone:phoneN, schoolCode:code.toUpperCase().trim(), name:name.trim() });
   if (!result.valid) { setError(result.reason || "Kòd la pa valid."); setLoading(false); return; }
+  const finalName = result.name || name.trim();
 
   // ✅ FIX : sync localStorage avec valeur serveur (indépendant de l'appareil)
   const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
   try { localStorage.setItem(`gid_scan_${phoneN}_${_today}`, String(result.scansToday ?? 0)); } catch {}
 
-      localStorage.setItem(`gid_name_${phoneN}`, name.trim());
+      localStorage.setItem(`gid_name_${phoneN}`, finalName);
       onLogin({
-          name:            name.trim(),
+          name:            finalName,
           phone:           phoneN,
           code:            code.toUpperCase().trim(),
           school:          result.school.name,
@@ -66,12 +67,13 @@ const handleLogin = async () => {
     setLoading(true);
     try {
       const result = await callEdge({ action:"freemium_login", phone:phoneN, name:name.trim() });
+      const finalName = result.name || name.trim();
       localStorage.setItem("gid_freemium_expires", result.freemiumExpiresAt ?? new Date(Date.now()+3*86400000).toISOString());
       const _today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
       try { localStorage.setItem(`gid_scan_${phoneN}_${_today}`, String(result.scansToday ?? 0)); } catch {}
-      localStorage.setItem(`gid_name_${phoneN}`, name.trim());
+      localStorage.setItem(`gid_name_${phoneN}`, finalName);
       onLogin({
-        name: name.trim(), phone: phoneN,
+        name: finalName, phone: phoneN,
         code: "FREEMIUM", school: "Freemium",
         subjects: ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
         dailyScans: result.dailyScans ?? 3, dailyImageScans: result.dailyImageScans ?? 1, dailyTextScans: result.dailyTextScans ?? 3,

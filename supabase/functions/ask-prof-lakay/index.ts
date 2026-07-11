@@ -400,7 +400,7 @@ async function saveCache(db: ReturnType<typeof createClient>, subject: string, h
 // ─── ACTION : validate_code ───────────────────────────────────────────────────
 async function validateCode(
   db: ReturnType<typeof createClient>,
-  body: { phone: string; schoolCode: string }
+  body: { phone: string; schoolCode: string; name?: string }
 ) {
   const { phone, schoolCode } = body;
 
@@ -488,9 +488,21 @@ async function validateCode(
     return { valid: false, reason: `Limit ${school.max_students} elèv rive pou kòd sa a.` };
   }
 
+  // 🔒 Verrouillage du nom : le premier nom jamais enregistré pour ce numéro
+  // (toutes écoles confondues) fait autorité. Un nom tapé différemment sur un
+  // autre appareil n'écrase JAMAIS le nom d'origine.
+  const { data: nameRow } = await db.from("profiles")
+    .select("name")
+    .eq("phone", phone)
+    .not("name", "is", null)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const canonicalName = nameRow?.name || (body.name ? String(body.name).trim() : null);
+
   // ✅ ÉTAPE 3 : Upsert du profil
   await db.from("profiles").upsert(
-    { phone, school_code: schoolCode, last_seen: new Date().toISOString() },
+    { phone, school_code: schoolCode, last_seen: new Date().toISOString(), ...(canonicalName ? { name: canonicalName } : {}) },
     { onConflict: "phone,school_code" }
   );
 
@@ -520,7 +532,8 @@ async function validateCode(
 
   return {
     valid: true,
-    isAdmin: ADMIN_PHONE !== "" && phone === ADMIN_PHONE,
+    isAdmin: ADMIN_PHONE !== "" && phone === normalizePhone(ADMIN_PHONE),
+    name: canonicalName,
     school: {
       name:            school.school_name,
       subjects:        addStatistique(school.subjects ?? []),
@@ -666,10 +679,18 @@ async function saveQuizScore(
     score: number; total: number; note20: number; streak: number; name?: string; source?: string;
   }
 ) {
-  const { phone, schoolCode, subject, score, total, note20, streak, name, source } = body;
+  const { phone, schoolCode, subject, score, total, note20, streak, source } = body;
+  const { data: nameRow } = await db.from("profiles")
+    .select("name")
+    .eq("phone", phone)
+    .not("name", "is", null)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const canonicalName = nameRow?.name || body.name || phone;
   await db.from("quiz_scores").insert({
     phone, school_code: schoolCode, subject, score, total, note20, streak,
-    name: name || phone, week: getWeekKey(), created_at: new Date().toISOString(), source: source || "quiz",
+    name: canonicalName, week: getWeekKey(), created_at: new Date().toISOString(), source: source || "quiz",
   });
   return { saved: true };
 }
@@ -681,11 +702,12 @@ async function getLeaderboard(
 ) {
   const { phone } = body;
 
-  // ✅ Fetch quiz scores + scans en parallèle
-  const [{ data: allScores }, { data: allScansData }, { data: weekScoresData }] = await Promise.all([
+  // ✅ Fetch quiz scores + scans + noms verrouillés en parallèle
+  const [{ data: allScores }, { data: allScansData }, { data: weekScoresData }, { data: profileNames }] = await Promise.all([
     db.from("quiz_scores").select("phone, name, note20, score, school_code, subject"),
     db.from("scans").select("phone, school_code, created_at"),
     db.from("quiz_scores").select("phone, score").eq("week", getWeekKey()),
+    db.from("profiles").select("phone, name").not("name", "is", null),
   ]);
 
   // ── Noms des écoles ──
@@ -724,17 +746,22 @@ async function getLeaderboard(
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
 
+  // Le nom verrouillé (profiles.name) prime toujours sur l'heuristique ci-dessus
+  (profileNames ?? []).forEach((row: any) => {
+    if (row.name) nameMap[row.phone] = row.name;
+  });
+
   // ── Classement semaine (quiz uniquement) ──
   const weekMap: Record<string, number> = {};
   (weekScoresData ?? []).forEach((row: any) => {
     weekMap[row.phone] = (weekMap[row.phone] ?? 0) + (row.score ?? 0);
   });
 
-  // Classement activité = total des requêtes AI (scans) par téléphone, 3 pts/requête
+  // Classement Rekèt = total des requêtes AI (scans) par téléphone, 2 pts/requête
   // Indépendant de "Pi bon nòt" (totalCorrectMap = points corrects quiz/exercices uniquement)
   const activityMap: Record<string, number> = {};
   (allScansData ?? []).forEach((row: any) => {
-    activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 3;
+    activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 2;
     if (!schoolMap[row.phone] && row.school_code) {
       schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
     }
@@ -971,17 +998,27 @@ async function freemiumLogin(
   const { phone, name } = body;
   const FREEMIUM_DAYS = 3;
 
+  // 🔒 Verrouillage du nom, comme pour validateCode
+  const { data: nameRow } = await db.from("profiles")
+    .select("name")
+    .eq("phone", phone)
+    .not("name", "is", null)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const canonicalName = nameRow?.name || (name ? String(name).trim() : phone);
+
   // Upsert profil — expiration basée sur minuit heure Haïti
   const nowHaiti = new Date(new Date().toLocaleString("sv-SE", { timeZone: "America/Port-au-Prince" }));
   nowHaiti.setHours(23, 59, 59, 0);
   nowHaiti.setDate(nowHaiti.getDate() + FREEMIUM_DAYS - 1); // J inclus = 3 jours affichés
   const expiresAt = nowHaiti.toISOString();
-  const { data: existing } = await db.from("profiles").select("freemium_expires_at").eq("phone", phone).maybeSingle();
+  const { data: existing } = await db.from("profiles").select("freemium_expires_at").eq("phone", phone).eq("school_code", "FREEMIUM").maybeSingle();
 
   if (!existing) {
-    await db.from("profiles").insert({ phone, school_code: "FREEMIUM", last_seen: new Date().toISOString(), freemium_expires_at: expiresAt });
+    await db.from("profiles").insert({ phone, school_code: "FREEMIUM", last_seen: new Date().toISOString(), freemium_expires_at: expiresAt, name: canonicalName });
   } else {
-    await db.from("profiles").update({ last_seen: new Date().toISOString() }).eq("phone", phone);
+    await db.from("profiles").update({ last_seen: new Date().toISOString(), name: canonicalName }).eq("phone", phone).eq("school_code", "FREEMIUM");
   }
 
   const freemiumExpiresAt = existing?.freemium_expires_at ?? expiresAt;
@@ -996,6 +1033,7 @@ async function freemiumLogin(
 
   return {
     success: true,
+    name: canonicalName,
     freemiumExpiresAt,
     daysRemaining,
     scansToday: scansToday ?? 0,

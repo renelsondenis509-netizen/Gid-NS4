@@ -52,7 +52,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
   const tabs = [
     { id:"totalCorrect",Icon:IcoTrophy,   label:"Pi bon nòt", valueLabel:" pts" },
     { id:"thisWeek",    Icon:IcoCalendar, label:"Semèn Sa",    valueLabel:" pts" },
-    { id:"activity",    Icon:IcoBolt,     label:"Aktivite",    valueLabel:" req" },
+    { id:"activity",    Icon:IcoBolt,     label:"Rekèt",       valueLabel:" req" },
   ];
 
   const currentTab = tabs.find(t => t.id === tab);
