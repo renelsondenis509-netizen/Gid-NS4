@@ -964,8 +964,8 @@ async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
 }
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 
-async function generateQuiz(_db: unknown, body: Record<string, string>) {
-  const { content, subject } = body;
+async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<string, string>) {
+  const { content, subject, phone, schoolCode } = body;
   if (!content) throw { status: 400, error: "Contenu manquant" };
 
   const isCreole = /[ò]|kisa|kijan|poukisa|\bmwen\b|\bnou\b|\byo\b/i.test(content.slice(0, 500));
@@ -987,8 +987,47 @@ async function generateQuiz(_db: unknown, body: Record<string, string>) {
   const clean = raw.replace(/```json|```/g, "").trim();
   try {
     const parsed = JSON.parse(clean);
+
+    // 🆕 Banque partagée automatique (option A) : chaque question valide est
+    // ajoutée à generated_questions, dédupliquée par hash. Ne bloque jamais
+    // la réponse à l'élève même en cas d'échec d'écriture.
+    if (Array.isArray(parsed?.questions) && subject) {
+      for (const q of parsed.questions) {
+        if (!q?.q || !Array.isArray(q.choices) || typeof q.answer !== "number") continue;
+        try {
+          const qHash = await hashMessage(q.q);
+          await db.from("generated_questions").upsert(
+            {
+              subject, question: q.q, choices: q.choices, answer: q.answer,
+              note: q.note ?? null, question_hash: qHash,
+              created_by_phone: phone ?? null, school_code: schoolCode ?? null,
+            },
+            { onConflict: "subject,question_hash", ignoreDuplicates: true }
+          );
+        } catch (_) { /* jamais bloquant */ }
+      }
+    }
+
     return parsed;
   } catch { throw { status: 500, error: "Format JSON invalide" }; }
+}
+
+// ─── ACTION : get_generated_questions (banque partagée auto-générée) ─────────
+async function getGeneratedQuestions(
+  db: ReturnType<typeof createClient>,
+  body: { subject: string; limit?: number }
+) {
+  const { subject, limit } = body;
+  if (!subject) throw { status: 400, error: "Matyè obligatwa" };
+  const { data, error } = await db.from("generated_questions")
+    .select("question, choices, answer, note")
+    .eq("subject", subject)
+    .order("created_at", { ascending: false })
+    .limit(limit ?? 200);
+  if (error) throw { status: 500, error: error.message };
+  return {
+    questions: (data ?? []).map((r: any) => ({ q: r.question, choices: r.choices, answer: r.answer, note: r.note })),
+  };
 }
 
 async function freemiumLogin(
@@ -1248,6 +1287,7 @@ Deno.serve(async (req) => {
 
     switch (body.action) {
       case "generate_quiz":        result = await generateQuiz(supabase, body); break;
+      case "get_generated_questions": result = await getGeneratedQuestions(supabase, body); break;
       case "freemium_login":      result = await freemiumLogin(supabase, body); break;
       case "validate_code":       result = await validateCode(supabase, body); break;
       case "ask":                 result = await processAsk(supabase, callAIProvider, body); break;

@@ -33,7 +33,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
     const cacheKey = `exercice_${scan.id}`;
     const cached = cacheGet(cacheKey);
     if (cached) { setQuestions(cached); setLoading(false); return; }
-    callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général" })
+    callEdge({ action: "generate_quiz", content: scan.response, subject: scan.subject || "Général", phone: user.phone, schoolCode: user.code })
       .then(r => {
         if (r.questions?.length > 0) {
           cacheSet(cacheKey, r.questions, 30 * 60 * 1000);

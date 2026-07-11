@@ -104,13 +104,21 @@ export function QuizScreen({ user, onNavigate }) {
   const [roundScore,    setRoundScore]    = useState(0);
   const [usedQKeys,     setUsedQKeys]     = useState(new Set());
   const [openBranch,    setOpenBranch]    = useState(null);
+  const [fullPool,      setFullPool]      = useState([]);
 
   if (!hasAccess(user)) { onNavigate("payment"); return null; }
 
   const currentQ = shuffledQs[qIndex];
 
-  const startQCM = (sub) => {
-    const all    = shuffleArray(QUIZ_DATA[sub]);
+  const startQCM = async (sub) => {
+    let extra = [];
+    try {
+      const r = await callEdge({ action: "get_generated_questions", subject: sub });
+      if (Array.isArray(r?.questions)) extra = r.questions;
+    } catch { /* la banque statique suffit si la requête échoue */ }
+    const merged = [...QUIZ_DATA[sub], ...extra];
+    setFullPool(merged);
+    const all    = shuffleArray(merged);
     const first10 = all.slice(0, 10).map(shuffleChoices);
     setSubject(sub); setShuffledQs(first10); setUsedQKeys(new Set(first10.map(q => q.q)));
     setPhase("qcm"); setQIndex(0); setScore(0); setTotalAnswered(0); setRoundScore(0);
@@ -156,7 +164,7 @@ export function QuizScreen({ user, onNavigate }) {
   };
 
   const continueQuiz = () => {
-    const all    = QUIZ_DATA[subject] || [];
+    const all    = fullPool.length ? fullPool : (QUIZ_DATA[subject] || []);
     const unseen = all.filter(q => !usedQKeys.has(q.q));
     const pool   = unseen.length >= 10 ? unseen : shuffleArray(all);
     const next10 = shuffleArray(pool).slice(0, 10).map(shuffleChoices);
