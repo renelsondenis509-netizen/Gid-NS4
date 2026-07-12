@@ -316,6 +316,21 @@ async function hashMessage(msg: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
 }
 
+// ─── Similarité texte (détecte les quasi-doublons, au-delà du hash exact) ────
+const SIMILARITY_THRESHOLD = 0.6; // 0-1 ; au-delà, on considère que c'est un quasi-doublon
+
+function wordSet(s: string): Set<string> {
+  return new Set(normalizeMessage(s).split(" ").filter(w => w.length > 2));
+}
+
+function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
+  if (a.size === 0 || b.size === 0) return 0;
+  let inter = 0;
+  for (const w of a) if (b.has(w)) inter++;
+  const union = a.size + b.size - inter;
+  return union === 0 ? 0 : inter / union;
+}
+
 // ─── Récupérer depuis le cache ─────────────────────────────────────────────
 async function getCachedAnswer(db: ReturnType<typeof createClient>, subject: string, hash: string): Promise<string | null> {
   try {
@@ -992,8 +1007,17 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
     // ajoutée à generated_questions, dédupliquée par hash. Ne bloque jamais
     // la réponse à l'élève même en cas d'échec d'écriture.
     if (Array.isArray(parsed?.questions) && subject && subject !== "Général") {
+      const { data: existingRows } = await db.from("generated_questions")
+        .select("question").eq("subject", subject).limit(500);
+      const existingSets = (existingRows ?? []).map((r: any) => wordSet(r.question));
+
       for (const q of parsed.questions) {
         if (!q?.q || !Array.isArray(q.choices) || typeof q.answer !== "number") continue;
+
+        const qSet = wordSet(q.q);
+        const isNearDuplicate = existingSets.some(s => jaccardSimilarity(qSet, s) >= SIMILARITY_THRESHOLD);
+        if (isNearDuplicate) continue; // quasi-doublon détecté, on ignore
+
         try {
           const qHash = await hashMessage(q.q);
           await db.from("generated_questions").upsert(
@@ -1004,6 +1028,7 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
             },
             { onConflict: "subject,question_hash", ignoreDuplicates: true }
           );
+          existingSets.push(qSet); // évite aussi les quasi-doublons entre les 5 questions du même lot
         } catch (_) { /* jamais bloquant */ }
       }
     }
