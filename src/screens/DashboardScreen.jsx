@@ -802,12 +802,12 @@ delete window[_winKey]; // toujours frais pour scansToday
 <div className="rounded-2xl p-4" style={{ background: "#ffffff08", border: "1px solid rgba(37,99,235,0.2)" }}>
   <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-    Voye yon anons
+    Voye yon mesaj
   </h3>
   <input
     value={annonce.title}
     onChange={e => setAnnonce(p => ({ ...p, title: e.target.value }))}
-    placeholder="Tit anons lan..."
+    placeholder="Tit mesaj lan..."
     style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:12, padding:"10px 14px", color:"#e2e8ff", fontSize:13, outline:"none", marginBottom:8, boxSizing:"border-box" }}
   />
   <textarea
@@ -823,7 +823,7 @@ delete window[_winKey]; // toujours frais pour scansToday
     onChange={e => setAnnonce(p => ({ ...p, expiresAt: e.target.value }))}
     style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(37,99,235,0.2)", borderRadius:12, padding:"10px 14px", color:"#e2e8ff", fontSize:13, outline:"none", marginBottom:10, boxSizing:"border-box" }}
   />
-  {annonceStatus === "ok" && <p style={{ color:"#4ade80", fontSize:12, marginBottom:8 }}>✅ Anons pibliye ak siksè !</p>}
+  {annonceStatus === "ok" && <p style={{ color:"#4ade80", fontSize:12, marginBottom:8 }}>✅ Mesaj pibliye ak siksè !</p>}
   {annonceStatus === "err" && <p style={{ color:"#f87171", fontSize:12, marginBottom:8 }}>❌ Echèk — eseye ankò.</p>}
   <button
     onClick={sendAnnonce}
