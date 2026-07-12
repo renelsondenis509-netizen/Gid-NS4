@@ -624,12 +624,12 @@ async function processAsk(
   }
 
   const creoleWords = message.toLowerCase().split(/\s+/);
-  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini","mwenmenm","noumenm","ye","yon","kap","tap","kote","konnen","men"];
+  const creoleMarkers = ["mwen","nou","yo","ak","pou","nan","gen","ap","kay","lekòl","egzèsis","kisa","kijan","poukisa","fòmil","repons","konprann","annou","pran","jwenn","wè","rele","ba","di","fe","ale","vini","mwenmenm","noumenm","ye","yon","kap","tap","kote","konnen","men","eske","èske","pale","kreyòl","kreyol","byen","anpil","vle","tande","kounye","toujou","kounyeya","tout","anba","anwo","dekwa","paske"];
   const creoleCount = creoleMarkers.filter(w => creoleWords.includes(w)).length;
   const detectedLang = creoleCount >= 2 ? "ht" : "fr";
   const langRule = detectedLang === "ht"
     ? "RÈGLE LANGUE: Réponds UNIQUEMENT en créole haïtien standard (IPN/CSLC). INTERDIT: mots anglais, mots français, répéter la question, traduire en anglais. Écris directement ta réponse sans préambule."
-    : "RÈGLE LANGUE: L'élève écrit en français. Réponds UNIQUEMENT en français. Zéro mot créole dans ta réponse.";
+    : "RÈGLE LANGUE: L'élève écrit en français. Réponds UNIQUEMENT en français. Zéro mot créole dans ta réponse. EXCEPTION IMPORTANTE: si le message de l'élève est en réalité clairement rédigé en créole haïtien (même si cette règle dit le contraire), ignore cette règle et réponds en créole à la place — ne réponds JAMAIS en français à un message manifestement en créole.";
   const systemPrompt = `${langRule}
 
 Tu es Prof Lakay, un professeur expert pour les élèves de NS4 (Bac haïtien).
