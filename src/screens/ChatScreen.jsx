@@ -64,6 +64,7 @@ export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
   const [messages,      setMessages]      = useState([{ role:"assistant", content:`Bonjou **${user.name||""}** ! Mwen se **Prof Lakay**\n\nJe suis ton assistant IA pour le **Bac NS4**.\n\n**Ann al travay !**` }]);
   const [input,         setInput]         = useState("");
   const [image,         setImage]         = useState(null);
+  const [zoomImage,     setZoomImage]     = useState(null);
   const [loading,       setLoading]       = useState(false);
   const [apiError,      setApiError]      = useState(null);
   const [lastPayload,   setLastPayload]   = useState(null);
@@ -357,7 +358,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
               </div>
             )}
             <div style={{ maxWidth:"80%" }}>
-              {msg.image && <img src={msg.image} alt="scan" style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.08)" }} />}
+              {msg.image && <img src={msg.image} alt="scan" onClick={() => setZoomImage(msg.image)} style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.08)", cursor:"pointer" }} />}
               <div style={{
                 padding:"12px 16px",
                 fontSize:14,
@@ -516,6 +517,11 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         </div>
       </div>
       <BottomNav active="chat" onNavigate={onNavigate} />
+      {zoomImage && (
+        <div onClick={() => setZoomImage(null)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20, cursor:"zoom-out" }}>
+          <img src={zoomImage} alt="scan agrandi" style={{ maxWidth:"100%", maxHeight:"100%", objectFit:"contain", borderRadius:8 }} />
+        </div>
+      )}
     </div>
   );
 }

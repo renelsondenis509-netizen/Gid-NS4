@@ -148,7 +148,7 @@ export function MenuScreen({ user, onNavigate, onLogout }) {
               )}
             </div>
 
-            <div style={{ color:"#3B5BA8", fontSize:10, marginTop:2 }}>{user.school}</div>
+            <div style={{ color:"#ffffff", fontSize:10, marginTop:2 }}>{user.school}</div>
           </div>
         </div>
 
