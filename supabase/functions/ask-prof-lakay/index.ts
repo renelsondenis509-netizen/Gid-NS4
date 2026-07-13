@@ -335,15 +335,24 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
 // (référence à "cet exercice", "cette image", etc.) — ces questions restent
 // valables pour l'exercice en cours de l'élève, mais ne doivent jamais
 // rejoindre la banque partagée où elles seraient incompréhensibles.
-function isContextDependent(q: string): boolean {
-  const s = normalizeMessage(q);
-  const patterns = [
-    "cet exercice", "cette exercice", "l exercice", "cette image", "cet image",
-    "ce texte", "ce document", "ce tableau", "ce schema", "cette photo",
-    "ci dessus", "dans l image", "sur l image", "d apres l image",
-    "dans le texte ci", "dans ce document", "la question precedente",
-  ];
-  return patterns.some(p => s.includes(p));
+const CONTEXT_PATTERNS_RAW = [
+  // Français
+  "cet exercice", "cette exercice", "l'exercice", "cette image", "cet image",
+  "ce texte", "ce document", "ce tableau", "ce schéma", "cette photo",
+  "ci-dessus", "dans l'image", "sur l'image", "d'après l'image",
+  "dans le texte ci-dessus", "dans ce document", "la question précédente",
+  "le graphique", "la figure", "le diagramme", "la capture", "le dessin",
+  "d'après ce qui précède", "la carte ci-dessus", "sur la photo", "sur ce document",
+  // Créole
+  "nan egzèsis sa a", "nan imaj sa a", "nan tèks sa a", "nan dokiman sa a",
+  "nan tablo sa a", "nan foto sa a", "pi wo a", "sou imaj la", "dapre imaj la",
+  "sou foto a", "nan grafik la", "nan chema a",
+];
+const CONTEXT_PATTERNS = CONTEXT_PATTERNS_RAW.map(normalizeMessage);
+
+function isContextDependent(q: string, choices: string[] = []): boolean {
+  const s = normalizeMessage(q + " " + choices.join(" "));
+  return CONTEXT_PATTERNS.some(p => s.includes(p));
 }
 
 // ─── Récupérer depuis le cache ─────────────────────────────────────────────
@@ -1000,7 +1009,7 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
 
   const isCreole = /[ò]|kisa|kijan|poukisa|\bmwen\b|\bnou\b|\byo\b/i.test(content.slice(0, 500));
   const tfLabel = isCreole ? "Vrè/Fo" : "Vrai/Faux";
-  const prompt = "Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti. " + "OBLIGATION ABSOLUE: génère EXACTEMENT 5 questions (ni plus, ni moins) basées UNIQUEMENT sur ce contenu de " + (subject || "cours") + ". " + "Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte. " + "N'invente rien qui ne soit pas dans le texte. " + "INTERDICTION ABSOLUE: ne jamais écrire une question qui fait référence à \"cet exercice\", \"cette image\", \"ce texte\", \"ce document\", \"ci-dessus\" ou toute formulation qui suppose que l'élève voit un contenu visuel externe — la question doit être compréhensible et répondable seule, sans avoir vu l'image ou le document d'origine. Si un détail précis (nombre, nom, donnée) est nécessaire, écris-le explicitement dans la question elle-même. " + "Génère TOUJOURS questions ET choix dans la MÊME langue que le contenu source ci-dessous. " + `Alterne les types : QCM (4 choix), ${tfLabel} (2 choix), Trou (4 choix). ` + 'RÉPONDS UNIQUEMENT avec un JSON valide sans backticks. Format: {"questions":[{"q":"...","choices":["A","B","C","D"],"answer":0,"note":"..."}]}' + "\n\nContenu:\n" + content.slice(0, 3000);
+  const prompt = "Tu es un générateur d'exercices QCM pour les élèves de NS4 Haïti. " + "OBLIGATION ABSOLUE: génère EXACTEMENT 5 questions (ni plus, ni moins) basées UNIQUEMENT sur ce contenu de " + (subject || "cours") + ". " + "Les questions doivent porter sur des faits, définitions, formules ou concepts présents dans le texte. " + "N'invente rien qui ne soit pas dans le texte. " + "INTERDICTION ABSOLUE: ne jamais écrire une question qui fait référence à \"cet exercice\", \"cette image\", \"ce texte\", \"ce document\", \"ci-dessus\", \"ce graphique/tableau/schéma\" ou toute formulation qui suppose que l'élève voit un contenu visuel externe — la question doit être compréhensible et répondable seule, sans avoir vu l'image ou le document d'origine. Si un détail précis (nombre, nom, donnée) est nécessaire, écris-le explicitement dans la question elle-même. " + "Pour CHAQUE question, ajoute un champ \"selfContained\": true si la question est totalement compréhensible sans le document/image d'origine, ou false si elle dépend d'un contenu visuel non répété dans le texte de la question. " + "Génère TOUJOURS questions ET choix dans la MÊME langue que le contenu source ci-dessous. " + `Alterne les types : QCM (4 choix), ${tfLabel} (2 choix), Trou (4 choix). ` + 'RÉPONDS UNIQUEMENT avec un JSON valide sans backticks. Format: {"questions":[{"q":"...","choices":["A","B","C","D"],"answer":0,"note":"...","selfContained":true}]}' + "\n\nContenu:\n" + content.slice(0, 3000);
 
   const systemPrompt = "Tu es un générateur d'exercices. Réponds UNIQUEMENT en JSON valide.";
   const fullPrompt = systemPrompt + "\n\nÉlève: " + prompt;
@@ -1028,11 +1037,19 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
 
       for (const q of parsed.questions) {
         if (!q?.q || !Array.isArray(q.choices) || typeof q.answer !== "number") continue;
-        if (isContextDependent(q.q)) continue; // dépend d'une image/contexte absent de QuizScreen
+
+        if (q.selfContained === false) {
+          console.log("⏭️ Question ignorée (auto-évaluée non-autonome par l'IA):", q.q.slice(0, 80));
+          continue;
+        }
+        if (isContextDependent(q.q, q.choices)) {
+          console.log("⏭️ Question ignorée (dépend d'un contexte visuel, détecté par mots-clés):", q.q.slice(0, 80));
+          continue;
+        }
 
         const qSet = wordSet(q.q);
         const isNearDuplicate = existingSets.some(s => jaccardSimilarity(qSet, s) >= SIMILARITY_THRESHOLD);
-        if (isNearDuplicate) continue; // quasi-doublon détecté, on ignore
+        if (isNearDuplicate) { console.log("⏭️ Question ignorée (quasi-doublon):", q.q.slice(0, 80)); continue; }
 
         try {
           const qHash = await hashMessage(q.q);
