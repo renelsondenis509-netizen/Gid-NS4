@@ -29,6 +29,7 @@ const handleLogin = async () => {
   setLoading(true); setError("");
   const phoneN = normalizePhone(phone);
   if (phoneN.length !== 8) { setError("Antre yon nimewo telefòn valid (8 chif)."); setLoading(false); return; }
+  if (!name.trim() || name.trim().length < 2) { setError("Antre non ou ki valid (omwen 2 lèt)."); setLoading(false); return; }
   if (!code.trim() || code.trim().length < 4) { setError("Antre yon kòd etablisman valid."); setLoading(false); return; }
   try {
     const result = await callEdge({ action:"validate_code", phone:phoneN, schoolCode:code.toUpperCase().trim(), name:name.trim() });

@@ -106,6 +106,7 @@ export function QuizScreen({ user, onNavigate }) {
   const [openBranch,    setOpenBranch]    = useState(null);
   const [fullPool,      setFullPool]      = useState([]);
   const [genCounts,     setGenCounts]     = useState({});
+  const [startingSubject, setStartingSubject] = useState(null);
 
   useEffect(() => {
     const key = "question_counts";
@@ -121,6 +122,8 @@ export function QuizScreen({ user, onNavigate }) {
   const currentQ = shuffledQs[qIndex];
 
   const startQCM = async (sub) => {
+    if (startingSubject) return; // évite double-tap pendant le chargement
+    setStartingSubject(sub);
     let extra = [];
     try {
       const r = await callEdge({ action: "get_generated_questions", subject: sub });
@@ -133,6 +136,7 @@ export function QuizScreen({ user, onNavigate }) {
     setSubject(sub); setShuffledQs(first10); setUsedQKeys(new Set(first10.map(q => q.q)));
     setPhase("qcm"); setQIndex(0); setScore(0); setTotalAnswered(0); setRoundScore(0);
     setHearts(3); setStreak(0); setMaxStreak(0); setWrongAnswers([]); setSelected(null); setRound(1);
+    setStartingSubject(null);
   };
 
   const saveScoreToSupabase = async (finalScore, finalTotal, finalStreak) => {
@@ -269,8 +273,8 @@ export function QuizScreen({ user, onNavigate }) {
                         const qCount    = (QUIZ_DATA[sub]?.length || 0) + (genCounts[sub] || 0);
 
                         return available ? (
-                          <button key={sub} onClick={() => startQCM(sub)}
-                            style={{ width:"100%", padding:"12px 18px 12px 22px", display:"flex", alignItems:"center", gap:12, background:"transparent", border:"none", borderBottom: idx < filiere.subjects.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", cursor:"pointer", transition:"background .15s", animation:`fadeIn .2s ${idx*0.04}s ease both` }}
+                          <button key={sub} onClick={() => startQCM(sub)} disabled={!!startingSubject}
+                            style={{ width:"100%", padding:"12px 18px 12px 22px", display:"flex", alignItems:"center", gap:12, background:"transparent", border:"none", borderBottom: idx < filiere.subjects.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", cursor: startingSubject ? "wait" : "pointer", opacity: startingSubject && startingSubject !== sub ? 0.4 : 1, transition:"background .15s", animation:`fadeIn .2s ${idx*0.04}s ease both` }}
                             onTouchStart={e => e.currentTarget.style.background=`${cfg.accent}10`}
                             onTouchEnd={e => e.currentTarget.style.background="transparent"}>
                             {/* Ligne couleur */}
@@ -281,7 +285,7 @@ export function QuizScreen({ user, onNavigate }) {
                             </div>
                             <div style={{ flex:1, textAlign:"left" }}>
                               <div style={{ color:"#e2e8ff", fontWeight:700, fontSize:13 }}>{sub}</div>
-                              <div style={{ color:"#3b5280", fontSize:11, marginTop:2 }}>{qCount} kesyon disponib</div>
+                              <div style={{ color:"#3b5280", fontSize:11, marginTop:2 }}>{startingSubject === sub ? "Chajman..." : `${qCount} kesyon disponib`}</div>
                             </div>
                             <span style={{ color:`${cfg.accent}88`, fontSize:20 }}>›</span>
                           </button>

@@ -246,6 +246,7 @@ const ExerciceCard = ({ exo, onRedo, onDelete, deleting }) => {
 export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   const [tab,       setTab]       = useState("history");
   const [history,   setHistory]   = useState([]);
+  const [zoomImage, setZoomImage] = useState(null);
   const [exercices, setExercices] = useState([]);
   const [selected,  setSelected]  = useState(null);
   const [loading,   setLoading]   = useState(true);
@@ -349,9 +350,9 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                   letterSpacing: "0.06em", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
                   <IcoCamera/> Imaj ki analize
                 </p>
-                <img src={selected.image} alt="scan"
+                <img src={selected.image} alt="scan" onClick={() => setZoomImage(selected.image)}
                   style={{ width: "100%", borderRadius: 16, objectFit: "contain", maxHeight: 220,
-                    border: `1px solid ${glow}33`, boxShadow: `0 0 20px ${glow}18` }}/>
+                    border: `1px solid ${glow}33`, boxShadow: `0 0 20px ${glow}18`, cursor: "pointer" }}/>
               </div>
             : <div style={{ borderRadius: 16, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10,
                 background: "#1e3a8a11", border: "1px solid #1e3a8a22" }}>
@@ -408,6 +409,11 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
         </div>
 
         <BottomNav active="history" onNavigate={onNavigate}/>
+        {zoomImage && (
+          <div onClick={() => setZoomImage(null)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20, cursor:"zoom-out" }}>
+            <img src={zoomImage} alt="scan agrandi" style={{ maxWidth:"100%", maxHeight:"100%", objectFit:"contain", borderRadius:8 }} />
+          </div>
+        )}
       </div>
     );
   }
