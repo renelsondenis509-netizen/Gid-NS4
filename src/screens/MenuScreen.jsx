@@ -4,6 +4,7 @@ import { idbGetExercice } from "../utils/idb";
 import { QUIZ_BRANCHES } from "../data/quizData";
 import { APP_LOGO } from "../config";
 import { BottomNav } from "../components/UI";
+import { API, SUPABASE_ANON } from "../config";
 import { scheduleDailyReminder, cancelAllNotifications, requestNotificationPermission } from "../utils/notifications";
 
 export function MenuScreen({ user, onNavigate, onLogout }) {
