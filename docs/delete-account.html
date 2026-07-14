@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Suppression de compte — Gid NS4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --bg: #04081A;
+    --surface: #080E24;
+    --accent: #2563EB;
+    --danger: #E8002A;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(232,0,42,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 10% 80%, rgba(37,99,235,0.06) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(37,99,235,0.3);
+  }
+  .logo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  header h1 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; }
+  header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    background: rgba(232,0,42,0.10); border: 1px solid rgba(232,0,42,0.3); color: #fca5a5;
+    margin-bottom: 16px;
+  }
+
+  h2 { font-family: 'Syne', sans-serif; font-size: clamp(24px, 5vw, 32px); font-weight: 800; color: #fff; margin-bottom: 14px; }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 26px;
+    margin-bottom: 20px;
+  }
+
+  .section p, .section li { color: #94a3b8; font-size: 14px; line-height: 1.7; }
+  .section ul { list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .section ul li { display: flex; align-items: flex-start; gap: 10px; }
+  .section ul li::before { content: '→'; color: var(--danger); font-size: 13px; margin-top: 2px; flex-shrink: 0; }
+
+  label { display: block; color: #e2e8f0; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+
+  input[type="tel"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  input[type="tel"]:focus { outline: none; border-color: var(--danger); }
+
+  button.delete-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #d4002a, #ff3b5c);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  button.delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.delete-btn:active:not(:disabled) { transform: scale(0.98); }
+
+  .confirm-box {
+    display: none;
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(232,0,42,0.08);
+    border: 1px solid rgba(232,0,42,0.25);
+    color: #fca5a5;
+    font-size: 13px;
+  }
+  .confirm-box.visible { display: block; }
+  .confirm-actions { display: flex; gap: 10px; margin-top: 12px; }
+  .confirm-actions button {
+    flex: 1; padding: 10px; border-radius: 10px; border: none; font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  .btn-cancel { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+  .btn-confirm { background: #d4002a; color: white; }
+
+  .status {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    display: none;
+  }
+  .status.success { display: block; background: rgba(34,197,94,0.10); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+  .status.error { display: block; background: rgba(232,0,42,0.10); border: 1px solid rgba(232,0,42,0.3); color: #fca5a5; }
+  .status.loading { display: block; background: rgba(37,99,235,0.10); border: 1px solid rgba(37,99,235,0.3); color: #93c5fd; }
+
+  footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; color: var(--muted); font-size: 12px; }
+  footer a { color: #6B8ADB; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="logo-box"><img src="/Gid-NS4/logo.png?v=2" alt="Gid NS4"></div>
+    <div>
+      <h1>Gid NS4 — Prof Lakay</h1>
+      <p>Suppression de compte et de données</p>
+    </div>
+  </header>
+
+  <div class="badge">⚠️ Action irréversible</div>
+  <h2>Supprimer mon compte</h2>
+
+  <div class="section">
+    <p>Cette page vous permet de demander la suppression définitive de votre compte Gid NS4 et de toutes les données associées, sans avoir besoin de réinstaller l'application.</p>
+    <p style="margin-top:12px">Les données suivantes seront <strong>définitivement effacées</strong> :</p>
+    <ul>
+      <li>Votre profil (nom, numéro de téléphone, école)</li>
+      <li>Votre historique de scores et quiz</li>
+      <li>Votre historique de requêtes (statistiques d'usage)</li>
+    </ul>
+    <p style="margin-top:12px">Les questions que vous avez générées et partagées dans la banque commune sont conservées (elles servent à d'autres élèves), mais sont anonymisées : votre numéro n'y sera plus associé.</p>
+  </div>
+
+  <div class="section">
+    <label for="phone">Numéro de téléphone utilisé dans l'app</label>
+    <input type="tel" id="phone" placeholder="Ex: 3712-3456 oswa +509 3712 3456" inputmode="tel" />
+    <button class="delete-btn" id="deleteBtn" onclick="showConfirm()">Demander la suppression</button>
+
+    <div class="confirm-box" id="confirmBox">
+      <strong>Êtes-vous certain(e) ?</strong> Cette action est permanente et ne peut pas être annulée. Toutes vos données seront effacées immédiatement.
+      <div class="confirm-actions">
+        <button class="btn-cancel" onclick="hideConfirm()">Annuler</button>
+        <button class="btn-confirm" onclick="submitDeletion()">Oui, supprimer définitivement</button>
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <footer>
+    <p>Des questions ? Contactez <a href="mailto:gidns4haiti@gmail.com">gidns4haiti@gmail.com</a></p>
+    <p style="margin-top:6px"><a href="/Gid-NS4/privacy-policy.html">Politique de confidentialité</a></p>
+    <p style="margin-top:6px">© 2026 Gid NS4 / Prof Lakay · Haïti</p>
+  </footer>
+
+</div>
+
+<script>
+  const API = "https://thxtnnjubzucisrujloe.supabase.co/functions/v1/ask-prof-lakay";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoeHRubmp1Ynp1Y2lzcnVqbG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNTQyNjUsImV4cCI6MjA4ODczMDI2NX0.mfmTxpNIdA6tBCN9O6NzQnP7Y20DpN9bBiSQP9QlMD4";
+
+  function showConfirm() {
+    const phone = document.getElementById('phone').value.trim();
+    if (!phone || phone.replace(/\D/g,"").length < 8) {
+      showStatus("error", "Antre yon nimewo telefòn valid (omwen 8 chif).");
+      return;
+    }
+    document.getElementById('confirmBox').classList.add('visible');
+  }
+
+  function hideConfirm() {
+    document.getElementById('confirmBox').classList.remove('visible');
+  }
+
+  function showStatus(type, msg) {
+    const el = document.getElementById('status');
+    el.className = 'status ' + type;
+    el.textContent = msg;
+  }
+
+  async function submitDeletion() {
+    const phone = document.getElementById('phone').value.trim();
+    const btn = document.getElementById('deleteBtn');
+    hideConfirm();
+    btn.disabled = true;
+    showStatus("loading", "Suppression en cours...");
+
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + ANON_KEY },
+        body: JSON.stringify({ action: "delete_account", phone: phone }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Échec de la suppression");
+      showStatus("success", "✅ Votre compte a été supprimé avec succès. Toutes les données associées ont été effacées.");
+      document.getElementById('phone').value = "";
+    } catch (e) {
+      showStatus("error", "Erreur : " + e.message + ". Réessayez ou contactez gidns4haiti@gmail.com");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
