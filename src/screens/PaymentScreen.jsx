@@ -27,7 +27,7 @@ export function PaymentScreen({ onBack }) {
         <div>
           <h3 className="text-white font-bold text-lg mb-2">Aksè a ekspire oswa poko aktive</h3>
           <p className="text-white/70 text-sm leading-relaxed max-w-xs mx-auto">
-            Pou kontinye itilize Gid NS4, ou bezwen yon kòd valid bay pa direksyon lekòl ou.
+            Pou kontinye itilize Gid NS4, ou bezwen yon kòd valid ki bay pa direksyon lekòl ou a.
           </p>
         </div>
 
