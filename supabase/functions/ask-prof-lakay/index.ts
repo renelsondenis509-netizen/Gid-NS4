@@ -1311,6 +1311,26 @@ async function revokeUser(
   return { success: true, message: `Pwofil ${phone} efase.` };
 }
 
+// ─── ACTION : delete_account (auto-suppression RGPD / Play Store) ───────────
+async function deleteAccount(
+  db: ReturnType<typeof createClient>,
+  body: { phone: string }
+) {
+  const { phone } = body;
+  if (!phone) throw { status: 400, error: "Nimewo telefòn obligatwa." };
+
+  await db.from("scans").delete().eq("phone", phone);
+  await db.from("quiz_scores").delete().eq("phone", phone);
+  // Anonymise plutôt que supprimer : les questions restent utiles à la banque partagée
+  await db.from("generated_questions").update({ created_by_phone: null }).eq("created_by_phone", phone);
+
+  const { error } = await db.from("profiles").delete().eq("phone", phone);
+  if (error) throw { status: 500, error: "Echèk sipresyon: " + error.message };
+
+  await logAudit(db, "delete_account", phone, phone);
+  return { success: true, message: "Kont ou efase avèk siksè." };
+}
+
 // ─── ACTION : revoke_school ───────────────────────────────────────────────────
 async function revokeSchool(
   db: ReturnType<typeof createClient>,
@@ -1362,6 +1382,7 @@ Deno.serve(async (req) => {
       case "delete_school":       result = await deleteSchool(supabase, body); break;
       case "update_school":       result = await updateSchool(supabase, body); break;
       case "revoke_user":         result = await revokeUser(supabase, body); break;
+case "delete_account":      result = await deleteAccount(supabase, body); break; 
       case "revoke_school":       result = await revokeSchool(supabase, body); break;
       default:
         return new Response(JSON.stringify({ error: "Action inconnue" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
