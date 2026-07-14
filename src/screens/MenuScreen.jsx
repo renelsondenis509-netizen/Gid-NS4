@@ -239,9 +239,10 @@ const handleDeleteAccount = async () => {
   🗑️ Efase kont mwen
 </button>
         <button onClick={onLogout} className="w-full py-2 rounded-xl text-red-400 font-semibold" style={{ fontSize:14, background:"#d4002a15", border:"1px solid #d4002a30" }}>Dekonekte</button>
-        <div style={{ textAlign:"center" }}>
-          <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/privacy-policy.html" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>🔒 Politik Konfidansyalite</a>
-        </div>
+        <div style={{ textAlign:"center", display:"flex", justifyContent:"center", gap:16 }}>
+  <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/privacy-policy.html" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>🔒 Politik Konfidansyalite</a>
+  <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/delete-account.html" target="_blank" rel="noopener noreferrer" style={{ color:"#3B5BA8", fontSize:12, textDecoration:"none" }}>🗑️ Efase kont sou web</a>
+</div>
       </div>
 
       <BottomNav active="menu" onNavigate={onNavigate} />
