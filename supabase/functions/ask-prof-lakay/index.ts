@@ -1331,6 +1331,21 @@ async function deleteAccount(
   return { success: true, message: "Kont ou efase avèk siksè." };
 }
 
+// ─── ACTION : report_message (signalement contenu IA — conformité Play Store) ─
+async function reportMessage(
+  db: ReturnType<typeof createClient>,
+  body: { phone: string; schoolCode?: string; subject?: string; message: string; reason: string }
+) {
+  const { phone, schoolCode, subject, message, reason } = body;
+  if (!message) throw { status: 400, error: "Mesaj obligatwa." };
+  await logAudit(db, "report_content", phone, subject || "Général", {
+    message: (message ?? "").slice(0, 500),
+    reason: reason || "Pa presize",
+    schoolCode: schoolCode ?? null,
+  });
+  return { success: true };
+}
+
 // ─── ACTION : revoke_school ───────────────────────────────────────────────────
 async function revokeSchool(
   db: ReturnType<typeof createClient>,
@@ -1382,7 +1397,8 @@ Deno.serve(async (req) => {
       case "delete_school":       result = await deleteSchool(supabase, body); break;
       case "update_school":       result = await updateSchool(supabase, body); break;
       case "revoke_user":         result = await revokeUser(supabase, body); break;
-case "delete_account":      result = await deleteAccount(supabase, body); break; 
+      case "delete_account":      result = await deleteAccount(supabase, body); break; 
+      case "report_message":      result = await reportMessage(supabase, body); break;
       case "revoke_school":       result = await revokeSchool(supabase, body); break;
       default:
         return new Response(JSON.stringify({ error: "Action inconnue" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
