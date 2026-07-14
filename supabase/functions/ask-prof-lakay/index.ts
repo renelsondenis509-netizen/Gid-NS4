@@ -992,15 +992,6 @@ async function createAnnouncement(
   return { created: true };
 }
 
-// ─── ACTION : get_payment_numbers (fonction manquante ajoutée) ────────────────
-async function getPaymentNumbers(_db: ReturnType<typeof createClient>) {
-  return {
-    numbers: [
-      { method: "MonCash", number: "+509 48 69 50 79" },
-      { method: "NatCash", number: "+509 40 66 90 98" },
-    ],
-  };
-}
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 
 async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<string, string>) {
@@ -1362,7 +1353,6 @@ Deno.serve(async (req) => {
       case "save_quiz_score":     result = await saveQuizScore(supabase, body); break;
       case "get_leaderboard":     result = await getLeaderboard(supabase, body); break;
       case "dashboard":           result = await processDashboard(supabase, body); break;
-      case "get_payment_numbers": result = await getPaymentNumbers(supabase); break;
       case "get_announcements":   result = await getAnnouncements(supabase, body); break;
       case "create_announcement": result = await createAnnouncement(supabase, body); break;
       case "verify_admin":        result = await verifyAdmin(body); break;

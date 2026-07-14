@@ -161,7 +161,7 @@ const handleLogin = async () => {
 
       {/* Footer */}
       <div style={{ padding:"16px 0 24px", display:"flex", justifyContent:"center", alignItems:"center", gap:20 }}>
-        <button onClick={()=>onNavigate("payment")} style={{ color:"#2d4080", fontSize:12, background:"none", border:"none", cursor:"pointer" }}>Pèman</button>
+        <button onClick={()=>onNavigate("payment")} style={{ color:"#2d4080", fontSize:12, background:"none", border:"none", cursor:"pointer" }}>Aktivasyon</button>
         <span style={{ color:"#1a2a50", fontSize:14 }}>·</span>
         <button onClick={()=>onNavigate("partner")} style={{ color:"#2d4080", fontSize:12, background:"none", border:"none", cursor:"pointer" }}>Vin Patnè</button>
         <span style={{ color:"#1a2a50", fontSize:14 }}>·</span>

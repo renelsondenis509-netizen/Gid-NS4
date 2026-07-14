@@ -64,11 +64,11 @@ export function LeaderboardScreen({ user, onNavigate }) {
       <span style={{ fontSize: 48 }}>🏆</span>
       <h2 style={{ color:"#fbbf24", fontWeight:800, fontSize:18, marginTop:12 }}>Klasman</h2>
       <p style={{ color:"#4b6aaf", fontSize:13, textAlign:"center", marginTop:8, padding:"0 32px" }}>
-        Pran yon abònman pou wè klasman an ak pozisyon ou.
+        Ou bezwen yon kòd lekòl valid pou wè klasman an ak pozisyon ou.
       </p>
       <button onClick={() => onNavigate("payment")}
         style={{ marginTop:20, padding:"12px 28px", borderRadius:14, background:"linear-gradient(135deg,#d4002a,#ff6b35)", color:"white", fontWeight:700, fontSize:14 }}>
-        Wè plan yo
+        Plis enfòmasyon
       </button>
       <BottomNav active="leaderboard" onNavigate={onNavigate}/>
     </div>
