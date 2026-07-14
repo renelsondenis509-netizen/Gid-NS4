@@ -56,6 +56,7 @@ const SpeakIcon     = () => (<svg width="13" height="13" viewBox="0 0 24 24" fil
 const ScrollDownIcon= () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>);
 const EnvelopeIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>);
 const CopyIcon      = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>);
+const FlagIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>);
 
 export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
   const offlineLocal = useOffline();
@@ -71,6 +72,8 @@ export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
   const [activeSubject, setActiveSubject] = useState(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites,     setFavorites]     = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
+  const [reportingMsg, setReportingMsg] = useState(null);
+  const [reportSent,   setReportSent]   = useState(false);
 
  const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
   const [msgTimes]  = useState(() => ({}));
@@ -278,6 +281,14 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
     } catch(e) { console.warn("TTS:", e); }
   };
 
+const submitReport = async (msg, reason) => {
+  try {
+    await callEdge({ action:"report_message", phone:user.phone, schoolCode:user.code||"FREEMIUM", subject: msg.subject||activeSubject||"Général", message: msg.content, reason });
+  } catch {}
+  setReportSent(true);
+  setTimeout(() => { setReportingMsg(null); setReportSent(false); }, 1500);
+};
+
   const activeColor = activeSubject ? getSubjectColor(activeSubject) : null;
 
   return (
@@ -344,6 +355,9 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
           <span style={{ fontSize:10, color:"#ffffff", fontWeight:700, letterSpacing:"0.05em" }}>REKÈT</span>
         </div>
       </div>
+<div style={{ textAlign:"center", padding:"4px 12px", fontSize:10, color:"#4b6cb7", background:"rgba(255,255,255,0.02)" }}>
+  ℹ️ Repons Prof Lakay yo jenere pa yon Entelijans Atifisyèl (IA)
+</div>
 
       {/* EXPIRY BANNER */}
       {user.daysRemaining > 0 && <ExpiryBanner daysRemaining={user.daysRemaining} />}
@@ -391,6 +405,9 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
                   <button onClick={()=>copyText(msg.content, i)} style={{ width:28, height:28, borderRadius:8, background:copiedId===i?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.05)", border:copiedId===i?"1px solid rgba(34,197,94,0.4)":"1px solid rgba(255,255,255,0.1)", cursor:"pointer", color:copiedId===i?"#4ade80":"#6b7280", display:"inline-flex", alignItems:"center", justifyContent:"center", transition:"all .2s" }}>
                     <CopyIcon/>
                   </button>
+                  <button onClick={()=>setReportingMsg(i)} style={{ width:28, height:28, borderRadius:8, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.15)", cursor:"pointer", color:"#f87171", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
+  <FlagIcon/>
+</button>
                   <span style={{ fontSize:10, color:"#2d3f6e", marginLeft:2, alignSelf:"center" }}>{getTime(i)}</span>
                 </div>
               )}
@@ -452,7 +469,25 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
     </div>
   </div>
 )}
-      <ErrorToast error={apiError} onRetry={lastPayload?()=>sendMessage(lastPayload):null} onDismiss={()=>{setApiError(null);setLastPayload(null);}} />
+
+{reportingMsg !== null && (
+  <div onClick={()=>setReportingMsg(null)} style={{ position:"fixed", inset:0, zIndex:60, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"flex-end" }}>
+    <div onClick={e=>e.stopPropagation()} style={{ width:"100%", background:"#080e24", borderRadius:"20px 20px 0 0", border:"1px solid rgba(239,68,68,0.2)", padding:"20px 16px 32px" }}>
+      {!reportSent ? (
+        <>
+          <div style={{ color:"#e2e8ff", fontWeight:800, fontSize:15, marginBottom:14 }}>🚩 Rapòte repons sa a</div>
+          {["Repons pa kòrèk","Kontni deranjan oswa ofansif","Lang ki pa apwopriye","Lòt rezon"].map(r => (
+            <button key={r} onClick={()=>submitReport(messages[reportingMsg], r)} style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 14px", marginBottom:8, borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#c8d8ff", fontSize:13, cursor:"pointer" }}>{r}</button>
+          ))}
+        </>
+      ) : (
+        <div style={{ textAlign:"center", padding:"20px 0", color:"#4ade80", fontWeight:700 }}>✅ Mèsi, nou resevwa rapò a</div>
+      )}
+    </div>
+  </div>
+)}
+    
+     <ErrorToast error={apiError} onRetry={lastPayload?()=>sendMessage(lastPayload):null} onDismiss={()=>{setApiError(null);setLastPayload(null);}} />
 
       {/* ZONE INPUT */}
       <div style={{ position:"relative", zIndex:10, padding:"8px 12px 4px", background:"rgba(6,11,32,0.97)", backdropFilter:"blur(24px)", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
