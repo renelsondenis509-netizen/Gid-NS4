@@ -1,3 +1,4 @@
+import { encryptWithDevice, decryptWithDevice } from "../utils/secureStorage";
 import { callEdge, parseApiError } from "../api";
 import { jsPDF } from "jspdf";
 import { useState, useEffect, useRef } from "react";
@@ -305,7 +306,7 @@ const sendAnnonce = async () => {
   try {
     const saved = localStorage.getItem(_dirKey);
     const { _auth } = JSON.parse(saved);
-    let directorCode; try { directorCode = atob(_auth.directorCode); } catch { directorCode = _auth.directorCode; }
+    const directorCode = await decryptWithDevice(_auth.directorCode, getDeviceId());
     await callEdge({
       action: "create_announcement",
       schoolCode: userCode,
@@ -358,7 +359,7 @@ delete window[_winKey]; // toujours frais pour scansToday
   if (!saved) return;
   const parsed = JSON.parse(saved);
   const { directorCode: _enc } = parsed._auth || {};
-  let directorCode; try { directorCode = _enc ? atob(_enc) : undefined; } catch { directorCode = _enc; }
+  const directorCode = _enc ? await decryptWithDevice(_enc, getDeviceId()) : undefined;
   if (!directorCode) return;
 
   setLoading(true);
@@ -393,7 +394,7 @@ delete window[_winKey]; // toujours frais pour scansToday
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode: dirCode.trim(), deviceId: getDeviceId() });
       setStats(result);
       setAuthorized(true);
-      const fullData = { ...result, _auth: { directorCode: btoa(dirCode.trim()) } };
+      const fullData = { ...result, _auth: { directorCode: await encryptWithDevice(dirCode.trim(), getDeviceId()) } };
       localStorage.setItem(_dirKey, JSON.stringify(fullData));
       window[`_gns4_dash_${userCode}`] = fullData;
     } catch (e) {
@@ -493,9 +494,10 @@ delete window[_winKey]; // toujours frais pour scansToday
   onClick={async () => {
     setLoading(true);
     try {
-      const saved = localStorage.getItem(_dirKey);
-      const { _auth } = JSON.parse(saved);
-      let directorCode; try { directorCode = atob(_auth.directorCode); } catch { directorCode = _auth.directorCode; }
+      const parsed = JSON.parse(saved);
+  const { directorCode: _enc } = parsed._auth || {};
+  const directorCode = _enc ? await decryptWithDevice(_enc, getDeviceId()) : undefined;
+  if (!directorCode) return;
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode });
       const full = { ...result, _auth };
       setStats(full);
