@@ -355,27 +355,29 @@ delete window[_winKey]; // toujours frais pour scansToday
   if (hasFetched.current) return;
   hasFetched.current = true;
 
-  const saved = localStorage.getItem(_dirKey);
-  if (!saved) return;
-  const parsed = JSON.parse(saved);
-  const { directorCode: _enc } = parsed._auth || {};
-  const directorCode = _enc ? await decryptWithDevice(_enc, getDeviceId()) : undefined;
-  if (!directorCode) return;
+  (async () => {
+    const saved = localStorage.getItem(_dirKey);
+    if (!saved) return;
+    const parsed = JSON.parse(saved);
+    const { directorCode: _enc } = parsed._auth || {};
+    const directorCode = _enc ? await decryptWithDevice(_enc, getDeviceId()) : undefined;
+    if (!directorCode) return;
 
-  setLoading(true);
-  callEdge({ action: "dashboard", schoolCode: userCode, directorCode })
-    .then(result => {
-      const full = { ...result, _auth: { directorCode } };
+    setLoading(true);
+    try {
+      const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode });
+      const encryptedCode = await encryptWithDevice(directorCode, getDeviceId());
+      const full = { ...result, _auth: { directorCode: encryptedCode } };
       setStats(full);
       setAuthorized(true);
       localStorage.setItem(_dirKey, JSON.stringify(full));
       window[`_gns4_dash_${userCode}`] = full;
-    })
-    .catch(() => {
-  // Ne PAS auto-autoriser sur erreur réseau
-  setLoading(false);
-})
-    .finally(() => setLoading(false));
+    } catch {
+      // Ne PAS auto-autoriser sur erreur réseau
+    } finally {
+      setLoading(false);
+    }
+  })();
 }, []);
 
   const getDeviceId = () => {
@@ -494,12 +496,15 @@ delete window[_winKey]; // toujours frais pour scansToday
   onClick={async () => {
     setLoading(true);
     try {
+      const saved = localStorage.getItem(_dirKey);
       const parsed = JSON.parse(saved);
-  const { directorCode: _enc } = parsed._auth || {};
-  const directorCode = _enc ? await decryptWithDevice(_enc, getDeviceId()) : undefined;
-  if (!directorCode) return;
+      const { directorCode: _enc } = parsed._auth || {};
+      const directorCode = _enc ? await decryptWithDevice(_enc, getDeviceId()) : undefined;
+      if (!directorCode) return;
       const result = await callEdge({ action: "dashboard", schoolCode: userCode, directorCode });
-      const full = { ...result, _auth };
+      const encryptedCode = await encryptWithDevice(directorCode, getDeviceId());
+      const full = { ...result, _auth: { directorCode: encryptedCode } };
+      
       setStats(full);
       localStorage.setItem(_dirKey, JSON.stringify(full));
       window[`_gns4_dash_${userCode}`] = full;
