@@ -350,7 +350,10 @@ export function QuizScreen({ user, onNavigate }) {
           <div style={{ height:6, borderRadius:6, background:"rgba(255,255,255,0.05)", overflow:"hidden" }}>
             <div style={{ height:"100%", borderRadius:6, background:"linear-gradient(90deg,#2563eb,#7c3aed)", width:`${progress}%`, transition:"width .4s ease" }} />
           </div>
-        </div>
+      <div style={{ textAlign:"center", marginTop:8, fontSize:10, color:"#3b5280" }}>
+            ℹ️ Kèk kesyon jenere pa yon IA
+          </div>
+  </div>
 
         <div className="flex-1 overflow-y-auto" style={{ padding:"16px 14px", display:"flex", flexDirection:"column", gap:12 }}>
 
@@ -400,6 +403,12 @@ export function QuizScreen({ user, onNavigate }) {
                   </p>
                 </div>
               )}
+              <button onClick={()=>{
+                callEdge({ action:"report_message", phone:user.phone, schoolCode:user.code||"FREEMIUM", subject, message: currentQ.q, reason:"Kesyon pa kòrèk (Quiz)" }).catch(()=>{});
+                alert("Mèsi, nou resevwa rapò a.");
+              }} style={{ width:"100%", padding:"8px", borderRadius:12, background:"rgba(239,68,68,0.06)", border:"1px solid rgba(239,68,68,0.15)", color:"#f87171", fontSize:11, fontWeight:600, cursor:"pointer", marginBottom:8 }}>
+                🚩 Rapòte kesyon sa a
+              </button>
               <button onClick={handleNext}
                 style={{ width:"100%", padding:"15px", borderRadius:16, background: hearts<=0 ? "linear-gradient(135deg,#dc2626,#ef4444)" : "linear-gradient(135deg,#1d4ed8,#2563eb)", color:"#fff", fontWeight:800, fontSize:15, border:"none", cursor:"pointer", boxShadow: hearts<=0 ? "0 4px 20px rgba(220,38,38,0.3)" : "0 4px 20px rgba(37,99,235,0.3)" }}>
                 {hearts <= 0 ? "💔 Gade Rezilta" : qIndex+1 >= shuffledQs.length ? "Wè Rezilta →" : "Kesyon ki vini →"}
