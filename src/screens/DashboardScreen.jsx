@@ -837,7 +837,7 @@ delete window[_winKey]; // toujours frais pour scansToday
     disabled={annonceSending || !annonce.title.trim() || !annonce.message.trim()}
     style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontWeight:700, fontSize:13, cursor: annonceSending ? "not-allowed" : "pointer", background: annonceSending ? "#1e3a8a" : "linear-gradient(135deg,#1d4ed8,#2563eb)", color:"#fff" }}
   >
-    {annonceSending ? "Piblikasyon..." : "📢 Pibliye Anons lan "}
+    {annonceSending ? "Piblikasyon..." : "📢 Pibliye mesaj lan "}
   </button>
 </div>  
       <button
