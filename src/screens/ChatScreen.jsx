@@ -356,7 +356,7 @@ const submitReport = async (msg, reason) => {
         </div>
       </div>
 <div style={{ textAlign:"center", padding:"4px 12px", fontSize:10, color:"#4b6cb7", background:"rgba(255,255,255,0.02)" }}>
-  ℹ️ Repons Prof Lakay yo jenere pa yon Entelijans Atifisyèl (IA)
+  ℹ️ Repons Gid NS4 yo jenere pa yon Entelijans Atifisyèl (IA)
 </div>
 
       {/* EXPIRY BANNER */}
@@ -475,8 +475,8 @@ const submitReport = async (msg, reason) => {
     <div onClick={e=>e.stopPropagation()} style={{ width:"100%", background:"#080e24", borderRadius:"20px 20px 0 0", border:"1px solid rgba(239,68,68,0.2)", padding:"20px 16px 32px" }}>
       {!reportSent ? (
         <>
-          <div style={{ color:"#e2e8ff", fontWeight:800, fontSize:15, marginBottom:14 }}>🚩 Rapòte repons sa a</div>
-          {["Repons pa kòrèk","Kontni deranjan oswa ofansif","Lang ki pa apwopriye","Lòt rezon"].map(r => (
+          <div style={{ color:"#e2e8ff", fontWeight:800, fontSize:15, marginBottom:14 }}>🚩 Rapòte repons sa</div>
+          {["Repons ki pa kòrèk","Kontni deranjan oswa ofansan","Lang ki pa apwopriye","Lòt rezon"].map(r => (
             <button key={r} onClick={()=>submitReport(messages[reportingMsg], r)} style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 14px", marginBottom:8, borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#c8d8ff", fontSize:13, cursor:"pointer" }}>{r}</button>
           ))}
         </>
