@@ -105,6 +105,45 @@ function ListSchools({ adminSecret }) {
   );
 }
 
+
+function ReportedMessages({ adminSecret }) {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const load = async () => {
+    setLoading(true); setError("");
+    try {
+      const data = await callEdge({ action: "get_reported_messages", adminSecret });
+      setReports(data.reports ?? []);
+    } catch (e) {
+      setError(e.error ?? "Erè.");
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div>
+      <button onClick={load} disabled={loading}
+        style={{ width:"100%", padding:10, borderRadius:8, background:"#1e293b", color:"#94a3b8", border:"1px solid #334155", cursor:"pointer", marginBottom:12 }}>
+        {loading ? "Chajman..." : "Chaje rapo yo"}
+      </button>
+      {error && <p style={{ color:"#fca5a5", fontSize:13 }}>{error}</p>}
+      {reports.length === 0 && !loading && <p style={{ color:"#475569", fontSize:13, textAlign:"center" }}>Pa gen rapo ankò.</p>}
+      {reports.map(r => (
+        <div key={r.id} style={{ padding:"10px 12px", borderRadius:8, background:"#1e293b", marginBottom:8, fontSize:13 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+            <span style={{ color:"#f87171", fontWeight:700 }}>{r.target || "Jeneral"}</span>
+            <span style={{ color:"#475569", fontSize:11 }}>{new Date(r.created_at).toLocaleString("fr-HT")}</span>
+          </div>
+          <div style={{ color:"#94a3b8", marginBottom:2 }}>Rezon : <span style={{ color:"#fca5a5" }}>{r.details?.reason || "-"}</span></div>
+          <div style={{ color:"#e2e8f0", background:"#0f172a", borderRadius:6, padding:"6px 8px", marginTop:4 }}>{r.details?.message?.slice(0, 200) || "-"}</div>
+          <div style={{ color:"#475569", fontSize:11, marginTop:4 }}>Telefòn : {r.performed_by}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function AdminScreen({ onBack }) {
   const [adminSecret, setAdminSecret] = useState("");
   const [secretOk, setSecretOk] = useState(false);
@@ -218,6 +257,10 @@ export default function AdminScreen({ onBack }) {
         <ActionButton label="Efase Pwofil" loading={loading.revokeUser} color="#dc2626"
           onClick={() => run("revoke_user", revokeUserForm, "revokeUser", setRevokeUserRes)} />
         <ResultBox {...revokeUserRes} />
+      </Section>
+
+      <Section title="Rapo Kontni Siyale">
+        <ReportedMessages adminSecret={adminSecret} />
       </Section>
 
       <Section title="📋 Jounal Odyit">
