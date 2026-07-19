@@ -1178,6 +1178,22 @@ async function getAuditLogs(
   return { success: true, logs: data };
 }
 
+async function getReportedMessages(
+  db: ReturnType<typeof createClient>,
+  body: { adminSecret: string }
+) {
+  const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+  if (body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
+  const { data, error } = await db
+    .from("audit_logs")
+    .select("*")
+    .eq("action", "report_content")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw { status: 500, error: error.message };
+  return { success: true, reports: data };
+}
+
 // ─── ACTION : verify_admin ────────────────────────────────────────────────────
 async function verifyAdmin(body: { adminSecret: string }) {
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
@@ -1399,6 +1415,7 @@ Deno.serve(async (req) => {
       case "revoke_user":         result = await revokeUser(supabase, body); break;
       case "delete_account":      result = await deleteAccount(supabase, body); break; 
       case "report_message":      result = await reportMessage(supabase, body); break;
+      case "get_reported_messages": result = await getReportedMessages(supabase, body); break;
       case "revoke_school":       result = await revokeSchool(supabase, body); break;
       default:
         return new Response(JSON.stringify({ error: "Action inconnue" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
