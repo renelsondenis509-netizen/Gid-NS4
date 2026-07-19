@@ -4,6 +4,7 @@ import { getQuizGrades } from "../utils/quiz";
 import { QUIZ_BRANCHES } from "../data/quizData";
 import { idbGetExercice, idbGetScans } from "../utils/idb";
 import { BADGES, computeBadges } from "../utils/badges";
+import { pushBackHandler, popBackHandler } from "../utils/backHandlerStack";
 
 const ALL_SUBJECTS = Object.values(QUIZ_BRANCHES).flatMap(f => f.subjects);
 
@@ -218,6 +219,13 @@ export function ProgressScreen({ user, onNavigate }) {
   const [exoData, setExoData] = useState([]);
   const [scanData, setScanData] = useState([]);
   const [showEval, setShowEval] = useState(false);
+
+  useEffect(() => {
+    if (!showEval) return;
+    const closeHandler = () => setShowEval(false);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [showEval]);
 
   const handleShareProgress = () => {
     if (!stats) return;

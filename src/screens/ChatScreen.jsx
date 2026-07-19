@@ -11,6 +11,7 @@ import { BottomNav } from "../components/UI";
 import { cacheClear } from "../utils/cache";
 import { TextToSpeech } from "@capacitor-community/text-to-speech";
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { pushBackHandler, popBackHandler } from "../utils/backHandlerStack";
 
 // ─── Couleurs par matière ─────────────────────────────────────
 const SUBJECT_COLORS = {
@@ -66,6 +67,13 @@ export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
   const [input,         setInput]         = useState("");
   const [image,         setImage]         = useState(null);
   const [zoomImage,     setZoomImage]     = useState(null);
+
+  useEffect(() => {
+    if (!zoomImage) return;
+    const closeHandler = () => setZoomImage(null);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [zoomImage]);
   const [loading,       setLoading]       = useState(false);
   const [apiError,      setApiError]      = useState(null);
   const [lastPayload,   setLastPayload]   = useState(null);
@@ -73,6 +81,13 @@ export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [favorites,     setFavorites]     = useState(() => { try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; } });
   const [reportingMsg, setReportingMsg] = useState(null);
+
+  useEffect(() => {
+    if (!reportingMsg && reportingMsg !== 0) return;
+    const closeHandler = () => setReportingMsg(null);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [reportingMsg]);
   const [reportSent,   setReportSent]   = useState(false);
 
  const formatTime = () => new Date().toLocaleTimeString("fr-HT", { hour:"2-digit", minute:"2-digit", timeZone:"America/Port-au-Prince" });
@@ -120,6 +135,13 @@ export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
 
 const [announcements,     setAnnouncements]     = useState([]);
 const [showAnnouncements, setShowAnnouncements] = useState(false);
+
+  useEffect(() => {
+    if (!showAnnouncements) return;
+    const closeHandler = () => setShowAnnouncements(false);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [showAnnouncements]);
 const [copiedId, setCopiedId] = useState(null);
 const [unreadCount,       setUnreadCount]       = useState(0);
 const [dismissedIds, setDismissedIds] = useState(() => {

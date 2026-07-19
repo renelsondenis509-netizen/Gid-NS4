@@ -20,6 +20,7 @@ import { ProgressScreen }   from "./screens/ProgressScreen";
 import { AboutScreen }      from "./screens/AboutScreen";
 import { OfflineBanner }     from "./components/OfflineBanner";
 import { idbGetPendingScores, idbDeletePendingScore } from "./utils/idb";
+import { triggerTopBackHandler } from "./utils/backHandlerStack";
 
 function enrichUser(u) {
   const { isFreemium, daysRemaining: freemiumDays } = getFreemiumStatus(u);
@@ -155,7 +156,10 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    const handler = CapApp.addListener("backButton", () => { goBack(); });
+    const handler = CapApp.addListener("backButton", () => {
+      if (triggerTopBackHandler()) return;
+      goBack();
+    });
     return () => { handler.then(h => h.remove()); };
   }, []);
 
