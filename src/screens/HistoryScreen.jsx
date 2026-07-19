@@ -261,7 +261,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   }, [user.phone]);
 
   useEffect(() => () => { TextToSpeech.stop().catch(()=>{}); }, []);
-  if (!hasAccess(user)) { onNavigate("payment"); return null; }
+  if (!hasAccess(user)) { onNavigate("partner"); return null; }
 
 
 

@@ -45,7 +45,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   }, []);
 
 
-  if (!hasAccess(user)) { onNavigate("payment"); return null; }
+  if (!hasAccess(user)) { onNavigate("partner"); return null; }
 
   const handleChoice = (idx) => {
     if (selected!==null) return;

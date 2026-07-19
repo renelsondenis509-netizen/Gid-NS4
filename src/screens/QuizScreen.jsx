@@ -117,7 +117,7 @@ export function QuizScreen({ user, onNavigate }) {
       .catch(() => {});
   }, []);
 
-  if (!hasAccess(user)) { onNavigate("payment"); return null; }
+  if (!hasAccess(user)) { onNavigate("partner"); return null; }
 
   const currentQ = shuffledQs[qIndex];
 

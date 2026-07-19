@@ -66,7 +66,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
       <p style={{ color:"#4b6aaf", fontSize:13, textAlign:"center", marginTop:8, padding:"0 32px" }}>
         Ou bezwen yon kòd lekòl valid pou wè klasman an ak pozisyon ou.
       </p>
-      <button onClick={() => onNavigate("payment")}
+      <button onClick={() => onNavigate("partner")}
         style={{ marginTop:20, padding:"12px 28px", borderRadius:14, background:"linear-gradient(135deg,#d4002a,#ff6b35)", color:"white", fontWeight:700, fontSize:14 }}>
         Plis enfòmasyon
       </button>

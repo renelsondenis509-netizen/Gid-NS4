@@ -12,7 +12,6 @@ import { ExerciceScreen }    from "./screens/ExerciceScreen";
 import { LeaderboardScreen } from "./screens/LeaderboardScreen";
 import { HistoryScreen }     from "./screens/HistoryScreen";
 import { MenuScreen }        from "./screens/MenuScreen";
-import { PaymentScreen }     from "./screens/PaymentScreen";
 import { DashboardScreen }   from "./screens/DashboardScreen";
 import { PartnerScreen }     from "./screens/PartnerScreen";
 import { FavoritesScreen }   from "./screens/FavoritesScreen";
@@ -45,7 +44,26 @@ export default function App() {
   const [activeScan, setActiveScan] = useState(null);
   const [isOffline,  setIsOffline]  = useState(!navigator.onLine);
 
-  const nav = (s) => setScreen(s);
+  const [history, setHistory] = useState([]);
+
+  const nav = (next) => {
+    setScreen(prevScreen => {
+      setHistory(h => [...h, prevScreen]);
+      return next;
+    });
+  };
+
+  const goBack = () => {
+    setHistory(h => {
+      if (h.length === 0) {
+        CapApp.exitApp();
+        return h;
+      }
+      const prev = h[h.length - 1];
+      setScreen(prev);
+      return h.slice(0, -1);
+    });
+  };
 
 useEffect(() => {
   let failCount = 0;
@@ -137,21 +155,16 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    const handler = CapApp.addListener("backButton", ({ canGoBack }) => {
-      if (screen === "chat") { CapApp.exitApp(); return; }
-      if (screen === "login" || screen === "splash") { CapApp.exitApp(); return; }
-      if (screen === "partner" || screen === "payment" || screen === "about") { setScreen("menu"); return; }
-      if (screen === "progress" || screen === "favorites" || screen === "leaderboard" || screen === "history" || screen === "quiz") { setScreen("chat"); return; }
-      setScreen("chat");
-    });
+    const handler = CapApp.addListener("backButton", () => { goBack(); });
     return () => { handler.then(h => h.remove()); };
-  }, [screen]);
+  }, []);
 
 
   const handleLogin = (u) => {
     const enriched = enrichUser(u);
     sessionSave(enriched);
     setUser(enriched);
+    setHistory([]);
     setScreen("chat");
     requestNotificationPermission().then(granted => {
       if (granted) {
@@ -168,24 +181,24 @@ useEffect(() => {
     localStorage.removeItem(`gid_dir_v3_${user.code}_${user.phone}`);
   }
   setUser(null);
+  setHistory([]);
   setScreen("login");
 };
 
   function renderContent() {
-    if (screen === "splash")      return <SplashScreen onDone={() => { const s = sessionLoad(); if (s?.phone && s?.code) { setUser(enrichUser(s)); setScreen("chat"); } else setScreen("login"); }} />;
+    if (screen === "splash")      return <SplashScreen onDone={() => { const s = sessionLoad(); setHistory([]); if (s?.phone && s?.code) { setUser(enrichUser(s)); setScreen("chat"); } else setScreen("login"); }} />;
     if (user && !hasAccess(user)) return <LoginScreen onLogin={handleLogin} onNavigate={nav} expired={true} />;
     if (screen === "login")       return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;
     if (screen === "chat")        return <ChatScreen user={user} onNavigate={nav} isOffline={isOffline} />;
     if (screen === "quiz")        return <QuizScreen user={user} onNavigate={nav} />;
     if (screen === "leaderboard") return <LeaderboardScreen user={user} onNavigate={nav} />;
-    if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); setScreen("exercice"); }} />;
+    if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); nav("exercice"); }} />;
     if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
-    if (screen === "payment")     return <PaymentScreen onBack={() => nav(user ? "menu" : "login")} />;
-    if (screen === "dashboard") return <DashboardScreen onBack={() => nav("menu")} userCode={user?.code} userPhone={user?.phone} />;
-    if (screen === "partner")     return <PartnerScreen onBack={() => nav(user ? "menu" : "login")} />;
-    if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={() => setScreen("history")} onNavigate={nav} />;
+    if (screen === "dashboard") return <DashboardScreen onBack={goBack} userCode={user?.code} userPhone={user?.phone} />;
+    if (screen === "partner")     return <PartnerScreen onBack={goBack} />;
+    if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={goBack} onNavigate={nav} />;
     if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
-    if (screen === "admin")       return <AdminScreen onBack={() => nav("menu")} />;
+    if (screen === "admin")       return <AdminScreen onBack={goBack} />;
     if (screen === "progress")    return <ProgressScreen user={user} onNavigate={nav} />;
     if (screen === "about")       return <AboutScreen onNavigate={nav} />;
     return <LoginScreen onLogin={handleLogin} onNavigate={nav} />;

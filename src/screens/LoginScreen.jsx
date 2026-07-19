@@ -161,8 +161,6 @@ const handleLogin = async () => {
 
       {/* Footer */}
       <div style={{ padding:"16px 0 24px", display:"flex", justifyContent:"center", alignItems:"center", gap:20 }}>
-        <button onClick={()=>onNavigate("payment")} style={{ color:"#2d4080", fontSize:12, background:"none", border:"none", cursor:"pointer" }}>Aktivasyon</button>
-        <span style={{ color:"#1a2a50", fontSize:14 }}>·</span>
         <button onClick={()=>onNavigate("partner")} style={{ color:"#2d4080", fontSize:12, background:"none", border:"none", cursor:"pointer" }}>Vin Patnè</button>
         <span style={{ color:"#1a2a50", fontSize:14 }}>·</span>
         <a href="https://renelsondenis509-netizen.github.io/Gid-NS4/privacy-policy.html" target="_blank" rel="noopener noreferrer" style={{ color:"#2d4080", fontSize:12, textDecoration:"none" }}>Politik Konfidansyalite</a>
