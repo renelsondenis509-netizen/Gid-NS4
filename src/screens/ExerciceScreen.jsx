@@ -25,6 +25,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
   const [answers,   setAnswers]   = useState([]);
 
   useEffect(() => {
+    if (!hasAccess(user)) return;
     if (scan.questions?.length > 0) {
       setQuestions(scan.questions);
       setLoading(false);
