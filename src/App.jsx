@@ -199,7 +199,7 @@ useEffect(() => {
     if (screen === "history")     return <HistoryScreen user={user} onNavigate={nav} onStartExercice={(scan) => { setActiveScan({ ...scan, _isRedo: !!scan.questions?.length }); nav("exercice"); }} />;
     if (screen === "menu")        return <MenuScreen user={user} onNavigate={nav} onLogout={handleLogout} />;
     if (screen === "dashboard") return <DashboardScreen onBack={goBack} userCode={user?.code} userPhone={user?.phone} />;
-    if (screen === "partner")     return <PartnerScreen onBack={goBack} />;
+    if (screen === "partner")     return <PartnerScreen onBack={goBack} onNavigate={nav} user={user} />;
     if (screen === "exercice")    return <ExerciceScreen user={user} scan={activeScan} onBack={goBack} onNavigate={nav} />;
     if (screen === "favorites")   return <FavoritesScreen user={user} onNavigate={nav} />;
     if (screen === "admin")       return <AdminScreen onBack={goBack} />;

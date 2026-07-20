@@ -1,6 +1,8 @@
 import { BottomNav } from "../components/UI";
+import { hasAccess } from "../utils/freemium";
 
-export function PartnerScreen({ onBack, onNavigate }) {
+export function PartnerScreen({ onBack, onNavigate, user }) {
+  const isExpiredStudent = user && !hasAccess(user);
   // ─── SVG ICONS (Components) ──────────────────────────────────────────────
   const SchoolIcon = () => (
     <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#fbbf24" }}>
@@ -88,7 +90,13 @@ export function PartnerScreen({ onBack, onNavigate }) {
         <h2 className="text-white font-bold text-lg">Patenarya</h2>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-        
+
+        {isExpiredStudent && (
+          <div className="rounded-2xl px-4 py-3" style={{ background:"#d4002a15", border:"1px solid #d4002a33" }}>
+            <p className="text-sm font-bold" style={{ color:"#ff8080" }}>Kòd oswa abònman ou ekspire</p>
+            <p className="text-xs mt-1" style={{ color:"#fca5a5" }}>Kontakte direksyon lekòl ou pou renouvle aksè ou. Si ou se yon direktè ki vle vin patnè, gade opsyon yo anba a.</p>
+          </div>
+        )}
         {/* En-tête */}
         <div className="text-center py-4">
           <SchoolIcon />
