@@ -257,6 +257,13 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   }, [zoomImage]);
   const [exercices, setExercices] = useState([]);
   const [selected,  setSelected]  = useState(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    const closeHandler = () => setSelected(null);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [selected]);
   const [loading,   setLoading]   = useState(true);
   const [deleting,  setDeleting]  = useState(null);
   const [speakingId,setSpeakingId]= useState(null);

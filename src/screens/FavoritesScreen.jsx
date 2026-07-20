@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { LatexText } from "../components/LatexText";
 import { BottomNav } from "../components/UI";
 import { TextToSpeech } from "@capacitor-community/text-to-speech";
+import { pushBackHandler, popBackHandler } from "../utils/backHandlerStack";
 
 // Icônes SVG pour synthèse vocale
 const IcoVolumeUp = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
@@ -12,6 +13,13 @@ export function FavoritesScreen({ user, onNavigate }) {
     try { return JSON.parse(localStorage.getItem(`fav_${user.phone}`) || "[]"); } catch { return []; }
   });
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    const closeHandler = () => setSelected(null);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [selected]);
   const [speakingId, setSpeakingId] = useState(null);
 
     const cleanForTTS = (text) => (text || "")
