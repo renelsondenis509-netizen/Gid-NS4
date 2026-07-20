@@ -1,9 +1,19 @@
+import { useState, useEffect } from "react";
+import { App as CapApp } from "@capacitor/app";
 import { APP_LOGO } from "../config";
 import { BottomNav } from "../components/UI";
 
-const APP_VERSION = "1.0.0";
+const FALLBACK_VERSION = "1.1";
 
 export function AboutScreen({ onNavigate }) {
+  const [appVersion, setAppVersion] = useState(FALLBACK_VERSION);
+
+  useEffect(() => {
+    CapApp.getInfo()
+      .then(info => { if (info?.version) setAppVersion(info.version); })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="fixed inset-0 flex flex-col" style={{ background: "linear-gradient(145deg,#04081A,#080E24)" }}>
       {/* Header */}
@@ -14,7 +24,7 @@ export function AboutScreen({ onNavigate }) {
         <div style={{ color: "#E8EEFF", fontSize: 22, fontWeight: 900, letterSpacing: 0.5 }}>Gid NS4</div>
         <div style={{ color: "#4B6ABA", fontSize: 13, marginTop: 4 }}>Asistan Etid pou Klas NS4</div>
         <div style={{ display: "inline-block", marginTop: 10, background: "rgba(37,99,235,0.15)", border: "1px solid rgba(37,99,235,0.30)", borderRadius: 20, padding: "3px 14px", color: "#6B8ADB", fontSize: 12, fontWeight: 700 }}>
-          v{APP_VERSION}
+          v{appVersion}
         </div>
       </div>
 
@@ -22,7 +32,7 @@ export function AboutScreen({ onNavigate }) {
       <div className="flex-1 px-5 py-6 space-y-4" style={{ overflowY: "auto", paddingBottom: 90 }}>
 
         <Card>
-          <Row label="Vèsyon" value={`v${APP_VERSION}`} />
+          <Row label="Vèsyon" value={`v${appVersion}`} />
           <Row label="Platfòm" value="Android" />
         </Card>
 
