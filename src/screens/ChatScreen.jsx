@@ -172,6 +172,7 @@ useEffect(() => {
       body: ann[0]?.message?.slice(0, 100) ?? `${unread} nouvo mesaj`,
       channelId: "gidns4_default",
       smallIcon: "ic_stat_notify",
+      iconColor: "#E8002A",
       schedule: { at: new Date(Date.now() + 500) },
     }]}).catch(()=>{});
   } catch {}
