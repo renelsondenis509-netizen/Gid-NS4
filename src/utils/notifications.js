@@ -37,7 +37,6 @@ export async function scheduleDailyReminder(hour = 18) {
         schedule: { on: { hour, minute: 0 }, repeats: true, allowWhileIdle: true },
         sound: null,
         smallIcon: "ic_stat_notify",
-        iconColor: "#E8002A",
         channelId: CHANNEL_ID,
       }]
     });
@@ -57,7 +56,6 @@ export async function scheduleExpiryReminder(daysRemaining) {
         schedule: { at: new Date(Date.now() + 1000) },
         sound: null,
         smallIcon: "ic_stat_notify",
-        iconColor: "#E8002A",
         channelId: CHANNEL_ID,
       }]
     });
