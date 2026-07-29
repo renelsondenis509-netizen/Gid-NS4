@@ -255,7 +255,25 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         imageBase64: payload.userMsg.image ? payload.userMsg.image.split(",")[1] : null,
         history:     messages.slice(-6), subject,
       });
-      setMessages(p => [...p, { role:"assistant", content:result.reply, subject }]);
+      {
+        const fullReply = result.reply;
+        const words = fullReply.split(/(\s+)/);
+        const totalMs = Math.min(4000, Math.max(600, words.length * 28));
+        const stepMs  = totalMs / words.length;
+        let msgIndex;
+        setMessages(p => { msgIndex = p.length; return [...p, { role:"assistant", content:"", subject, typing:true }]; });
+        let w = 0;
+        const typer = setInterval(() => {
+          w++;
+          setMessages(p => {
+            const copy = [...p];
+            if (!copy[msgIndex]) { clearInterval(typer); return p; }
+            copy[msgIndex] = { ...copy[msgIndex], content: words.slice(0, w).join(""), typing: w < words.length };
+            return copy;
+          });
+          if (w >= words.length) clearInterval(typer);
+        }, stepMs);
+      }
       const next = result.scansUsed ?? (scansUsed + 1);
       setScansUsed(next);
       cacheClear(`leaderboard_${user.phone}_${user.code}`);
@@ -416,7 +434,7 @@ const submitReport = async (msg, reason) => {
               }}>
                 <LatexText content={msg.content} />
               </div>
-              {msg.role === "assistant" && (
+              {msg.role === "assistant" && !msg.typing && (
                 <div style={{ display:"flex", gap:4, marginTop:6, paddingLeft:4 }}>
                   <button onClick={()=>toggleFav(msg,i)} style={{ width:28, height:28, borderRadius:8, background:"none", border:"none", cursor:"pointer", color:"#fbbf24", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
                     {favorites.findIndex(f=>f.id===`${msg.subject||"gen"}_${(msg.content||"").slice(0,32).replace(/\s/g,"_")}`)>=0 ? <StarFullIcon/> : <StarOutlineIcon/>}
