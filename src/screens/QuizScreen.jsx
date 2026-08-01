@@ -131,8 +131,14 @@ export function QuizScreen({ user, onNavigate }) {
     } catch { /* la banque statique suffit si la requête échoue */ }
     const merged = [...QUIZ_DATA[sub], ...extra];
     setFullPool(merged);
-    const all    = shuffleArray(merged);
-    const first10 = all.slice(0, 10).map(shuffleChoices);
+    // Garantir jusqu'à 5 questions générées récemment (déjà triées par date
+    // décroissante côté serveur) dans les 10 tirées, pour que l'élève voie
+    // ses propres exercices transformés en quiz plutôt que de compter sur le hasard.
+    const guaranteedCount = Math.min(5, extra.length);
+    const guaranteed = extra.slice(0, guaranteedCount);
+    const remainingPool = [...QUIZ_DATA[sub], ...extra.slice(guaranteedCount)];
+    const filler = shuffleArray(remainingPool).slice(0, 10 - guaranteedCount);
+    const first10 = shuffleArray([...guaranteed, ...filler]).map(shuffleChoices);
     setSubject(sub); setShuffledQs(first10); setUsedQKeys(new Set(first10.map(q => q.q)));
     setPhase("qcm"); setQIndex(0); setScore(0); setTotalAnswered(0); setRoundScore(0);
     setHearts(3); setStreak(0); setMaxStreak(0); setWrongAnswers([]); setSelected(null); setRound(1);
