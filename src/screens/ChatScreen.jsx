@@ -286,6 +286,10 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         query: payload.userMsg.content||payload.currentInput||"",
         dailyLimit:DAILY_MAX, scansUsed:next,
       });
+      if ((result.reply || "").length > 150) {
+        callEdge({ action: "generate_quiz", content: result.reply, subject, phone: user.phone, schoolCode: user.code })
+          .catch(() => {});
+      }
     } catch(e) {
       const parsed = parseApiError(e);
       setApiError(parsed);
