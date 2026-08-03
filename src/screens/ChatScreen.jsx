@@ -415,7 +415,7 @@ const submitReport = async (msg, reason) => {
                 <img src={PROF_LAKAY_PHOTO} alt="Prof Lakay" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }} />
               </div>
             )}
-            <div style={{ maxWidth:"80%" }}>
+            <div style={{ maxWidth:"80%", minWidth:0 }}>
               {msg.image && <img src={msg.image} alt="scan" onClick={() => setZoomImage(msg.image)} style={{ borderRadius:14, marginBottom:6, maxHeight:140, objectFit:"contain", border:"1px solid rgba(255,255,255,0.08)", cursor:"pointer" }} />}
               <div style={{
                 padding:"12px 16px",
