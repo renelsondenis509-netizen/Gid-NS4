@@ -134,7 +134,7 @@ async function callSambaNova(systemPrompt: string, userContent: unknown[]): Prom
       "Authorization": `Bearer ${SAMBANOVA_KEY}`,
     },
     body: JSON.stringify({
-      model: "gemma-4-31B-it",
+      model: "Meta-Llama-3.3-70B-Instruct",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent.length > 1 ? userContent : userContent[0] },
@@ -157,7 +157,7 @@ async function callGroq(systemPrompt: string, userText: string): Promise<string>
       "Authorization": `Bearer ${Math.random() < 0.5 ? GROQ_KEY : (Deno.env.get("GROQ_KEY_2") || GROQ_KEY)}`,
     },
     body: JSON.stringify({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model: "openai/gpt-oss-120b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userText },
