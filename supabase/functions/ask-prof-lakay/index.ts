@@ -1383,6 +1383,8 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     if (typeof body.phone === "string") body.phone = normalizePhone(body.phone);
+    if (typeof body.code === "string") body.code = body.code.trim();
+    if (typeof body.schoolCode === "string") body.schoolCode = body.schoolCode.trim();
     let result: unknown;
 
     switch (body.action) {
