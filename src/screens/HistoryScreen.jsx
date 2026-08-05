@@ -23,6 +23,9 @@ const IcoStop       = () => (<svg width="15" height="15" viewBox="0 0 24 24" fil
 const IcoPencil     = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>);
 const IcoBook       = () => (<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C9.243 2 7 4.243 7 7v9c0 .55.45 1 1 1s1-.45 1-1V7c0-1.654 1.346-3 3-3s3 1.346 3 3v9c0 .55.45 1 1 1s1-.45 1-1V7c0-2.757-2.243-5-5-5zm-5 16H5V7c0-.55-.45-1-1-1s-1 .45-1 1v11c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-.55-.45-1-1-1s-1 .45-1 1v11H7z"/></svg>);
 const IcoStar       = () => (<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>);
+const IcoCheck2     = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>);
+const IcoX2         = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+const IcoEye        = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>);
 
 /* ─── Palette matières ───────────────────────────────────────────────── */
 const SUBJECT_COLORS = {
@@ -192,7 +195,7 @@ const HistoryCard = ({ h, onSelect, onSpeak, onDelete, speakingId, deleting }) =
 };
 
 /* ─── ExerciceCard ───────────────────────────────────────────────────── */
-const ExerciceCard = ({ exo, onRedo, onDelete, deleting }) => {
+const ExerciceCard = ({ exo, onRedo, onView, onDelete, deleting }) => {
   const subject = exo.subject || exo.matiere || exo.subjectName || null;
   const { glow } = getSubjectColor(subject);
   return (
@@ -225,6 +228,12 @@ const ExerciceCard = ({ exo, onRedo, onDelete, deleting }) => {
         </div>
         {/* Buttons */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <button onClick={() => onView(exo)}
+            style={{ padding: "6px 12px", borderRadius: 10, fontSize: 13, fontWeight: 700,
+              display: "flex", alignItems: "center", gap: 4, cursor: "pointer",
+              background: "#14532d22", color: "#4ade80", border: "1px solid #22c55e33" }}>
+            <IcoEye/> Rezilta
+          </button>
           <button onClick={() => onRedo(exo)}
             style={{ padding: "6px 12px", borderRadius: 10, fontSize: 13, fontWeight: 700,
               display: "flex", alignItems: "center", gap: 4, cursor: "pointer",
@@ -257,6 +266,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
   }, [zoomImage]);
   const [exercices, setExercices] = useState([]);
   const [selected,  setSelected]  = useState(null);
+  const [selectedExo, setSelectedExo] = useState(null);
 
   useEffect(() => {
     if (!selected) return;
@@ -264,6 +274,13 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     pushBackHandler(closeHandler);
     return () => popBackHandler(closeHandler);
   }, [selected]);
+
+  useEffect(() => {
+    if (!selectedExo) return;
+    const closeHandler = () => setSelectedExo(null);
+    pushBackHandler(closeHandler);
+    return () => popBackHandler(closeHandler);
+  }, [selectedExo]);
   const [loading,   setLoading]   = useState(true);
   const [deleting,  setDeleting]  = useState(null);
   const [speakingId,setSpeakingId]= useState(null);
@@ -308,6 +325,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
     setDeleting(exo.id);
     await idbDeleteExercice(exo.id);
     setExercices(e => e.filter(x => x.id !== exo.id));
+    if (selectedExo?.id === exo.id) setSelectedExo(null);
     setDeleting(null);
   };
 
@@ -429,6 +447,71 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
             <img src={zoomImage} alt="scan agrandi" style={{ maxWidth:"100%", maxHeight:"100%", objectFit:"contain", borderRadius:8 }} />
           </div>
         )}
+      </div>
+    );
+  }
+
+  /* ── Detail View (Egzèsis) ────────────────────────────────── */
+  if (selectedExo) {
+    const subject = selectedExo.subject || selectedExo.matiere || selectedExo.subjectName || null;
+    const list = selectedExo.answers?.length ? selectedExo.answers : (selectedExo.questions || []);
+    return (
+      <div className="fixed inset-0 flex flex-col" style={{ background: "#0a0f2e" }}>
+        <div style={{
+          padding: "16px 16px 14px",
+          background: "rgba(10,15,46,0.98)",
+          borderBottom: "1px solid #ffffff10",
+          display: "flex", alignItems: "center", gap: 10,
+        }}>
+          <button onClick={() => setSelectedExo(null)}
+            style={{ color: "#60a5fa", fontSize: 20, background: "none", border: "none", cursor: "pointer" }}>
+            ←
+          </button>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+              <h2 style={{ color: "#fff", fontWeight: 700, fontSize: 15, margin: 0 }}>Rezilta egzèsis</h2>
+              {subject && <SubjectPill subject={subject}/>}
+            </div>
+            <p style={{ color: "#475569", fontSize: 13, margin: 0 }}>{selectedExo.date}</p>
+          </div>
+          <button onClick={() => handleDeleteExercice(selectedExo)} disabled={deleting === selectedExo.id}
+            style={{ padding: "6px 12px", borderRadius: 12, fontSize: 13, fontWeight: 700,
+              display: "flex", alignItems: "center", gap: 5, cursor: "pointer",
+              background: "#d4002a22", color: "#ff8080", border: "1px solid #d4002a33" }}>
+            {deleting === selectedExo.id ? <IcoLoader/> : <IcoTrash/>} Efase
+          </button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 0", display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ borderRadius: 18, padding: 16, textAlign: "center",
+            background: "rgba(37,99,235,0.15)", border: "2px solid rgba(37,99,235,0.35)" }}>
+            <div style={{ fontSize: 40, fontWeight: 900, color: "#60a5fa", lineHeight: 1 }}>
+              {selectedExo.score}<span style={{ fontSize: 18, color: "#60a5fa99" }}>/{selectedExo.total}</span>
+            </div>
+          </div>
+
+          {list.map((a, i) => (
+            <div key={i} style={{ borderRadius: 16, padding: 12,
+              background: a.correct ? "#14532d22" : "#7f1d1d22",
+              border: `1px solid ${a.correct ? "#22c55e33" : "#ef444433"}` }}>
+              <p style={{ color: "#fff", fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{i + 1}. {a.q}</p>
+              {a.choices && a.selected != null && (
+                <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13,
+                  color: a.correct ? "#86efac" : "#fca5a5" }}>
+                  {a.correct ? <IcoCheck2/> : <IcoX2/>} {a.choices[a.selected]}
+                </p>
+              )}
+              {!a.correct && a.choices && (
+                <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#86efac", marginTop: 3 }}>
+                  <IcoCheck2/> {a.choices[a.answer]}
+                </p>
+              )}
+            </div>
+          ))}
+          <div style={{ height: 16 }}/>
+        </div>
+
+        <BottomNav active="history" onNavigate={onNavigate}/>
       </div>
     );
   }
@@ -619,7 +702,8 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                         </p>
                         {items.map(exo => (
                           <ExerciceCard key={exo.id} exo={exo}
-                            onRedo={onStartExercice} onDelete={handleDeleteExercice} deleting={deleting}/>
+                            onRedo={onStartExercice} onView={setSelectedExo}
+                            onDelete={handleDeleteExercice} deleting={deleting}/>
                         ))}
                       </div>
                     ));
