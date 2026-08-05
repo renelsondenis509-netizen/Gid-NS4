@@ -599,7 +599,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                       <div style={{ flex: 1, height: 6, borderRadius: 99, background: "#1e3a8a44", overflow: "hidden" }}>
                         <div style={{
                           height: "100%", borderRadius: 99,
-                          width: `${Math.min((count / (user.dailyTextScans ?? user.dailyScans)) * 100, 100)}%`,
+                          width: `${Math.min((count / user.dailyScans) * 100, 100)}%`,
                           background: count >= user.dailyScans
                             ? "#ef4444"
                             : "linear-gradient(90deg,#d4002a,#ff6b35)",
@@ -607,7 +607,7 @@ export function HistoryScreen({ user, onNavigate, onStartExercice }) {
                         }}/>
                       </div>
                       <span style={{ fontSize: 12, fontWeight: 700, color: "#fb923c", width: 36, textAlign: "right" }}>
-                        {count}/{user.dailyTextScans ?? user.dailyScans}
+                        {count}/{user.dailyScans}
                       </span>
                     </div>
                   ))}

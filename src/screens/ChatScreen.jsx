@@ -103,7 +103,7 @@ export function ChatScreen({ user, onNavigate, isOffline: isOfflineProp }) {
   const fileRef   = useRef(null);
   const chatRef   = useRef(null);
 
-  const DAILY_MAX = user.dailyTextScans ?? user.dailyScans ?? 10;
+  const DAILY_MAX = user.dailyScans ?? 10;
   const today     = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
   const getToday = () => new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
   const getScanKey = () => `gid_scan_${user.phone}_${getToday()}`;

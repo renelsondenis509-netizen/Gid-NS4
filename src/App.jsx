@@ -115,7 +115,7 @@ useEffect(() => {
           .then(result => {
             if (saved.code === "FREEMIUM") {
               if (result?.freemiumExpiresAt) {
-                const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0, dailyTextScans: result.dailyTextScans ?? 3, dailyImageScans: result.dailyImageScans ?? 1, dailyScans: result.dailyScans ?? 3 });
+                const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0, dailyScans: result.dailyScans ?? 3 });
                 sessionSave(fresh);
                 setUser(fresh);
                 // Sync compteur local avec serveur
@@ -123,7 +123,7 @@ useEffect(() => {
                 try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
               }
             } else if (result?.valid && result?.school) {
-              const fresh = enrichUser({ ...saved, ...result.school, code: saved.code, phone: saved.phone, name: saved.name, dailyScans: result.school.dailyScans, dailyImageScans: result.school.dailyImageScans, dailyTextScans: result.school.dailyTextScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects, isAdmin: result.isAdmin ?? saved.isAdmin ?? false, scansToday: result.scansToday ?? saved.scansToday ?? 0,
+              const fresh = enrichUser({ ...saved, ...result.school, code: saved.code, phone: saved.phone, name: saved.name, dailyScans: result.school.dailyScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects, isAdmin: result.isAdmin ?? saved.isAdmin ?? false, scansToday: result.scansToday ?? saved.scansToday ?? 0,
               });
               sessionSave(fresh);
               setUser(fresh);

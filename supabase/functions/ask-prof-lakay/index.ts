@@ -453,8 +453,6 @@ async function validateCode(
         name: "Freemium", 
         daily_scans: 3, 
         dailyScans: 3, 
-        dailyImageScans: 1, 
-        dailyTextScans: 2, 
         subjects: [], 
         daysRemaining: fr.daysRemaining, 
         expiresAt: fr.freemiumExpiresAt 
@@ -577,8 +575,6 @@ async function validateCode(
       name:            school.school_name,
       subjects:        addStatistique(school.subjects ?? []),
       dailyScans:      school.daily_scans ?? 5,
-      dailyImageScans: school.daily_image_scans ?? 1,
-      dailyTextScans:  school.daily_text_scans  ?? 4,
       daysRemaining,
       expiresAt:       school.expires_at,
       maxStudents:     school.max_students,
@@ -1135,8 +1131,6 @@ async function freemiumLogin(
     daysRemaining,
     scansToday: scansToday ?? 0,
     dailyScans: 3,
-    dailyImageScans: 1,
-    dailyTextScans: 3,
     subjects: ["Biologie","Géologie","Chimie","Physique","Histoire","Géographie","Économie","Philosophie","Analyse","Algèbre","Suite","Complexe","Probabilité","Géométrie","Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
   };
 }
@@ -1211,8 +1205,7 @@ async function createSchool(
     schoolName: string;
     durationDays?: number;
     maxStudents?: number;
-    dailyImageScans?: number;
-    dailyTextScans?: number;
+    dailyScans?: number;
   }
 ) {
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
@@ -1220,7 +1213,7 @@ async function createSchool(
     throw { status: 403, error: "Aksè refize." };
   }
 
-  const { schoolName, durationDays = 365, maxStudents = 200, dailyImageScans = 5, dailyTextScans = 10 } = body;
+  const { schoolName, durationDays = 365, maxStudents = 200, dailyScans = 5 } = body;
 if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." };
   const { data: existing } = await db.from("schools").select("code").eq("school_name", schoolName.trim()).limit(1).maybeSingle();
   if (existing) throw { status: 409, error: `Lekòl "${schoolName.trim()}" deja egziste ak kòd ${existing.code}.` };
@@ -1250,8 +1243,7 @@ if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." 
     starts_at: startsAt,
     expires_at: expiresAt,
     max_students: maxStudents,
-    daily_image_scans: dailyImageScans,
-    daily_text_scans: dailyTextScans,
+    daily_scans: dailyScans,
     subjects: body.subjects ?? [],
   });
 
@@ -1289,15 +1281,14 @@ async function deleteSchool(db: ReturnType<typeof createClient>, body: { adminSe
 // ─── ACTION : update_school ───────────────────────────────────────────────────
 async function updateSchool(
   db: ReturnType<typeof createClient>,
-  body: { adminSecret: string; code: string; dailyImageScans?: number; dailyTextScans?: number; maxStudents?: number; durationDays?: number; }
+  body: { adminSecret: string; code: string; dailyScans?: number; maxStudents?: number; durationDays?: number; }
 ) {
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
   if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
-  const { code, dailyImageScans, dailyTextScans, maxStudents, durationDays } = body;
+  const { code, dailyScans, maxStudents, durationDays } = body;
   if (!code?.trim()) throw { status: 400, error: "Kod lekol la obligatwa." };
   const updates: Record<string, unknown> = {};
-  if (dailyImageScans !== undefined) updates.daily_image_scans = dailyImageScans;
-  if (dailyTextScans  !== undefined) updates.daily_text_scans  = dailyTextScans;
+  if (dailyScans        !== undefined) updates.daily_scans        = dailyScans;
   if (maxStudents     !== undefined) updates.max_students      = maxStudents;
   if (durationDays    !== undefined) {
     const { data: school } = await db.from("schools").select("starts_at").eq("code", code).maybeSingle();

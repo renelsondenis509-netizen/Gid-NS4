@@ -51,8 +51,7 @@ Deno.test("create_school — création valide", async () => {
     schoolName: "Lekòl Test Auto",
     durationDays: 30,
     maxStudents: 10,
-    dailyImageScans: 2,
-    dailyTextScans: 5,
+    dailyScans: 5,
   });
   if (status !== 200 || !data.code) throw new Error(`Échec création: ${JSON.stringify(data)}`);
   console.log(`✅ create_school OK — code: ${data.code}`);

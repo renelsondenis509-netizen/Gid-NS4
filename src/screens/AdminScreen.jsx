@@ -149,11 +149,11 @@ export default function AdminScreen({ onBack }) {
   const [secretOk, setSecretOk] = useState(false);
   const [secretError, setSecretError] = useState("");
   const [verifying, setVerifying] = useState(false);
-  const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyImageScans: 5, dailyTextScans: 10 });
+  const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyScans: 10 });
   const [selectedFilieres, setSelectedFilieres] = useState([]);
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
-  const [updateForm, setUpdateForm] = useState({ code: "", dailyImageScans: "", dailyTextScans: "", maxStudents: "", durationDays: "" });
+  const [updateForm, setUpdateForm] = useState({ code: "", dailyScans: "", maxStudents: "", durationDays: "" });
   const [updateRes, setUpdateRes] = useState({ result: null, error: "" });
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
@@ -215,8 +215,7 @@ export default function AdminScreen({ onBack }) {
         <Field label="Non Lekòl" k="schoolName" form={createForm} setForm={setCreateForm} />
         <Field label="Dire (jou)" k="durationDays" type="number" form={createForm} setForm={setCreateForm} />
         <Field label="Max Elèv" k="maxStudents" type="number" form={createForm} setForm={setCreateForm} />
-        <Field label="Foto/jou" k="dailyImageScans" type="number" form={createForm} setForm={setCreateForm} />
-        <Field label="Tèks/jou" k="dailyTextScans" type="number" form={createForm} setForm={setCreateForm} />
+        <Field label="Rekèt/jou" k="dailyScans" type="number" form={createForm} setForm={setCreateForm} />
         <div style={{ marginBottom: 12 }}>
           <label style={{ display:"block", fontSize:13, color:"#94a3b8", marginBottom:8 }}>Filiè (matye)</label>
           <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
@@ -237,15 +236,13 @@ export default function AdminScreen({ onBack }) {
       
         <Section title="✏️ Modifye Lekol Egzistan">
           <Field label="Kod Lekol"  k="code"            form={updateForm} setForm={setUpdateForm} />
-          <Field label="Foto/jou"   k="dailyImageScans" type="number" form={updateForm} setForm={setUpdateForm} />
-          <Field label="Teks/jou"   k="dailyTextScans"  type="number" form={updateForm} setForm={setUpdateForm} />
+          <Field label="Rekèt/jou"  k="dailyScans"     type="number" form={updateForm} setForm={setUpdateForm} />
           <Field label="Max Elev"   k="maxStudents"     type="number" form={updateForm} setForm={setUpdateForm} />
           <Field label="Dire (jou)" k="durationDays"    type="number" form={updateForm} setForm={setUpdateForm} />
           <ActionButton label="Mete Ajou" loading={loading.update}
             onClick={() => run("update_school", {
               ...updateForm,
-              dailyImageScans: updateForm.dailyImageScans ? Number(updateForm.dailyImageScans) : undefined,
-              dailyTextScans:  updateForm.dailyTextScans  ? Number(updateForm.dailyTextScans)  : undefined,
+              dailyScans:      updateForm.dailyScans      ? Number(updateForm.dailyScans)      : undefined,
               maxStudents:     updateForm.maxStudents     ? Number(updateForm.maxStudents)     : undefined,
               durationDays:    updateForm.durationDays    ? Number(updateForm.durationDays)    : undefined,
             }, "update", setUpdateRes)} />
