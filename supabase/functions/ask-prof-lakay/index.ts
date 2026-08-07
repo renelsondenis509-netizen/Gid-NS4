@@ -1291,8 +1291,7 @@ async function updateSchool(
   if (dailyScans        !== undefined) updates.daily_scans        = dailyScans;
   if (maxStudents     !== undefined) updates.max_students      = maxStudents;
   if (durationDays    !== undefined) {
-    const { data: school } = await db.from("schools").select("starts_at").eq("code", code).maybeSingle();
-    if (school) updates.expires_at = new Date(new Date(school.starts_at).getTime() + durationDays * 86400000).toISOString();
+    updates.expires_at = new Date(Date.now() + durationDays * 86400000).toISOString();
   }
 if (Object.keys(updates).length === 0) throw { status: 400, error: "Pa gen chanjman." };
   const { data: exists } = await db.from("schools").select("code").eq("code", code).maybeSingle();
