@@ -102,37 +102,44 @@ useEffect(() => {
       requestNotificationPermission().then(granted => {
         if (granted && enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
       });
-      // Refresh données école en arrière-plan (throttle 5 min)
-      const lastRefresh = parseInt(localStorage.getItem("gid_last_refresh") || "0");
-      const now = Date.now();
-      if (navigator.onLine && (now - lastRefresh > 5 * 60 * 1000)) {
+
+      const refreshUserData = () => {
+        const current = sessionLoad();
+        if (!current?.phone || !current?.code) return;
+        const lastRefresh = parseInt(localStorage.getItem("gid_last_refresh") || "0");
+        const now = Date.now();
+        if (!navigator.onLine || (now - lastRefresh <= 60 * 1000)) return;
         localStorage.setItem("gid_last_refresh", String(now));
-        const refreshAction = saved.code === "FREEMIUM" ? "freemium_login" : "validate_code";
-        const refreshPayload = saved.code === "FREEMIUM"
-          ? { action: "freemium_login", phone: saved.phone, name: saved.name || saved.phone }
-          : { action: "validate_code", phone: saved.phone, schoolCode: saved.code };
+        const refreshPayload = current.code === "FREEMIUM"
+          ? { action: "freemium_login", phone: current.phone, name: current.name || current.phone }
+          : { action: "validate_code", phone: current.phone, schoolCode: current.code };
         callEdge(refreshPayload)
           .then(result => {
-            if (saved.code === "FREEMIUM") {
+            if (current.code === "FREEMIUM") {
               if (result?.freemiumExpiresAt) {
-                const fresh = enrichUser({ ...saved, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0, dailyScans: result.dailyScans ?? 3 });
+                const fresh = enrichUser({ ...current, freemiumExpiresAt: result.freemiumExpiresAt, daysRemaining: result.daysRemaining, scansToday: result.scansToday ?? 0, dailyScans: result.dailyScans ?? 3 });
                 sessionSave(fresh);
                 setUser(fresh);
-                // Sync compteur local avec serveur
                 const today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
-                try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
+                try { localStorage.setItem(`gid_scan_${current.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
               }
             } else if (result?.valid && result?.school) {
-              const fresh = enrichUser({ ...saved, ...result.school, code: saved.code, phone: saved.phone, name: saved.name, dailyScans: result.school.dailyScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects, isAdmin: result.isAdmin ?? saved.isAdmin ?? false, scansToday: result.scansToday ?? saved.scansToday ?? 0,
+              const fresh = enrichUser({ ...current, ...result.school, code: current.code, phone: current.phone, name: current.name, dailyScans: result.school.dailyScans, expiresAt: result.school.expiresAt, subjects: result.school.subjects, isAdmin: result.isAdmin ?? current.isAdmin ?? false, scansToday: result.scansToday ?? current.scansToday ?? 0,
               });
               sessionSave(fresh);
               setUser(fresh);
-              // Sync compteur local avec serveur
               const today = new Date().toLocaleString("sv-SE", { timeZone:"America/Port-au-Prince" }).split(" ")[0];
-              try { localStorage.setItem(`gid_scan_${saved.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
+              try { localStorage.setItem(`gid_scan_${current.phone}_${today}`, String(result.scansToday ?? 0)); } catch {}
             }
           }).catch(() => {});
-      }
+      };
+
+      refreshUserData();
+
+      const resumeHandler = CapApp.addListener("appStateChange", ({ isActive }) => {
+        if (isActive) refreshUserData();
+      });
+      return () => { resumeHandler.then(h => h.remove()); };
     }
   }, []);
 
