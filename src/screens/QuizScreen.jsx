@@ -89,6 +89,7 @@ const getSubjectIcon = (subject, size = 20, color = "#fff") => {
 // ─── QUIZ SCREEN ─────────────────────────────────────────────
 export function QuizScreen({ user, onNavigate }) {
   const [phase,         setPhase]         = useState("select");
+  const [bestNoteInfo,  setBestNoteInfo]  = useState(null); // { beat, previousBest, isNewSubject }
   const [subject,       setSubject]       = useState(null);
   const [shuffledQs,    setShuffledQs]    = useState([]);
   const [qIndex,        setQIndex]        = useState(0);
@@ -149,10 +150,12 @@ export function QuizScreen({ user, onNavigate }) {
     if (finalTotal === 0 || !subject) return;
     const note20 = scoreToNote20(finalScore, finalTotal);
     saveQuizGrade(user.phone, subject, note20, finalScore, finalTotal);
+    setBestNoteInfo(null);
     try {
       if (!user.isFreemium) {
         try {
-          await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz" });
+          const res = await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz" });
+          setBestNoteInfo(res);
           cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
           cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
         } catch {
@@ -454,6 +457,21 @@ export function QuizScreen({ user, onNavigate }) {
             <div style={{ color:"#60a5fa", fontSize:12, marginTop:4 }}>{roundScore}/10 kòrèk</div>
           </div>
 
+          {bestNoteInfo && !bestNoteInfo.isNewSubject && !bestNoteInfo.beat && (
+            <div style={{ background:"rgba(59,130,246,0.1)", border:"1px solid rgba(59,130,246,0.25)", borderRadius:14, padding:"10px 14px", textAlign:"center" }}>
+              <p style={{ color:"#93c5fd", fontSize:12, margin:0 }}>
+                Ou pa bat pi bon nòt ou nan {subject} ({bestNoteInfo.previousBest}/20). Kontinye eseye !
+              </p>
+            </div>
+          )}
+          {bestNoteInfo && bestNoteInfo.beat && !bestNoteInfo.isNewSubject && (
+            <div style={{ background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, padding:"10px 14px", textAlign:"center" }}>
+              <p style={{ color:"#86efac", fontSize:12, margin:0 }}>
+                🎉 Nouvo pi bon nòt nan {subject} !
+              </p>
+            </div>
+          )}
+
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
             {[
               { icon:<CheckCircleIcon size={22} color="#22c55e"/>, val:score, label:"Total kòrèk" },
@@ -514,6 +532,21 @@ export function QuizScreen({ user, onNavigate }) {
             <div style={{ color:"#fff", fontWeight:700, fontSize:18, marginTop:4 }}>{mention.label}</div>
             <div style={{ color:"#60a5fa", fontSize:12, marginTop:4 }}>{score}/{totalAnswered} kòrèk</div>
           </div>
+
+          {bestNoteInfo && !bestNoteInfo.isNewSubject && !bestNoteInfo.beat && (
+            <div style={{ background:"rgba(59,130,246,0.1)", border:"1px solid rgba(59,130,246,0.25)", borderRadius:14, padding:"10px 14px", textAlign:"center" }}>
+              <p style={{ color:"#93c5fd", fontSize:12, margin:0 }}>
+                Ou pa bat pi bon nòt ou nan {subject} ({bestNoteInfo.previousBest}/20). Kontinye eseye !
+              </p>
+            </div>
+          )}
+          {bestNoteInfo && bestNoteInfo.beat && !bestNoteInfo.isNewSubject && (
+            <div style={{ background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, padding:"10px 14px", textAlign:"center" }}>
+              <p style={{ color:"#86efac", fontSize:12, margin:0 }}>
+                🎉 Nouvo pi bon nòt nan {subject} !
+              </p>
+            </div>
+          )}
 
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
             {[

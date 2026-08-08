@@ -715,19 +715,31 @@ async function saveQuizScore(
   }
 ) {
   const { phone, schoolCode, subject, score, total, note20, streak, source } = body;
-  const { data: nameRow } = await db.from("profiles")
-    .select("name")
-    .eq("phone", phone)
-    .not("name", "is", null)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const [{ data: nameRow }, { data: prevBestRow }] = await Promise.all([
+    db.from("profiles")
+      .select("name")
+      .eq("phone", phone)
+      .not("name", "is", null)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    db.from("quiz_scores")
+      .select("note20")
+      .eq("phone", phone)
+      .eq("subject", subject)
+      .order("note20", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
   const canonicalName = nameRow?.name || body.name || phone;
+  const previousBest = prevBestRow?.note20 ?? null;
+  const isNewSubject = previousBest === null;
+  const beat = isNewSubject || note20 > previousBest;
   await db.from("quiz_scores").insert({
     phone, school_code: schoolCode, subject, score, total, note20, streak,
     name: canonicalName, week: getWeekKey(), created_at: new Date().toISOString(), source: source || "quiz",
   });
-  return { saved: true };
+  return { saved: true, beat, previousBest, isNewSubject, note20 };
 }
 
 // ─── ACTION : get_leaderboard (corrigé, scope école/national) ─────────────────
