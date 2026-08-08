@@ -730,19 +730,40 @@ async function saveQuizScore(
   return { saved: true };
 }
 
-// ─── ACTION : get_leaderboard (corrigé) ───────────────────────────────────────
+// ─── ACTION : get_leaderboard (corrigé, scope école/national) ─────────────────
 async function getLeaderboard(
   db: ReturnType<typeof createClient>,
-  body: { phone: string }
+  body: { phone: string; scope?: "school" | "national"; schoolCode?: string }
 ) {
-  const { phone } = body;
+  const { phone, scope, schoolCode } = body;
+  const isSchoolScope = scope === "school";
+  if (isSchoolScope && !schoolCode) {
+    throw { status: 400, error: "schoolCode obligatoire pour le classement par école." };
+  }
 
   // ✅ Fetch quiz scores + scans + noms verrouillés en parallèle
+  // Filtre school_code appliqué seulement si scope === "school"
   const [{ data: allScores }, { data: allScansData }, { data: weekScoresData }, { data: profileNames }] = await Promise.all([
-    db.from("quiz_scores").select("phone, name, note20, score, school_code, subject"),
-    db.from("scans").select("phone, school_code, created_at"),
-    db.from("quiz_scores").select("phone, score").eq("week", getWeekKey()),
-    db.from("profiles").select("phone, name").not("name", "is", null),
+    (() => {
+      let q = db.from("quiz_scores").select("phone, name, note20, score, school_code, subject");
+      if (isSchoolScope) q = q.eq("school_code", schoolCode!);
+      return q;
+    })(),
+    (() => {
+      let q = db.from("scans").select("phone, school_code, created_at");
+      if (isSchoolScope) q = q.eq("school_code", schoolCode!);
+      return q;
+    })(),
+    (() => {
+      let q = db.from("quiz_scores").select("phone, score").eq("week", getWeekKey());
+      if (isSchoolScope) q = q.eq("school_code", schoolCode!);
+      return q;
+    })(),
+    (() => {
+      let q = db.from("profiles").select("phone, name").not("name", "is", null);
+      if (isSchoolScope) q = q.eq("school_code", schoolCode!);
+      return q;
+    })(),
   ]);
 
   // ── Noms des écoles ──
@@ -821,6 +842,7 @@ async function getLeaderboard(
     thisWeek:     formatBoard(weekMap, phone),
     activity:     formatBoard(activityMap, phone),
     currentWeek:  getWeekKey(),
+    scope:        isSchoolScope ? "school" : "national",
   };
 }
 

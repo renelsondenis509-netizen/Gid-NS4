@@ -30,24 +30,31 @@ const Medal = ({ rank }) => {
 
 export function LeaderboardScreen({ user, onNavigate }) {
   const [tab, setTab] = useState("totalCorrect");
+  const [scope, setScope] = useState("national"); // "national" | "school" — défaut national = comportement inchangé
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const load = (force = false) => {
-    const key = `leaderboard_${user.phone}_${user.code}`;
+  const load = (force = false, scopeOverride = scope) => {
+    const key = `leaderboard_${user.phone}_${user.code}_${scopeOverride}`;
     if (!force) {
       const cached = cacheGet(key);
       if (cached) { setData(cached); setLoading(false); return; }
     }
     setLoading(true); setError(null);
-    callEdge({ action:"get_leaderboard", phone:user.phone, schoolCode:user.code })
+    callEdge({ action:"get_leaderboard", phone:user.phone, schoolCode:user.code, scope:scopeOverride })
       .then(d => { cacheSet(key, d, 15 * 60 * 1000); setData(d); })
       .catch(e => setError(parseApiError(e).message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, []);
+
+  const switchScope = (next) => {
+    if (next === scope) return;
+    setScope(next);
+    load(false, next);
+  };
 
   const tabs = [
     { id:"totalCorrect",Icon:IcoTrophy,   label:"Pi bon nòt", valueLabel:" pts" },
@@ -83,6 +90,15 @@ export function LeaderboardScreen({ user, onNavigate }) {
             <h2 className="text-white font-bold">Klasman</h2>
             <p className="text-blue-400 text-xs">{user.school}</p>
           </div>
+        </div>
+        <div className="flex gap-2 mb-2">
+          {[{ id:"national", label:"Nasyonal" }, { id:"school", label:"Lekòl Mwen" }].map(({ id, label }) => (
+            <button key={id} onClick={() => switchScope(id)}
+              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold"
+              style={{ background:scope===id?"#1e3a8a55":"transparent", color:scope===id?"#93c5fd":"#4b5ea8", border:scope===id?"1px solid #3b82f655":"1px solid transparent" }}>
+              {label}
+            </button>
+          ))}
         </div>
         <div className="flex gap-2">
           {tabs.map(({ id, Icon, label }) => (
