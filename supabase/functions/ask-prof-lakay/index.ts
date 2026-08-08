@@ -715,31 +715,19 @@ async function saveQuizScore(
   }
 ) {
   const { phone, schoolCode, subject, score, total, note20, streak, source } = body;
-  const [{ data: nameRow }, { data: prevBestRow }] = await Promise.all([
-    db.from("profiles")
-      .select("name")
-      .eq("phone", phone)
-      .not("name", "is", null)
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .maybeSingle(),
-    db.from("quiz_scores")
-      .select("note20")
-      .eq("phone", phone)
-      .eq("subject", subject)
-      .order("note20", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
+  const { data: nameRow } = await db.from("profiles")
+    .select("name")
+    .eq("phone", phone)
+    .not("name", "is", null)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
   const canonicalName = nameRow?.name || body.name || phone;
-  const previousBest = prevBestRow?.note20 ?? null;
-  const isNewSubject = previousBest === null;
-  const beat = isNewSubject || note20 > previousBest;
   await db.from("quiz_scores").insert({
     phone, school_code: schoolCode, subject, score, total, note20, streak,
     name: canonicalName, week: getWeekKey(), created_at: new Date().toISOString(), source: source || "quiz",
   });
-  return { saved: true, beat, previousBest, isNewSubject, note20 };
+  return { saved: true };
 }
 
 // ─── ACTION : get_leaderboard (corrigé, scope école/national) ─────────────────
@@ -792,22 +780,9 @@ async function getLeaderboard(
   const nameMap: Record<string, string> = {};
   const schoolMap: Record<string, string> = {};
 
-  // 1. Meilleure note par matière pour chaque utilisateur
-  const bestPerSubject: Record<string, Record<string, number>> = {};
+  // Pi bon nòt = cumul de note20 sur TOUTES les tentatives, sans plafond par matière
   (allScores ?? []).forEach((row: any) => {
-    if (!bestPerSubject[row.phone]) bestPerSubject[row.phone] = {};
-    const cur = bestPerSubject[row.phone][row.subject] ?? 0;
-    if (row.note20 > cur) bestPerSubject[row.phone][row.subject] = row.note20;
-  });
-
-  // bestNoteMap = somme des meilleures notes par matière
-  Object.entries(bestPerSubject).forEach(([p, subjects]) => {
-    const vals = Object.values(subjects);
-    bestNoteMap[p] = Math.round(vals.reduce((a, b) => a + b, 0) * 10) / 10;
-  });
-
-  // 2. Remplir les autres maps (name, school) — totalCorrect fusionné dans bestNote, supprimé
-  (allScores ?? []).forEach((row: any) => {
+    bestNoteMap[row.phone] = Math.round(((bestNoteMap[row.phone] ?? 0) + (row.note20 ?? 0)) * 10) / 10;
     if (row.name) { const cur = nameMap[row.phone]; if (!cur || /^\d+$/.test(cur)) nameMap[row.phone] = row.name; }
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
