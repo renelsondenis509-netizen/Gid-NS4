@@ -92,7 +92,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
           </div>
         </div>
         <div className="flex gap-2 mb-2">
-          {[{ id:"national", label:"Nasyonal" }, { id:"school", label:"Lekòl Mwen" }].map(({ id, label }) => (
+          {[{ id:"national", label:"Jeneral" }, { id:"school", label:"Lekòl Mwen" }].map(({ id, label }) => (
             <button key={id} onClick={() => switchScope(id)}
               className="flex-1 py-1.5 rounded-lg text-[11px] font-bold"
               style={{ background:scope===id?"#1e3a8a55":"transparent", color:scope===id?"#93c5fd":"#4b5ea8", border:scope===id?"1px solid #3b82f655":"1px solid transparent" }}>
