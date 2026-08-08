@@ -75,7 +75,10 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         score, total: questions.length,
         note20, streak: score === questions.length ? 1 : 0,
         name: user.name, source: "exercice",
-      }).then(() => cacheClear(`leaderboard_${user.phone}_${user.code}`)).catch(() => {});
+      }).then(() => {
+        cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
+        cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
+      }).catch(() => {});
       setDone(true); return;
     }
     setCurrent(c=>c+1); setSelected(null);

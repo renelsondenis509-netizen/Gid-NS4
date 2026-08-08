@@ -276,7 +276,8 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
       }
       const next = result.scansUsed ?? (scansUsed + 1);
       setScansUsed(next);
-      cacheClear(`leaderboard_${user.phone}_${user.code}`);
+      cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
+      cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
       try { localStorage.setItem(getScanKey(), String(next)); localStorage.setItem(`gid_first_scan_${user.phone}`, "1"); } catch {}
       setLastPayload(null);
       await idbSaveScan(user.phone, {
