@@ -29,7 +29,7 @@ const Medal = ({ rank }) => {
 };
 
 export function LeaderboardScreen({ user, onNavigate }) {
-  const [tab, setTab] = useState("totalCorrect");
+  const [tab, setTab] = useState("bestNote");
   const [scope, setScope] = useState("national"); // "national" | "school" — défaut national = comportement inchangé
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export function LeaderboardScreen({ user, onNavigate }) {
   };
 
   const tabs = [
-    { id:"totalCorrect",Icon:IcoTrophy,   label:"Pi bon nòt", valueLabel:" pts" },
+    { id:"bestNote",    Icon:IcoTrophy,   label:"Pi bon nòt", valueLabel:" pts" },
     { id:"thisWeek",    Icon:IcoCalendar, label:"Semèn Sa",    valueLabel:" pts" },
     { id:"activity",    Icon:IcoBolt,     label:"Rekèt",       valueLabel:" pts" },
   ];

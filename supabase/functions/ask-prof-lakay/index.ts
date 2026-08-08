@@ -745,7 +745,7 @@ async function getLeaderboard(
   // Filtre school_code appliqué seulement si scope === "school"
   const [{ data: allScores }, { data: allScansData }, { data: weekScoresData }, { data: profileNames }] = await Promise.all([
     (() => {
-      let q = db.from("quiz_scores").select("phone, name, note20, score, school_code, subject");
+      let q = db.from("quiz_scores").select("phone, name, note20, school_code, subject");
       if (isSchoolScope) q = q.eq("school_code", schoolCode!);
       return q;
     })(),
@@ -776,7 +776,6 @@ async function getLeaderboard(
   (schools ?? []).forEach((s: any) => { schoolNameMap[s.code] = s.school_name; });
 
   // ── Agrégation globale ──
-  const totalCorrectMap: Record<string, number> = {};
   const bestNoteMap: Record<string, number> = {};
   const nameMap: Record<string, string> = {};
   const schoolMap: Record<string, string> = {};
@@ -795,9 +794,8 @@ async function getLeaderboard(
     bestNoteMap[p] = Math.round(vals.reduce((a, b) => a + b, 0) * 10) / 10;
   });
 
-  // 2. Remplir les autres maps (totalCorrect, name, school)
+  // 2. Remplir les autres maps (name, school) — totalCorrect fusionné dans bestNote, supprimé
   (allScores ?? []).forEach((row: any) => {
-    totalCorrectMap[row.phone] = (totalCorrectMap[row.phone] ?? 0) + (row.score ?? 0);
     if (row.name) { const cur = nameMap[row.phone]; if (!cur || /^\d+$/.test(cur)) nameMap[row.phone] = row.name; }
     if (row.school_code) schoolMap[row.phone] = schoolNameMap[row.school_code] ?? row.school_code;
   });
@@ -814,7 +812,7 @@ async function getLeaderboard(
   });
 
   // Classement Rekèt = total des requêtes AI (scans) par téléphone, 2 pts/requête
-  // Indépendant de "Pi bon nòt" (totalCorrectMap = points corrects quiz/exercices uniquement)
+  // Indépendant de "Pi bon nòt" (bestNoteMap = somme des meilleures notes par matière)
   const activityMap: Record<string, number> = {};
   (allScansData ?? []).forEach((row: any) => {
     activityMap[row.phone] = (activityMap[row.phone] ?? 0) + 2;
@@ -838,7 +836,6 @@ async function getLeaderboard(
 
   return {
     bestNote:     formatBoard(bestNoteMap, phone),
-    totalCorrect: formatBoard(totalCorrectMap, phone),
     thisWeek:     formatBoard(weekMap, phone),
     activity:     formatBoard(activityMap, phone),
     currentWeek:  getWeekKey(),
