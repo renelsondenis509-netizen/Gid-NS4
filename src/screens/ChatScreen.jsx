@@ -258,7 +258,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
       {
         const fullReply = result.reply;
         const words = fullReply.split(/(\s+)/);
-        const totalMs = Math.min(4000, Math.max(600, words.length * 28));
+        const totalMs = Math.min(2000, Math.max(400, words.length * 14));
         const stepMs  = totalMs / words.length;
         let msgIndex;
         setMessages(p => { msgIndex = p.length; return [...p, { role:"assistant", content:"", subject, typing:true }]; });
