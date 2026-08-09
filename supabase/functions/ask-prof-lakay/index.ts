@@ -715,6 +715,23 @@ async function saveQuizScore(
   }
 ) {
   const { phone, schoolCode, subject, score, total, note20, streak, source } = body;
+
+  // Validation anti-triche : bornes strictes côté serveur (le client n'est pas fiable)
+  if (
+    typeof note20 !== "number" || !Number.isFinite(note20) || note20 < 0 || note20 > 20 ||
+    typeof total !== "number" || !Number.isInteger(total) || total <= 0 ||
+    typeof score !== "number" || !Number.isInteger(score) || score < 0 || score > total ||
+    typeof subject !== "string" || !subject.trim() ||
+    typeof phone !== "string" || !phone.trim()
+  ) {
+    throw { status: 400, error: "Données de score invalides." };
+  }
+  // note20 doit correspondre au calcul réel (score/total)*20, marge d'arrondi tolérée
+  const expectedNote20 = Math.round((score / total) * 20 * 10) / 10;
+  if (Math.abs(note20 - expectedNote20) > 0.15) {
+    throw { status: 400, error: "Incohérence entre score et note20." };
+  }
+
   const { data: nameRow } = await db.from("profiles")
     .select("name")
     .eq("phone", phone)
