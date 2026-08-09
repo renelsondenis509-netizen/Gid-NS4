@@ -255,25 +255,7 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
         imageBase64: payload.userMsg.image ? payload.userMsg.image.split(",")[1] : null,
         history:     messages.slice(-6), subject,
       });
-      {
-        const fullReply = result.reply;
-        const words = fullReply.split(/(\s+)/);
-        const totalMs = Math.min(800, Math.max(150, words.length * 6));
-        const stepMs  = totalMs / words.length;
-        let msgIndex;
-        setMessages(p => { msgIndex = p.length; return [...p, { role:"assistant", content:"", subject, typing:true }]; });
-        let w = 0;
-        const typer = setInterval(() => {
-          w++;
-          setMessages(p => {
-            const copy = [...p];
-            if (!copy[msgIndex]) { clearInterval(typer); return p; }
-            copy[msgIndex] = { ...copy[msgIndex], content: words.slice(0, w).join(""), typing: w < words.length };
-            return copy;
-          });
-          if (w >= words.length) clearInterval(typer);
-        }, stepMs);
-      }
+      setMessages(p => [...p, { role:"assistant", content:result.reply, subject }]);
       const next = result.scansUsed ?? (scansUsed + 1);
       setScansUsed(next);
       cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
