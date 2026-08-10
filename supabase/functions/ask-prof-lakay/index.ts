@@ -453,7 +453,7 @@ async function validateCode(
         name: "Freemium", 
         daily_scans: 3, 
         dailyScans: 3, 
-        subjects: [], 
+        subjects: fr.subjects, 
         daysRemaining: fr.daysRemaining, 
         expiresAt: fr.freemiumExpiresAt 
       } 
@@ -1040,7 +1040,10 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
     // 🆕 Banque partagée automatique (option A) : chaque question valide est
     // ajoutée à generated_questions, dédupliquée par hash. Ne bloque jamais
     // la réponse à l'élève même en cas d'échec d'écriture.
-    if (Array.isArray(parsed?.questions) && subject && subject !== "Général") {
+    // Exclusion : les exercices en créole ne sont PAS ajoutés à la banque partagée
+    // (QuizScreen), seuls ceux en français y contribuent — l'élève reçoit quand
+    // même ses 5 questions normalement, seule l'insertion en banque est sautée.
+    if (Array.isArray(parsed?.questions) && subject && subject !== "Général" && !isCreole) {
       const { data: existingRows } = await db.from("generated_questions")
         .select("question").eq("subject", subject).limit(500);
       const existingSets = (existingRows ?? []).map((r: any) => wordSet(r.question));
@@ -1154,7 +1157,7 @@ async function freemiumLogin(
     daysRemaining,
     scansToday: scansToday ?? 0,
     dailyScans: 3,
-    subjects: ["Biologie","Géologie","Chimie","Physique","Histoire","Géographie","Économie","Philosophie","Analyse","Algèbre","Suite","Complexe","Probabilité","Géométrie","Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
+    subjects: ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
   };
 }
 

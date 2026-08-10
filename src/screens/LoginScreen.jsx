@@ -74,7 +74,7 @@ const handleLogin = async () => {
       onLogin({
         name: finalName, phone: phoneN,
         code: "FREEMIUM", school: "Freemium",
-        subjects: ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
+        subjects: result.subjects ?? ["Créole","Français","Anglais","Espagnol","Dissertation","Littérature Haïtienne","Littérature Française","Éducation Esthétique et Artistique","Éducation Physique et Sportive","Éducation à la Citoyenneté","Numérique et Informatique"],
         dailyScans: result.dailyScans ?? 3,
         daysRemaining: result.daysRemaining,
         expiresAt: result.freemiumExpiresAt,
