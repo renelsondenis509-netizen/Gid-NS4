@@ -48,8 +48,10 @@ export function parseApiError(err) {
     return { type: "network", message: "Pa gen koneksyon entènèt !", detail: "Konekte epi eseye ankò.", icon: "📶", retry: false };
   if (err instanceof TypeError && err.message.includes("fetch"))
     return { type: "network", message: "Koneksyon an pa bon, eseye ankò !", detail: "Verifye entènèt ou epi eseye ankò.", icon: "📶", retry: true };
-  if (err?.status === 429 || err?.quotaExceeded)
+  if (err?.quotaExceeded)
     return { type: "quota", message: "Ou rive nan limit rekèt ou pou jodi a !", detail: "Tounen demen pou kontinye.", icon: "⏳", retry: false };
+  if (err?.status === 429)
+    return { type: "rateLimit", message: err?.error || "Twòp tantativ. Tanpri eseye ankò nan kèk minit.", detail: null, icon: "⏳", retry: false };
   if (err?.status === 403)
     return { type: "auth", message: err?.error || "Aksè refize. Kontakte direksyon lekòl ou.", detail: null, icon: "🔒", retry: false };
   if (err?.status >= 500)

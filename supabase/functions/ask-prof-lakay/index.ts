@@ -436,6 +436,29 @@ async function saveCache(db: ReturnType<typeof createClient>, subject: string, h
   }
 }
 
+// ─── ANTI-ABUS : rate limiting par IP + action ─────────────────────────────────
+// Fenêtre fixe simple : compte les appels d'une même IP pour une même action
+// sur une fenêtre de `windowMs`. Dépassement → 429. Protège freemium_login et
+// validate_code contre le spam scripté (ex. générer des numéros aléatoires
+// pour multiplier les essais gratuits, ou bruteforcer des codes d'école).
+async function checkRateLimit(
+  db: ReturnType<typeof createClient>,
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<void> {
+  const now = Date.now();
+  const { data: row } = await db.from("rate_limits").select("count, window_start").eq("key", key).maybeSingle();
+  if (!row || (now - new Date(row.window_start).getTime()) > windowMs) {
+    await db.from("rate_limits").upsert({ key, count: 1, window_start: new Date(now).toISOString() });
+    return;
+  }
+  if (row.count >= limit) {
+    throw { status: 429, error: "Twòp tantativ. Tanpri eseye ankò nan kèk minit." };
+  }
+  await db.from("rate_limits").update({ count: row.count + 1 }).eq("key", key);
+}
+
 // ─── ACTION : validate_code ───────────────────────────────────────────────────
 async function validateCode(
   db: ReturnType<typeof createClient>,
@@ -1411,6 +1434,18 @@ Deno.serve(async (req) => {
     if (typeof body.code === "string") body.code = body.code.trim();
     if (typeof body.schoolCode === "string") body.schoolCode = body.schoolCode.trim();
     let result: unknown;
+
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("cf-connecting-ip")
+      || "unknown";
+
+    // Anti-abus : limite les tentatives par IP sur les points d'entrée sensibles
+    // au spam scripté (essais gratuits illimités, bruteforce de code d'école).
+    if (body.action === "freemium_login") {
+      await checkRateLimit(supabase, `freemium_login:${clientIp}`, 5, 10 * 60 * 1000); // 5/10min
+    } else if (body.action === "validate_code") {
+      await checkRateLimit(supabase, `validate_code:${clientIp}`, 10, 10 * 60 * 1000); // 10/10min
+    }
 
     switch (body.action) {
       case "generate_quiz":        result = await generateQuiz(supabase, body); break;
