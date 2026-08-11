@@ -51,7 +51,7 @@ const supabase = createClient(
 );
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
-function withTimeout<T>(promise: Promise<T>, ms = 35000): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms = 7000): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error("Timeout")), ms)
   );
