@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BottomNav } from "../components/UI";
-import { idbSaveExercice } from "../utils/idb";
+import { idbSaveExercice, idbSavePendingScore } from "../utils/idb";
 import { callEdge } from "../api";
 import { hasAccess } from "../utils/freemium";
 
@@ -67,18 +67,23 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         scanId:scan.id,
       });
       const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
-      if (user.code && user.code !== "FREEMIUM") callEdge({
-        action: "save_quiz_score",
-        phone: user.phone,
-        schoolCode: user.code || "FREEMIUM",
-        subject: scan.subject || "Général",
-        score, total: questions.length,
-        note20, streak: score === questions.length ? 1 : 0,
-        name: user.name, source: "exercice",
-      }).then(() => {
-        cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
-        cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
-      }).catch(() => {});
+      if (user.code && user.code !== "FREEMIUM") {
+        const payload = {
+          action: "save_quiz_score",
+          phone: user.phone,
+          schoolCode: user.code || "FREEMIUM",
+          subject: scan.subject || "Général",
+          score, total: questions.length,
+          note20, streak: score === questions.length ? 1 : 0,
+          name: user.name, source: "exercice",
+        };
+        callEdge(payload).then(() => {
+          cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
+          cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
+        }).catch(() => {
+          idbSavePendingScore({ ...payload, ts: Date.now() }).catch(() => {});
+        });
+      }
       setDone(true); return;
     }
     setCurrent(c=>c+1); setSelected(null);

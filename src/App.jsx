@@ -47,6 +47,22 @@ export default function App() {
 
   const [history, setHistory] = useState([]);
 
+  // Synchronise les scores de quiz/exercice sauvegardés hors-ligne (IndexedDB)
+  // dès qu'une connexion réelle est confirmée. Appelée depuis plusieurs points
+  // de déclenchement (polling isOffline + reprise d'app) pour ne pas dépendre
+  // uniquement de l'événement DOM "online", peu fiable en WebView Android.
+  const syncPendingScores = async () => {
+    try {
+      const pending = await idbGetPendingScores();
+      for (const score of pending) {
+        try {
+          await callEdge({ action: "save_quiz_score", ...score });
+          await idbDeletePendingScore(score.id);
+        } catch {}
+      }
+    } catch {}
+  };
+
   const nav = (next) => {
     setScreen(prevScreen => {
       setHistory(h => [...h, prevScreen]);
@@ -137,30 +153,18 @@ useEffect(() => {
       refreshUserData();
 
       const resumeHandler = CapApp.addListener("appStateChange", ({ isActive }) => {
-        if (isActive) refreshUserData();
+        if (isActive) { refreshUserData(); syncPendingScores(); }
       });
       return () => { resumeHandler.then(h => h.remove()); };
     }
   }, []);
 
-  // Sync pending scores au retour en ligne
+  // Sync pending scores dès que la connexion réelle est confirmée (isOffline
+  // passe à false) — s'appuie sur le polling actif fiable ci-dessus plutôt que
+  // sur le seul événement DOM "online", peu fiable en WebView Android.
   useEffect(() => {
-    const sync = async () => {
-      if (!navigator.onLine) return;
-      try {
-        const pending = await idbGetPendingScores();
-        for (const score of pending) {
-          try {
-            await callEdge({ action: "save_quiz_score", ...score });
-            await idbDeletePendingScore(score.id);
-          } catch {}
-        }
-      } catch {}
-    };
-    window.addEventListener("online", sync);
-    sync();
-    return () => window.removeEventListener("online", sync);
-  }, []);
+    if (!isOffline) syncPendingScores();
+  }, [isOffline]);
 
   useEffect(() => {
     const handler = CapApp.addListener("backButton", () => {
