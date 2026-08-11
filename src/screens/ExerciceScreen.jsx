@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BottomNav } from "../components/UI";
 import { idbSaveExercice, idbSavePendingScore } from "../utils/idb";
+import { saveQuizGrade } from "../utils/quiz";
 import { callEdge } from "../api";
 import { hasAccess } from "../utils/freemium";
 
@@ -67,6 +68,7 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         scanId:scan.id,
       });
       const note20 = Math.round((score / questions.length) * 20 * 10) / 10;
+      saveQuizGrade(user.phone, scan.subject || "Général", note20, score, questions.length);
       if (user.code && user.code !== "FREEMIUM") {
         const payload = {
           action: "save_quiz_score",
