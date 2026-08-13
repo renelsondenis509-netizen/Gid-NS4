@@ -183,7 +183,12 @@ useEffect(() => {
     setScreen("chat");
     requestNotificationPermission().then(granted => {
       if (granted) {
-        scheduleDailyReminder();
+        let notifPref;
+        try { notifPref = JSON.parse(localStorage.getItem("gns4_notif_settings") || "{}"); } catch { notifPref = {}; }
+        // Respecte le choix explicite de l'élève : par défaut activé pour un
+        // premier login (préférence absente), mais ne réactive jamais un
+        // rappel que l'élève a délibérément désactivé.
+        if (notifPref.enabled !== false) scheduleDailyReminder(notifPref.hour ?? 18);
         if (enriched.daysRemaining <= 7) scheduleExpiryReminder(enriched.daysRemaining);
       }
     });
