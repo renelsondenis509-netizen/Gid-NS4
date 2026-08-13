@@ -1317,9 +1317,6 @@ async function deleteSchool(db: ReturnType<typeof createClient>, body: { adminSe
   const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
   if (!body.adminSecret || body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
   if (!body.code?.trim()) throw { status: 400, error: "Kòd la obligatwa." };
-  await db.from("scans").delete().eq("school_code", body.code);
-  await db.from("quiz_scores").delete().eq("school_code", body.code);
-  await db.from("announcements").delete().eq("school_code", body.code);
   // Suppression en cascade des données liées
   await db.from("scans").delete().eq("school_code", body.code);
   await db.from("quiz_scores").delete().eq("school_code", body.code);
@@ -1445,6 +1442,12 @@ Deno.serve(async (req) => {
       await checkRateLimit(supabase, `freemium_login:${clientIp}`, 5, 10 * 60 * 1000); // 5/10min
     } else if (body.action === "validate_code") {
       await checkRateLimit(supabase, `validate_code:${clientIp}`, 10, 10 * 60 * 1000); // 10/10min
+    }
+    // Toute action admin (adminSecret présent) : limite générique, indépendante
+    // de l'action précise visée — bloque le bruteforce même via une action
+    // "anodine" comme list_schools plutôt que verify_admin.
+    if (typeof body.adminSecret === "string") {
+      await checkRateLimit(supabase, `admin:${clientIp}`, 10, 10 * 60 * 1000); // 10/10min
     }
 
     switch (body.action) {
