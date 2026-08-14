@@ -58,7 +58,12 @@ export default function App() {
         try {
           await callEdge({ action: "save_quiz_score", ...score });
           await idbDeletePendingScore(score.id);
-        } catch {}
+        } catch (e) {
+          // Rejet applicatif définitif (400-499, ex. compte expiré depuis) :
+          // ne réussira jamais, on purge plutôt que de retenter indéfiniment.
+          const isDefinitiveRejection = typeof e?.status === "number" && e.status >= 400 && e.status < 500;
+          if (isDefinitiveRejection) await idbDeletePendingScore(score.id);
+        }
       }
     } catch {}
   };

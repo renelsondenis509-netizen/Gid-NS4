@@ -155,8 +155,14 @@ export function QuizScreen({ user, onNavigate }) {
           await callEdge({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz" });
           cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
           cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
-        } catch {
-          await idbSavePendingScore({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz", ts:Date.now() });
+        } catch (e) {
+          // Ne remettre en file d'attente que les échecs réseau/serveur — un rejet
+          // applicatif définitif (400/403, ex. compte expiré, score invalide) ne
+          // réussira jamais au retry, inutile de le stocker indéfiniment.
+          const isDefinitiveRejection = typeof e?.status === "number" && e.status >= 400 && e.status < 500;
+          if (!isDefinitiveRejection) {
+            await idbSavePendingScore({ action:"save_quiz_score", phone:user.phone, schoolCode:user.code, name:user.name||user.phone, subject, score:finalScore, total:finalTotal, note20, streak:finalStreak, source:"quiz", ts:Date.now() });
+          }
         }
       }
     } catch {}

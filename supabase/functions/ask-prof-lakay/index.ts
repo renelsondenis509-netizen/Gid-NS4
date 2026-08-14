@@ -739,6 +739,19 @@ async function saveQuizScore(
 ) {
   const { phone, schoolCode, subject, score, total, note20, streak, source } = body;
 
+  // 🔒 Vérification d'expiration côté serveur — même garde que processAsk,
+  // pour empêcher un contournement du client (hasAccess ne protège que l'UI).
+  if (schoolCode === "FREEMIUM") {
+    const { data: profile } = await db.from("profiles").select("freemium_expires_at").eq("phone", phone).maybeSingle();
+    if (!profile?.freemium_expires_at || new Date() > new Date(profile.freemium_expires_at)) {
+      throw { status: 403, error: "Peryòd gratis ou a fini. Kontakte direksyon lekòl ou." };
+    }
+  } else {
+    const { data: school } = await db.from("schools").select("active, expires_at").eq("code", schoolCode).maybeSingle();
+    if (!school || !school.active) throw { status: 403, error: "Kòd la pa valid oswa dezaktive." };
+    if (new Date() > new Date(school.expires_at)) throw { status: 403, error: "Kòd ou a ekspire. Kontakte direksyon lekòl ou." };
+  }
+
   // Validation anti-triche : bornes strictes côté serveur (le client n'est pas fiable)
   if (
     typeof note20 !== "number" || !Number.isFinite(note20) || note20 < 0 || note20 > 20 ||

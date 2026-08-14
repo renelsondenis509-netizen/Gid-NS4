@@ -82,8 +82,13 @@ export function ExerciceScreen({ user, scan, onBack, onNavigate }) {
         callEdge(payload).then(() => {
           cacheClear(`leaderboard_${user.phone}_${user.code}_national`);
           cacheClear(`leaderboard_${user.phone}_${user.code}_school`);
-        }).catch(() => {
-          idbSavePendingScore({ ...payload, ts: Date.now() }).catch(() => {});
+        }).catch((e) => {
+          // Ne remettre en file d'attente que les échecs réseau/serveur — un rejet
+          // applicatif définitif (400/403) ne réussira jamais au retry.
+          const isDefinitiveRejection = typeof e?.status === "number" && e.status >= 400 && e.status < 500;
+          if (!isDefinitiveRejection) {
+            idbSavePendingScore({ ...payload, ts: Date.now() }).catch(() => {});
+          }
         });
       }
       setDone(true); return;
