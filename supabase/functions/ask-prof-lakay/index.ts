@@ -623,6 +623,12 @@ async function processAsk(
 ) {
   const { phone, schoolCode, message, subject, imageBase64, history, name } = body;
 
+  // Garde-fou défense en profondeur : rejette une image trop lourde même si
+  // la validation client (compression) a été contournée ou a échoué.
+  if (imageBase64 && imageBase64.length * 0.75 > 4 * 1024 * 1024) {
+    throw { status: 413, error: "Foto a twò gwo. Eseye pran yon lòt foto oswa redwi kalite li." };
+  }
+
   let allowedSubjects: string[];
   let dailyLimitOverride: number | null = null;
 

@@ -284,7 +284,19 @@ const maxDate = announcements.reduce((m, a) => a.created_at > m ? a.created_at :
   const handleImage = async (e) => {
     const file = e.target.files?.[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = async (ev) => { setImage(await compressImage(ev.target.result)); };
+    reader.onload = async (ev) => {
+      const compressed = await compressImage(ev.target.result);
+      // Garde-fou : si la compression échoue (ex. format non supporté) ou que
+      // le résultat reste trop lourd, on refuse plutôt que d'envoyer un
+      // payload énorme qui échouerait silencieusement côté réseau/serveur.
+      const approxBytes = Math.round((compressed.length - (compressed.indexOf(",") + 1)) * 0.75);
+      const MAX_BYTES = 4 * 1024 * 1024; // 4 Mo
+      if (approxBytes > MAX_BYTES) {
+        setApiError({ type: "imageTooLarge", message: "Foto a twò gwo.", detail: "Eseye pran yon lòt foto oswa redwi kalite li.", icon: "📷", retry: false });
+        return;
+      }
+      setImage(compressed);
+    };
     reader.readAsDataURL(file);
   };
 
