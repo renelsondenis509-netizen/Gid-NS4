@@ -58,6 +58,17 @@ function withTimeout<T>(promise: Promise<T>, ms = 7000): Promise<T> {
   return Promise.race([promise, timeout]);
 }
 
+// ─── Hachage SHA-256 des codes directeur ───────────────────────────────────────
+// Format identique à pgcrypto digest(..., 'sha256') encode en hex (64 car. hex
+// minuscule), pour rester cohérent avec la migration de la table `schools`.
+// Comparaison seulement — jamais réaffiché, donc le hash (irréversible) est
+// préférable à un chiffrement réversible qui nécessiterait de protéger une clé.
+async function hashDirectorCode(code: string): Promise<string> {
+  const data = new TextEncoder().encode(code);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 // ─── Clés fournisseurs ────────────────────────────────────────────
 const OPENROUTER_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? "";
 const GROQ_KEY       = Deno.env.get("GROQ_API_KEY") ?? "";
@@ -897,7 +908,7 @@ async function processDashboard(
   const { schoolCode, directorCode } = body;
 
   const { data: school } = await db.from("schools").select("*").eq("code", schoolCode).single();
-  if (!school || school.director_code !== directorCode) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
+  if (!school || school.director_code !== await hashDirectorCode(directorCode)) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
   // Verrouillage appareil
   if (body.deviceId) {
     if (!school.device_id) {
@@ -1034,7 +1045,6 @@ async function getAnnouncements(
     .eq("school_code", schoolCode)
     .order("created_at", { ascending: false })
     .limit(5);
-  console.log("📢 getAnnouncements:", schoolCode, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
   return { announcements: data ?? [] };
 }
 
@@ -1045,7 +1055,7 @@ async function createAnnouncement(
 ) {
   const { schoolCode, directorCode, title, message, expiresAt } = body;
   const { data: school } = await db.from("schools").select("director_code").eq("code", schoolCode).single();
-  if (!school || school.director_code !== directorCode) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
+  if (!school || school.director_code !== await hashDirectorCode(directorCode)) throw { status: 403, error: "Kòd direktè a pa kòrèk." };
   await db.from("announcements").insert({
     school_code: schoolCode, title, message,
     expires_at: expiresAt || null,
@@ -1299,6 +1309,7 @@ if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." 
   if (!code) throw { status: 500, error: "Echèk jenerasyon kòd. Eseye ankò." };
 
   const directorCode = rand(5) + "-" + rand(5);
+  const directorCodeHash = await hashDirectorCode(directorCode);
   const now = new Date();
   const startsAt = now.toISOString();
   const expiresAt = new Date(now.getTime() + durationDays * 86400000).toISOString();
@@ -1306,7 +1317,7 @@ if (!schoolName?.trim()) throw { status: 400, error: "Non lekòl la obligatwa." 
   const { error } = await db.from("schools").insert({
     code,
     school_name: schoolName.trim(),
-    director_code: directorCode,
+    director_code: directorCodeHash,
     active: true,
     starts_at: startsAt,
     expires_at: expiresAt,
