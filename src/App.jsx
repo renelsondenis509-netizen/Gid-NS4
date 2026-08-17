@@ -35,8 +35,22 @@ function enrichUser(u) {
 class ErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
   static getDerivedStateFromError() { return { hasError: true }; }
-  componentDidCatch(error) { console.error("ErrorBoundary:", error); this.setState({ hasError: false }); }
-  render() { return this.props.children; }
+  componentDidCatch(error) { console.error("ErrorBoundary:", error); }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#0f172a", color:"#f1f5f9", padding:24, textAlign:"center" }}>
+          <p style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>Gen yon pwoblèm ki rive.</p>
+          <p style={{ fontSize:13, color:"#94a3b8", marginBottom:20 }}>Eseye relanse app la.</p>
+          <button onClick={() => { this.setState({ hasError:false }); window.location.reload(); }}
+            style={{ padding:"12px 24px", borderRadius:10, background:"#3b82f6", color:"#fff", fontWeight:700, border:"none" }}>
+            Relanse
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 export default function App() {
