@@ -1507,11 +1507,14 @@ Deno.serve(async (req) => {
     } else if (body.action === "validate_code") {
       await checkRateLimit(supabase, `validate_code:${clientIp}`, 10, 10 * 60 * 1000); // 10/10min
     }
-    // Toute action admin (adminSecret présent) : limite générique, indépendante
-    // de l'action précise visée — bloque le bruteforce même via une action
-    // "anodine" comme list_schools plutôt que verify_admin.
+    // Toute action admin (adminSecret présent) : ne compte que les tentatives
+    // ÉCHOUÉES (mauvais code) — un admin légitime qui connaît le bon code
+    // n'est jamais throttlé, même après plusieurs appels internes par écran.
     if (typeof body.adminSecret === "string") {
-      await checkRateLimit(supabase, `admin:${clientIp}`, 10, 10 * 60 * 1000); // 10/10min
+      const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+      if (body.adminSecret !== ADMIN_SECRET) {
+        await checkRateLimit(supabase, `admin:${clientIp}`, 10, 10 * 60 * 1000); // 10 échecs/10min
+      }
     }
 
     switch (body.action) {
