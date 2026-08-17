@@ -470,12 +470,19 @@ async function checkRateLimit(
   await db.from("rate_limits").update({ count: row.count + 1 }).eq("key", key);
 }
 
+// Vérifie qu'un numéro n'est pas banni (revocation admin) avant toute (ré)inscription.
+async function checkNotBanned(db: ReturnType<typeof createClient>, phone: string): Promise<void> {
+  const { data } = await db.from("banned_phones").select("phone").eq("phone", phone).maybeSingle();
+  if (data) throw { status: 403, error: "Kont sa a bloke. Kontakte administrasyon Gid NS4." };
+}
+
 // ─── ACTION : validate_code ───────────────────────────────────────────────────
 async function validateCode(
   db: ReturnType<typeof createClient>,
   body: { phone: string; schoolCode: string; name?: string }
 ) {
   const { phone, schoolCode } = body;
+  await checkNotBanned(db, phone);
 
   // ✅ Cas spécial Freemium (inchangé)
   if (schoolCode === "FREEMIUM") {
@@ -1168,6 +1175,7 @@ async function freemiumLogin(
 ) {
   const { phone, name } = body;
   const FREEMIUM_DAYS = 3;
+  await checkNotBanned(db, phone);
 
   // 🔒 Verrouillage du nom, comme pour validateCode
   const { data: nameRow } = await db.from("profiles")
@@ -1387,10 +1395,36 @@ async function revokeUser(
   if (body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
   const { phone } = body;
   if (!phone) throw { status: 400, error: "Nimewo telefòn obligatwa." };
+
+  // Suppression complète (aligné sur deleteAccount) : scans, scores, et
+  // anonymisation de la banque de questions générées — pas seulement le profil.
+  await db.from("scans").delete().eq("phone", phone);
+  await db.from("quiz_scores").delete().eq("phone", phone);
+  await db.from("generated_questions").update({ created_by_phone: null }).eq("created_by_phone", phone);
+
   const { error } = await db.from("profiles").delete().eq("phone", phone);
   if (error) throw { status: 500, error: "Echèk revokasyon: " + error.message };
+
+  // Bloque la réinscription par défaut — l'admin doit explicitement autoriser
+  // via authorize_reregistration pour que ce numéro puisse se réinscrire.
+  await db.from("banned_phones").upsert({ phone, banned_at: new Date().toISOString(), reason: body.reason ?? null });
+
   await logAudit(db, "revoke_user", body.adminSecret.slice(-4), phone);
-  return { success: true, message: `Pwofil ${phone} efase.` };
+  return { success: true, message: `Kont ${phone} efase nèt e bloke pou reyenskripsyon.` };
+}
+
+// ─── ACTION : authorize_reregistration ─────────────────────────────────────────
+async function authorizeReregistration(
+  db: ReturnType<typeof createClient>,
+  body: { adminSecret: string; phone: string }
+) {
+  const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+  if (body.adminSecret !== ADMIN_SECRET) throw { status: 403, error: "Aksè refize." };
+  const { phone } = body;
+  if (!phone) throw { status: 400, error: "Nimewo telefòn obligatwa." };
+  await db.from("banned_phones").delete().eq("phone", phone);
+  await logAudit(db, "authorize_reregistration", body.adminSecret.slice(-4), phone);
+  return { success: true, message: `Nimewo ${phone} otorize pou reyenskri.` };
 }
 
 // ─── ACTION : delete_account (auto-suppression RGPD / Play Store) ───────────
@@ -1499,6 +1533,7 @@ Deno.serve(async (req) => {
       case "delete_school":       result = await deleteSchool(supabase, body); break;
       case "update_school":       result = await updateSchool(supabase, body); break;
       case "revoke_user":         result = await revokeUser(supabase, body); break;
+      case "authorize_reregistration": result = await authorizeReregistration(supabase, body); break;
       case "delete_account":      result = await deleteAccount(supabase, body); break; 
       case "report_message":      result = await reportMessage(supabase, body); break;
       case "get_reported_messages": result = await getReportedMessages(supabase, body); break;

@@ -251,9 +251,16 @@ export default function AdminScreen({ onBack }) {
 
         <Section title="🚫 Revoké Elèv">
         <Field label="Nimewo Telefòn" k="phone" form={revokeUserForm} setForm={setRevokeUserForm} />
-        <ActionButton label="Efase Pwofil" loading={loading.revokeUser} color="#dc2626"
+        <ActionButton label="Efase Kont Nèt" loading={loading.revokeUser} color="#dc2626"
           onClick={() => run("revoke_user", revokeUserForm, "revokeUser", setRevokeUserRes)} />
         <ResultBox {...revokeUserRes} />
+      </Section>
+
+      <Section title="✅ Otorize Reyenskripsyon">
+        <Field label="Nimewo Telefòn" k="phone" form={authorizeForm} setForm={setAuthorizeForm} />
+        <ActionButton label="Otorize" loading={loading.authorize} color="#16a34a"
+          onClick={() => run("authorize_reregistration", authorizeForm, "authorize", setAuthorizeRes)} />
+        <ResultBox {...authorizeRes} />
       </Section>
 
       <Section title="Rapo Kontni Siyale">
