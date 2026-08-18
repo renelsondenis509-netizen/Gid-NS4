@@ -152,6 +152,7 @@ export default function AdminScreen({ onBack }) {
   const [createForm, setCreateForm] = useState({ schoolName: "", durationDays: 365, maxStudents: 200, dailyScans: 10 });
   const [selectedFilieres, setSelectedFilieres] = useState([]);
   const [revokeUserForm, setRevokeUserForm] = useState({ phone: "" });
+  const [authorizeForm, setAuthorizeForm] = useState({ phone: "" });
   const [revokeSchoolForm, setRevokeSchoolForm] = useState({ code: "" });
   const [updateForm, setUpdateForm] = useState({ code: "", dailyScans: "", maxStudents: "", durationDays: "" });
   const [updateRes, setUpdateRes] = useState({ result: null, error: "" });
@@ -159,6 +160,7 @@ export default function AdminScreen({ onBack }) {
   const [logsLoading, setLogsLoading] = useState(false);
   const [createRes, setCreateRes] = useState({ result: null, error: "" });
   const [revokeUserRes, setRevokeUserRes] = useState({ result: null, error: "" });
+  const [authorizeRes, setAuthorizeRes] = useState({ result: null, error: "" });
   const [revokeSchoolRes, setRevokeSchoolRes] = useState({ result: null, error: "" });
   const [loading, setLoading] = useState({ create: false, revokeUser: false, revokeSchool: false, update: false });
 
