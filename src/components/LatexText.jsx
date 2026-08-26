@@ -1,22 +1,5 @@
-import { useState, useEffect } from "react";
-
-let katexReady = false;
-let katexQueue = [];
-
-function ensureKatex() {
-  if (katexReady) return Promise.resolve();
-  if (document.getElementById("katex-css")) return new Promise(r => katexQueue.push(r));
-  const link = document.createElement("link");
-  link.id = "katex-css"; link.rel = "stylesheet";
-  link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-  document.head.appendChild(link);
-  const script = document.createElement("script");
-  script.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-  script.onload = () => { katexReady = true; katexQueue.forEach(r => r()); katexQueue = []; };
-  script.onerror = () => { katexQueue = []; };
-  document.head.appendChild(script);
-  return new Promise(r => katexQueue.push(r));
-}
+import katex from "katex";
+import "katex/dist/katex.min.css";
 
 function sanitizeHtml(html) {
   return html
@@ -61,8 +44,6 @@ function renderTable(lines) {
   return html;
 }
 
-// Convertit le Markdown léger (titres, séparateurs, tableaux) + normalise le LaTeX
-// \[...\] / \(...\) vers $$...$$ / $...$, en préservant les blocs math multi-lignes intacts.
 function buildHtml(content) {
   const withMath = content
     .replace(/\\\[([\s\S]+?)\\\]/g, (_, e) => `$$${e}$$`)
@@ -112,34 +93,27 @@ function buildHtml(content) {
   return out.join("\n").replace(/\u0000MATHBLOCK(\d+)\u0000/g, (_, idx) => `$$${mathBlocks[Number(idx)]}$$`);
 }
 
-export function LatexText({ content }) {
-  const [html, setHtml] = useState(null);
-  const base = buildHtml(content);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!/\$/.test(base)) { setHtml(sanitizeHtml(base)); return; }
-    ensureKatex().then(() => {
-      if (cancelled) return;
-      try {
-        const result = base
-          .replace(/\$\$([\s\S]+?)\$\$/g, (_, e) => {
-            try { return window.katex.renderToString(e.trim(), { displayMode:true,  throwOnError:false }); }
-            catch { return `<code class="katex-fallback">${e}</code>`; }
-          })
-          .replace(/\$([^$\n]+?)\$/g, (_, e) => {
-            try { return window.katex.renderToString(e.trim(), { displayMode:false, throwOnError:false }); }
-            catch { return `<code class="katex-fallback">${e}</code>`; }
-          });
-        setHtml(sanitizeHtml(result));
-      } catch { setHtml(sanitizeHtml(base)); }
+function renderMath(base) {
+  if (!/\$/.test(base)) return sanitizeHtml(base);
+  const result = base
+    .replace(/\$\$([\s\S]+?)\$\$/g, (_, e) => {
+      try { return katex.renderToString(e.trim(), { displayMode: true, throwOnError: false }); }
+      catch { return `<code class="katex-fallback">${e}</code>`; }
+    })
+    .replace(/\$([^$\n]+?)\$/g, (_, e) => {
+      try { return katex.renderToString(e.trim(), { displayMode: false, throwOnError: false }); }
+      catch { return `<code class="katex-fallback">${e}</code>`; }
     });
-    return () => { cancelled = true; };
-  }, [base]);
+  return sanitizeHtml(result);
+}
+
+export function LatexText({ content }) {
+  const base = buildHtml(content);
+  const html = renderMath(base);
 
   return (
     <span
-      dangerouslySetInnerHTML={{ __html: html ?? sanitizeHtml(base) }}
+      dangerouslySetInnerHTML={{ __html: html }}
       style={{ lineHeight: 1.7, display: "block", overflowX: "auto", maxWidth: "100%" }}
     />
   );
