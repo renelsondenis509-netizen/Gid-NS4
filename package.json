@@ -9,11 +9,10 @@
     "build": "npm run validate-quiz && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
+    "test:unit": "vitest run src/tests/unit",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:unit": "vitest run src/tests/unit",
-    "test:components": "vitest run src/tests/components",
-    "test:integration": "vitest run src/tests/integration"
+    "test:edge": "cd supabase/functions/tests && ./run_tests.sh"
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^5.1.0",

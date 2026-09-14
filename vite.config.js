@@ -55,6 +55,13 @@ export default defineConfig({
     port: 5173,
   },
 
+  test: {
+    // supabase/functions/** contient des tests Deno (run_tests.sh), pas Vitest.
+    exclude: ["**/node_modules/**", "supabase/functions/**"],
+    environment: "jsdom",
+    setupFiles: ["./src/tests/setup.js"],
+  },
+
   build: {
     outDir: "dist",
     minify: "esbuild",
