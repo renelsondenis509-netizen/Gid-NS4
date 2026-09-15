@@ -448,26 +448,29 @@ async function saveCache(db: ReturnType<typeof createClient>, subject: string, h
 }
 
 // ─── ANTI-ABUS : rate limiting par IP + action ─────────────────────────────────
-// Fenêtre fixe simple : compte les appels d'une même IP pour une même action
-// sur une fenêtre de `windowMs`. Dépassement → 429. Protège freemium_login et
-// validate_code contre le spam scripté (ex. générer des numéros aléatoires
-// pour multiplier les essais gratuits, ou bruteforcer des codes d'école).
+// Délègue à la fonction Postgres check_rate_limit (UPSERT atomique en une seule
+// requête) plutôt qu'un SELECT puis INSERT/UPDATE séparés — élimine la
+// condition de course possible sous requêtes concurrentes de la même IP.
+// Fail-open si la RPC échoue : un rate limiter en panne ne doit jamais bloquer
+// tout le monde.
 async function checkRateLimit(
   db: ReturnType<typeof createClient>,
   key: string,
   limit: number,
   windowMs: number
 ): Promise<void> {
-  const now = Date.now();
-  const { data: row } = await db.from("rate_limits").select("count, window_start").eq("key", key).maybeSingle();
-  if (!row || (now - new Date(row.window_start).getTime()) > windowMs) {
-    await db.from("rate_limits").upsert({ key, count: 1, window_start: new Date(now).toISOString() });
+  const { data: allowed, error } = await db.rpc("check_rate_limit", {
+    p_key: key,
+    p_limit: limit,
+    p_window_ms: windowMs,
+  });
+  if (error) {
+    console.warn("⚠️ checkRateLimit RPC error (fail-open):", error.message);
     return;
   }
-  if (row.count >= limit) {
+  if (!allowed) {
     throw { status: 429, error: "Twòp tantativ. Tanpri eseye ankò nan kèk minit." };
   }
-  await db.from("rate_limits").update({ count: row.count + 1 }).eq("key", key);
 }
 
 // Vérifie qu'un numéro n'est pas banni (revocation admin) avant toute (ré)inscription.
@@ -672,12 +675,12 @@ async function processAsk(
   }
   allowedSubjects = rawSubjects;
     dailyLimitOverride = school.daily_scans ?? 5;
-    if (subject !== "Général" && !allowedSubjects.includes(subject)) {
-      throw { status: 403, error: `Matière ${subject} pa otorize ak kòd sa a.` };
-    }
   }
 
-  const today = getHaitiDate();
+  if (subject !== "Général" && !allowedSubjects.includes(subject)) {
+    throw { status: 403, error: `Matière ${subject} pa otorize ak kòd sa a.` };
+  }
+
   const { count: scansToday } = await db
     .from("scans")
     .select("*", { count: "exact", head: true })
@@ -926,9 +929,6 @@ async function processDashboard(
     }
   }
 
-  const today = getHaitiDate();
-  const currentWeek = getWeekKey();
-
   const [
     { count: totalStudents },
     { count: totalScans },
@@ -1086,22 +1086,26 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
   const quizOrder = await loadFallbackOrder();
   for (const p of quizOrder) {
     try {
-      raw = TEXT_ONLY_PROVIDERS.has(p)
-        ? await callProvider(p, systemPrompt, prompt, [prompt])
-        : await callProvider(p, systemPrompt, prompt, [prompt]);
+      raw = await callProvider(p, systemPrompt, prompt, [prompt]);
       break;
     } catch { /* essaie suivant */ }
   }
   const clean = raw.replace(/```json|```/g, "").trim();
+  let parsed: any;
   try {
-    const parsed = JSON.parse(clean);
+    parsed = JSON.parse(clean);
+  } catch {
+    throw { status: 500, error: "Format JSON invalide" };
+  }
 
-    // 🆕 Banque partagée automatique (option A) : chaque question valide est
-    // ajoutée à generated_questions, dédupliquée par hash. Ne bloque jamais
-    // la réponse à l'élève même en cas d'échec d'écriture.
-    // Exclusion : les exercices en créole ne sont PAS ajoutés à la banque partagée
-    // (QuizScreen), seuls ceux en français y contribuent — l'élève reçoit quand
-    // même ses 5 questions normalement, seule l'insertion en banque est sautée.
+  // 🆕 Banque partagée automatique (option A) : chaque question valide est
+  // ajoutée à generated_questions, dédupliquée par hash. Ne bloque jamais
+  // la réponse à l'élève même en cas d'échec d'écriture — même si l'échec
+  // vient d'une erreur DB (réseau, timeout) et non d'un JSON invalide.
+  // Exclusion : les exercices en créole ne sont PAS ajoutés à la banque partagée
+  // (QuizScreen), seuls ceux en français y contribuent — l'élève reçoit quand
+  // même ses 5 questions normalement, seule l'insertion en banque est sautée.
+  try {
     if (Array.isArray(parsed?.questions) && subject && subject !== "Général" && !isCreole) {
       const { data: existingRows } = await db.from("generated_questions")
         .select("question").eq("subject", subject).limit(500);
@@ -1137,9 +1141,11 @@ async function generateQuiz(db: ReturnType<typeof createClient>, body: Record<st
         } catch (_) { /* jamais bloquant */ }
       }
     }
+  } catch (e) {
+    console.warn("⚠️ Enrichissement banque partagée échoué (non bloquant):", e);
+  }
 
-    return parsed;
-  } catch { throw { status: 500, error: "Format JSON invalide" }; }
+  return parsed;
 }
 
 // ─── ACTION : get_question_counts (comptage seul, aucun appel IA) ────────────
@@ -1207,7 +1213,6 @@ async function freemiumLogin(
     throw { status: 403, error: "Peryòd gratis ou a fini. Kontakte direksyon lekòl ou pou yon kòd." };
   }
 
-  const today = getHaitiDate();
   const { count: scansToday } = await db.from("scans").select("*", { count: "exact", head: true }).eq("phone", phone).gte("created_at", getHaitiMidnightISO());
 
   return {
@@ -1360,6 +1365,8 @@ async function deleteSchool(db: ReturnType<typeof createClient>, body: { adminSe
   await db.from("quiz_scores").delete().eq("school_code", body.code);
   await db.from("announcements").delete().eq("school_code", body.code);
   await db.from("profiles").delete().eq("school_code", body.code);
+  await logAudit(db, "delete_school", body.adminSecret.slice(-4), body.code);
+  return { success: true, message: `Lekòl ${body.code} efase nèt.` };
 }
 
 // ─── ACTION : update_school ───────────────────────────────────────────────────
