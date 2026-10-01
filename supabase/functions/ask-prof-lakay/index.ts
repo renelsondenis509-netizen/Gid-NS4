@@ -45,10 +45,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+const supabase = createClient(Deno.env.get("SUPABASE_URL")!, (JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}")["default"] ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"))!);
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
 function withTimeout<T>(promise: Promise<T>, ms = 7000): Promise<T> {
@@ -1484,13 +1481,14 @@ async function revokeSchool(
   return { success: true, message: `Lekòl ${code} ${reactivate ? "reaktive" : "revoké"}.` };
 }
 
+const validKeys: string[] = [...(Object.values(JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") ?? "{}")) as string[]), Deno.env.get("SUPABASE_ANON_KEY") ?? ""].filter(Boolean);
+function safeEqual(a: string, b: string): boolean { if (a.length !== b.length) return false; let diff = 0; for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i); return diff === 0; }
+function isAuthorizedCaller(req: Request): boolean { const auth = req.headers.get("Authorization") ?? ""; const bearer = auth.startsWith("Bearer ") ? auth.slice(7).trim() : ""; const apikey = req.headers.get("apikey") ?? ""; return [bearer, apikey].some((c) => c !== "" && validKeys.some((k) => safeEqual(c, k))); }
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
 
-  // VÉRIFICATION SÉCURITÉ : Header Authorization
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return new Response(JSON.stringify({ error: "Accès refusé : Token manquant" }), {
+  if (!isAuthorizedCaller(req)) { return new Response(JSON.stringify({ error: "Accès refusé : clé invalide" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
