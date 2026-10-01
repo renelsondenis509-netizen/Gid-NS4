@@ -1481,7 +1481,7 @@ async function revokeSchool(
   return { success: true, message: `Lekòl ${code} ${reactivate ? "reaktive" : "revoké"}.` };
 }
 
-const validKeys: string[] = [...(Object.values(JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") ?? "{}")) as string[]), Deno.env.get("SUPABASE_ANON_KEY") ?? ""].filter(Boolean);
+const validKeys: string[] = [...(Object.values(JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") ?? "{}")) as string[]), Deno.env.get("LEGACY_ANON_KEY") ?? ""].filter(Boolean);
 function safeEqual(a: string, b: string): boolean { if (a.length !== b.length) return false; let diff = 0; for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i); return diff === 0; }
 function isAuthorizedCaller(req: Request): boolean { const auth = req.headers.get("Authorization") ?? ""; const bearer = auth.startsWith("Bearer ") ? auth.slice(7).trim() : ""; const apikey = req.headers.get("apikey") ?? ""; return [bearer, apikey].some((c) => c !== "" && validKeys.some((k) => safeEqual(c, k))); }
 
