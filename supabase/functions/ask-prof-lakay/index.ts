@@ -45,7 +45,10 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const supabase = createClient(Deno.env.get("SUPABASE_URL")!, (JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}")["default"] ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"))!);
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
 
 // ─── Timeout helper ───────────────────────────────────────────────────────────
 function withTimeout<T>(promise: Promise<T>, ms = 7000): Promise<T> {
